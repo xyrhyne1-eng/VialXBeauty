@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#f9d8e5" />
+  <title>VialXBeauty</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23a30f2d'/%3E%3Cpath d='M32 48S13 37 13 23c0-7 5-11 11-11 4 0 7 2 8 5 2-3 5-5 9-5 6 0 11 4 11 11 0 14-20 25-20 25Z' fill='white'/%3E%3C/svg%3E" />
+  <script>
+    // Shared links opened by Messenger can restore a stale vertical position.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    const startAtTop = () => {
+      document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+    };
+    [0, 60, 180, 450].forEach((delay) => setTimeout(startAtTop, delay));
+    window.addEventListener("pageshow", startAtTop);
+  </script>
+  <link rel="stylesheet" href="styles.css?v=cute-payment-v2" />
+  <link rel="stylesheet" href="storefront.css?v=select-address-v4" />
+</head>
+<body class="storefront-page settings-loading">
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="VialXBeauty home">
+      <img id="brandLogo" class="brand-logo" alt="Shop logo" hidden />
+      <span id="brandFallback" class="brand-mark">VX</span>
+      <span id="brandName">VialXBeauty</span>
+    </a>
+    <nav class="storefront-nav" aria-label="Storefront navigation">
+      <a class="shop-link" href="#shop">Shop</a>
+
+      <button
+        id="favoritesButton"
+        class="icon-button favorite-header-button"
+        type="button"
+        aria-label="Open favorites"
+      >
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 20.5S4 15.8 4 9.5A4.5 4.5 0 0 1 12 6.7a4.5 4.5 0 0 1 8 2.8c0 6.3-8 11-8 11Z" />
+        </svg>
+        <span id="favoritesCount" class="favorites-badge" hidden>0</span>
+      </button>
+
+      <button
+        id="cartButton"
+        class="cart-button"
+        type="button"
+        aria-label="Open shopping bag"
+      >
+        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6.4 8.5h11.2l.8 11H5.6l.8-11Z" />
+          <path d="M9 9V6.8a3 3 0 0 1 6 0V9" />
+        </svg>
+        <span id="cartCount">0</span>
+      </button>
+
+      <button
+        id="menuButton"
+        class="icon-button menu-button"
+        type="button"
+        aria-label="Open menu"
+      >
+        <svg class="header-icon menu-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 7h14M5 12h14M5 17h14" />
+        </svg>
+      </button>
+    </nav>
+  </header>
+<aside id="menuDrawer" class="drawer menu-drawer" aria-hidden="true">
+  <div class="drawer-panel">
+    <div class="menu-drawer-brand">
+      <div class="menu-brand-identity">
+        <img id="menuBrandLogo" class="menu-brand-logo" alt="Shop logo" hidden />
+        <span id="menuBrandFallback" class="menu-brand-fallback" aria-hidden="true">✦</span>
+        <div>
+          <h2 id="menuBrandName">VialXBeauty <small>PH</small></h2>
+          <p id="menuBrandTagline">Everything lovely, in one place</p>
+        </div>
+      </div>
+      <button
+        id="closeMenu"
+        class="icon-button menu-close-button"
+        type="button"
+        aria-label="Close menu"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <nav id="storeMenuItems" class="store-menu-items" aria-label="Shop menu"></nav>
+  </div>
+</aside>
+  <main>
+    <section id="home" class="hero" aria-labelledby="heroTitle">
+      <div class="hero-media">
+        <div class="hero-image-frame">
+          <img
+            id="heroImage"
+            class="hero-image"
+            alt="VialXBeauty featured product"
+            hidden
+          />
+          <div id="heroFallback" class="bunny-card" aria-hidden="true">
+            <div class="ears">◡ ◡</div>
+            <div class="face">◠ ᴥ ◠</div>
+            <div class="hearts">VIAL × BEAUTY</div>
+          </div>
+        </div>
+        <span class="hero-sparkle hero-sparkle-one" aria-hidden="true">✦</span>
+        <span class="hero-sparkle hero-sparkle-two" aria-hidden="true">✦</span>
+      </div>
+
+      <div class="hero-copy">
+        <p id="heroEyebrow" class="eyebrow">
+          Pretty packaging, simple ordering
+        </p>
+        <h1 id="heroTitle">Soft pink shopping made easy.</h1>
+        <p id="heroSubtitle">Browse products, add them to your bag, and send your order details in just a few taps.</p>
+        <a class="primary-button hero-button" href="#shop">
+          Shop now
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="shop" class="section catalog-section" aria-labelledby="catalogTitle">
+      <div class="section-heading">
+        <div>
+          <p id="catalogEyebrow" class="eyebrow">OUR COLLECTION</p>
+          <h2 id="catalogTitle">Find your new favorite</h2>
+          <p id="catalogSubtitle" class="catalog-subtitle">Curated beauty essentials, selected for your routine.</p>
+        </div>
+
+      </div>
+
+        <label class="search-wrap catalog-search" for="searchInput">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4 4" />
+          </svg>
+          <input
+            id="searchInput"
+            class="search"
+            type="search"
+            placeholder="Search products"
+            autocomplete="off"
+          />
+        </label>
+
+      <div class="category-area" aria-label="Product categories">
+        <div id="categoryFilters" class="category-filters"></div>
+      </div>
+
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+
+
+  </main>
+
+  <aside id="cartDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <h2>Your bag</h2>
+        <button id="closeCart" class="icon-button" type="button" aria-label="Close cart">×</button>
+      </div>
+      <div id="cartItems"></div>
+      <div class="cart-summary">
+        <div><span>Subtotal</span><strong id="cartSubtotal">₱0</strong></div>
+        <button id="checkoutButton" class="primary-button full" type="button">Checkout</button>
+      </div>
+    </div>
+  </aside>
+
+   <aside
+    id="favoritesDrawer"
+    class="drawer"
+    aria-hidden="true">
+   <div class="drawer-panel">
+
+    <div class="drawer-header">
+        <h2>My Favorites</h2>
+
+        <button
+            id="closeFavorites"
+            class="icon-button"
+            type="button"
+            aria-label="Close favorites">
+
+            ✕
+
+        </button>
+    </div>
+
+    <div id="favoritesItems" class="drawer-body">
+        <p class="empty">
+            No favorites yet.
+        </p>
+    </div>
+</div>
+</aside>
+<!-- =========================
+     PRODUCT VARIANT MODAL
+========================= -->
+
+<dialog id="variantDialog" class="variant-dialog">
+  <div class="variant-dialog-card">
+    <div class="variant-dialog-header">
+      <div>
+        <p class="eyebrow">Product options</p>
+        <h2 id="variantDialogTitle">Choose Variant</h2>
+      </div>
+
+      <button
+        id="closeVariantDialog"
+        class="icon-button"
+        type="button"
+        aria-label="Close variant selector"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="variant-dialog-product">
+      <div id="variantDialogImageWrap" class="variant-dialog-image-wrap">
+        <img
+          id="variantDialogImage"
+          class="variant-dialog-image"
+          alt=""
+          hidden
+        />
+
+        <div
+          id="variantDialogImageFallback"
+          class="variant-dialog-image-fallback"
+          aria-hidden="true"
+        >
+          ✦
+        </div>
+      </div>
+
+      <div>
+        <h3 id="variantDialogProductName"></h3>
+        <p id="variantDialogDescription" class="tiny-note"></p>
+      </div>
+    </div>
+
+    <div
+      id="variantOptions"
+      class="variant-options-list"
+      role="radiogroup"
+      aria-label="Product variants"
+    ></div>
+
+    <div class="variant-selection-summary">
+      <div>
+        <span>Selected price</span>
+        <strong id="variantSelectedPrice">₱0</strong>
+      </div>
+
+      <div>
+        <span>Available stock</span>
+        <strong id="variantSelectedStock">—</strong>
+      </div>
+    </div>
+
+    <div class="variant-quantity-row">
+      <span>Quantity</span>
+
+      <div class="variant-quantity-control">
+        <button
+          id="decreaseVariantQuantity"
+          type="button"
+          aria-label="Decrease quantity"
+        >
+          −
+        </button>
+
+        <strong id="variantQuantity">1</strong>
+
+        <button
+          id="increaseVariantQuantity"
+          type="button"
+          aria-label="Increase quantity"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <p id="variantDialogError" class="checkout-error" role="alert"></p>
+
+    <button
+      id="confirmVariantButton"
+      class="primary-button full"
+      type="button"
+      disabled
+    >
+      Add to Bag
+    </button>
+  </div>
+</dialog>
+
+<!-- =========================
+     PRODUCT VARIANT MODAL END
+========================= -->
+  <dialog id="checkoutDialog">
+    <form id="checkoutForm" method="dialog" class="checkout-form">
+      <div class="drawer-header">
+        <h2>Checkout</h2>
+        <button id="closeCheckout" class="icon-button" type="button">×</button>
+      </div>
+
+      <section class="checkout-section-card checkout-customer-card" aria-labelledby="customerInformationTitle">
+        <div class="checkout-section-heading">
+          <span class="checkout-section-icon" aria-hidden="true">✦</span>
+          <div>
+            <h3 id="customerInformationTitle">Customer information</h3>
+            <p>Who should we contact about this order?</p>
+          </div>
+        </div>
+
+        <div class="checkout-field-grid">
+          <label>
+            Name
+            <input name="name" autocomplete="name" placeholder="Your full name" required>
+          </label>
+
+          <label>
+            Username
+            <input name="username" autocomplete="username" placeholder="Username in community" required>
+          </label>
+
+          <label>
+            Mobile Number
+            <input
+              name="phone"
+              inputmode="tel"
+              autocomplete="tel"
+              placeholder="09XXXXXXXXX"
+              required
+            >
+          </label>
+
+          <label>
+            <span>Email Address <small>Optional</small></span>
+            <input
+              type="email"
+              name="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+            >
+          </label>
+        </div>
+      </section>
+
+      <section class="checkout-section-card checkout-address-card" aria-labelledby="shippingAddressTitle">
+        <div class="checkout-section-heading">
+          <span class="checkout-section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 11.5 12 5l8 6.5" />
+              <path d="M6.5 10.5V20h11v-9.5" />
+              <path d="M10 20v-5h4v5" />
+            </svg>
+          </span>
+          <div>
+            <h3 id="shippingAddressTitle">Shipping address</h3>
+            <p>Where should we send your lovely order?</p>
+          </div>
+        </div>
+
+        <div class="checkout-field-grid">
+          <label class="checkout-province-field">
+            Province / NCR District
+            <input
+              name="province"
+              id="checkoutProvince"
+              list="checkoutProvinceOptions"
+              autocomplete="address-level1"
+              placeholder="Choose a province"
+              required
+            >
+            <datalist id="checkoutProvinceOptions"></datalist>
+          </label>
+
+          <label class="checkout-city-field">
+            City / Municipality
+            <input
+              name="city"
+              id="checkoutCity"
+              list="checkoutCityOptions"
+              autocomplete="address-level2"
+              placeholder="Choose a province first"
+              required
+            >
+            <datalist id="checkoutCityOptions"></datalist>
+          </label>
+
+          <label class="checkout-barangay-field">
+            Barangay / District
+            <input
+              name="barangay"
+              id="checkoutBarangay"
+              list="checkoutBarangayOptions"
+              autocomplete="address-level3"
+              placeholder="Choose a city first"
+              required
+            >
+            <datalist id="checkoutBarangayOptions"></datalist>
+          </label>
+
+          <label class="checkout-zipcode-field">
+            <span>ZIP Code <small>Optional</small></span>
+            <input
+              name="zipcode"
+              inputmode="numeric"
+              autocomplete="postal-code"
+              placeholder="4024"
+            >
+          </label>
+
+          <label class="checkout-field-full">
+            Full Address
+            <textarea
+              name="street"
+              rows="2"
+              autocomplete="street-address"
+              placeholder="Block, lot, building, subdivision, and street"
+              required
+            ></textarea>
+          </label>
+          <p id="checkoutAddressStatus" class="checkout-address-status" role="status" aria-live="polite">Loading Philippine address choices…</p>
+        </div>
+      </section>
+      <section class="checkout-shipping-card" aria-labelledby="shippingMethodTitle">
+        <div class="checkout-section-heading">
+          <span class="checkout-section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M3.5 7.5h10v9h-10z" />
+              <path d="M13.5 10h3.4l3.6 3.6v2.9h-7z" />
+              <circle cx="7" cy="18" r="1.8" />
+              <circle cx="17.5" cy="18" r="1.8" />
+            </svg>
+          </span>
+          <div>
+            <h3 id="shippingMethodTitle">Shipping option</h3>
+            <p>Choose how you would like to receive your order.</p>
+          </div>
+        </div>
+        <input id="selectedShippingMethodInput" name="shipping_method" type="hidden">
+        <div id="shippingMethodOptions" class="shipping-method-selector" aria-live="polite"></div>
+      </section>
+      <section id="shippingFeeSection" class="checkout-shipping-card" aria-labelledby="shippingFeeTitle" hidden>
+        <div class="checkout-section-heading">
+          <span class="checkout-section-icon" aria-hidden="true">₱</span>
+          <div>
+            <h3 id="shippingFeeTitle">Shipping fee</h3>
+            <p id="shippingFeeHelp">Choose the delivery area for your order.</p>
+          </div>
+        </div>
+        <input id="selectedShippingInput" name="shipping" type="hidden">
+        <div id="shippingFeeOptions" class="shipping-fee-selector" aria-live="polite"></div>
+      </section>
+      <section id="externalCheckoutSection" class="external-checkout-card" hidden>
+        <p id="externalCheckoutMessage"></p>
+        <a id="externalCheckoutLink" class="primary-button full" href="#" target="_blank" rel="noopener noreferrer">Continue to marketplace</a>
+      </section>
+      <div id="paymentMethodSection">
+        <label>Payment method</label>
+        <input id="selectedPaymentInput" name="payment" type="hidden" />
+        <div id="paymentMethodsList" class="payment-method-selector" aria-live="polite"></div>
+      </div>
+      <label id="orderNotesField">Order notes
+        <textarea name="notes" rows="2"></textarea>
+      </label>
+      <p id="checkoutFormError" class="checkout-error" role="alert"></p>
+      <div id="checkoutTotalRow" class="checkout-total">
+        <span>Total</span>
+        <strong id="checkoutTotal">₱0</strong>
+      </div>
+      <button id="proceedPaymentButton" class="primary-button full" type="button">Proceed to Payment</button>
+    </form>
+  </dialog>
+
+  <dialog id="paymentStepDialog">
+    <div class="payment-step-card">
+      <div class="drawer-header">
+        <h2>Payment</h2>
+        <button id="paymentStepCloseButton" class="icon-button" type="button" aria-label="Close payment step">×</button>
+      </div>
+      <div id="paymentStepContent" class="payment-step-content"></div>
+      <div class="payment-step-actions">
+        <button id="paymentStepBackButton" class="secondary-button" type="button">Back to Checkout</button>
+        <button id="paymentStepContinueButton" class="primary-button" type="button">Continue Payment</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="successDialog">
+    <div class="success-card">
+      <div class="success-icon">✦</div>
+      <h2>Order received!</h2>
+      <p>Your order reference is:</p>
+      <strong id="orderReference"></strong>
+      <div id="successExternalCheckout" class="success-external-checkout" hidden>
+        <p id="successExternalMessage">Your item payment is complete. Continue to the selected marketplace to arrange shipping.</p>
+        <a id="successExternalLink" class="primary-button full" href="#" target="_blank" rel="noopener noreferrer">Continue to shipping checkout</a>
+      </div>
+      <button id="closeSuccess" class="primary-button full" type="button">Done</button>
+    </div>
+  </dialog>
+
+  <footer>
+    <p id="footerBrand">© VialXBeauty</p>
+    <div class="footer-links">
+      <a id="facebookLink" href="#" target="_blank" hidden>Facebook</a>
+      <a id="tiktokLink" href="#" target="_blank" hidden>TikTok</a>
+      <a href="admin.html">Admin</a>
+    </div>
+  </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="variants.js"></script>
+<script src="favorites.js?v=prune-deleted-v1"></script>
+<script src="philippine-address.js?v=close-address-list-v5"></script>
+<script src="checkout-payment-v18.js?v=variant-cod-fee-v3"></script>
+</body>
+</html>

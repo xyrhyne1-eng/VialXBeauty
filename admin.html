@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VialXBeauty Admin</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23a30f2d'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='24' font-family='Arial' font-weight='700' fill='white'%3EVX%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=cute-payment-v2" />
+  <link rel="stylesheet" href="admin.css?v=grouped-address-v4" />
+</head>
+<body class="admin-page">
+  <a class="skip-link" href="#dashboardSection">Skip to dashboard</a>
+
+  <header class="site-header admin-site-header">
+    <a class="brand admin-brand" href="index.html" aria-label="VialXBeauty shop home">
+      <span class="brand-mark" aria-hidden="true">VX</span>
+      <span class="admin-brand-copy">VialXBeauty <small>ADMIN STUDIO</small></span>
+    </a>
+    <a class="secondary-button view-shop-button" href="index.html">
+      <span>View storefront</span><span aria-hidden="true">↗</span>
+    </a>
+  </header>
+
+  <main class="admin-shell">
+  <section id="loginSection" class="admin-card admin-login-card">
+  <div class="login-icon" aria-hidden="true">VX</div>
+  <p class="eyebrow">Welcome back</p>
+  <h1>Admin login</h1>
+  <p class="login-intro">Sign in to manage the VialXBeauty storefront.</p>
+
+  <form id="loginForm" class="admin-form">
+    <label>
+      Email
+      <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+    </label>
+
+    <label>
+      Password
+      <input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required />
+    </label>
+
+    <button class="primary-button full" type="submit">
+      Log in
+    </button>
+  </form>
+
+  <p id="loginMessage" class="tiny-note"></p>
+</section>
+
+<div id="adminContent" hidden>
+  <div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-title">
+      <span class="sidebar-brand-badge" aria-hidden="true">VX</span>
+      <span>VialXBeauty</span>
+      <small>Shop control center</small>
+    </div>
+
+    <div class="sidebar-session"><span aria-hidden="true"></span> Admin workspace</div>
+
+    <nav class="admin-sidebar-nav" aria-label="Admin sections">
+      <div class="nav-group-label">Overview</div>
+      <a class="active" href="#dashboardSection"><span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span></a>
+      <a href="#ordersSection"><span class="nav-icon" aria-hidden="true">◫</span><span>Orders</span></a>
+      <a href="sales.html"><span class="nav-icon" aria-hidden="true">₱</span><span>Sales tracker</span></a>
+
+      <div class="nav-group-label">Catalog</div>
+      <a href="#productsSection"><span class="nav-icon" aria-hidden="true">◇</span><span>Products</span></a>
+      <a href="#categoriesSection"><span class="nav-icon" aria-hidden="true">✿</span><span>Categories</span></a>
+      <a href="#menuSection"><span class="nav-icon" aria-hidden="true">☰</span><span>Menu</span></a>
+
+      <div class="nav-group-label">Store</div>
+      <a href="#shippingFeesSection"><span class="nav-icon" aria-hidden="true">♢</span><span>Shipping options</span></a>
+      <a id="paymentMethodsNav" href="#paymentMethodsSection"><span class="nav-icon" aria-hidden="true">✦</span><span>Payment methods</span></a>
+      <a href="#addProductSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add product</span></a>
+      <a href="#addMenuSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add menu item</span></a>
+
+      <div class="nav-group-label">Settings</div>
+      <a href="#shopSettingsSection"><span class="nav-icon" aria-hidden="true">⚙</span><span>Shop settings</span></a>
+      <a href="#securitySection"><span class="nav-icon" aria-hidden="true">⌘</span><span>Security &amp; accounts</span></a>
+    </nav>
+
+    <button
+      id="sidebarLogoutButton"
+      class="secondary-button danger full"
+      type="button"
+    >
+      Log out
+    </button>
+  </aside>
+
+  <div class="admin-main-content">
+    <div class="admin-top">
+      <div>
+        <p class="eyebrow">VialXBeauty workspace</p>
+        <h1>VialXBeauty Admin <span aria-hidden="true">×</span></h1>
+        <p class="admin-top-note">Everything you need to keep the shop lovely and running smoothly.</p>
+      </div>
+      <div class="admin-quick-actions" aria-label="Quick actions">
+        <a class="secondary-button" href="#ordersSection">View orders</a>
+        <a class="secondary-button" href="sales.html">Sales tracker</a>
+        <a class="primary-button" href="#addProductSection"><span aria-hidden="true">＋</span> New product</a>
+      </div>
+    </div>
+
+    <section id="dashboardSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p class="tiny-note">Live store overview from your existing Supabase tables.</p>
+        </div>
+      </div>
+      <div id="dashboardStats" class="dashboard-stats"></div>
+      <div class="dashboard-grid">
+        <div class="admin-card soft-card">
+          <div class="admin-section-header">
+            <div><h3>Recent orders</h3></div>
+          </div>
+          <div id="dashboardRecentOrders"></div>
+        </div>
+        <div class="admin-card soft-card">
+          <div class="admin-section-header">
+            <div><h3>Best-selling products</h3></div>
+          </div>
+          <div id="dashboardBestSellers"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ordersSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Orders</h2>
+          <p class="tiny-note">Filter by payment status or archive orders when they are no longer active.</p>
+        </div>
+      </div>
+      <div class="admin-toolbar">
+        <input id="ordersSearch" class="search-field" type="search" placeholder="Search orders" />
+        <div id="ordersTabs" class="order-tabs" role="tablist"></div>
+      </div>
+      <div id="ordersList"></div>
+    </section>
+
+    <section id="productsSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Products</h2>
+          <p class="tiny-note">Manage your catalog with live inventory and sales summaries.</p>
+        </div>
+      </div>
+      <div id="productsSummary" class="dashboard-stats"></div>
+      <div class="admin-toolbar product-toolbar">
+        <input id="productsSearch" class="search-field" type="search" placeholder="Search products" />
+        <select id="productsCategoryFilter" class="search-field">
+          <option value="all">All categories</option>
+        </select>
+        <label class="chip-toggle">
+          <input id="productsLowStockFilter" type="checkbox" />
+          Low stock only
+        </label>
+      </div>
+      <div id="productsTableContainer" class="table-shell"></div>
+      <div id="productsPagination" class="pagination"></div>
+    </section>
+
+    <section id="categoriesSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Categories</h2>
+          <p class="tiny-note">Organize product categories using the existing product.category field.</p>
+        </div>
+      </div>
+      <form id="categoryForm" class="admin-form category-editor-form">
+        <input type="hidden" name="id" />
+        <label>Category name<input name="categoryName" required /></label>
+        <div id="categoryProductsEditor" class="category-products-editor" hidden>
+          <div class="category-products-heading">
+            <div>
+              <h3>Products in this category</h3>
+              <p class="tiny-note">Move a product to another active category, remove its category, or open its full editor.</p>
+            </div>
+          </div>
+          <div id="categoryProductsList" class="category-products-list"></div>
+        </div>
+        <div class="category-form-actions">
+          <button class="primary-button" type="submit">Save changes</button>
+          <button id="cancelCategoryEdit" class="secondary-button" type="button" hidden>Cancel</button>
+        </div>
+      </form>
+      <div id="categoriesList" class="category-list"></div>
+    </section>
+
+    <section id="menuSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Menu</h2>
+          <p class="tiny-note">Drag the handle to reorder links. Items are grouped by their editable menu header.</p>
+        </div>
+      </div>
+      <p id="menuOrderStatus" class="menu-order-status" role="status" aria-live="polite"></p>
+      <div id="adminMenuItems" class="admin-products"></div>
+    </section>
+
+
+    <section id="shopSettingsSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Shop settings</h2>
+          <p class="tiny-note">Branding, storefront messaging, and social links.</p>
+        </div>
+      </div>
+      <div class="admin-toolbar">
+        <button class="secondary-button" type="button" data-settings-tab="branding">Branding</button>
+        <button class="secondary-button" type="button" data-settings-tab="hero">Hero</button>
+        <button class="secondary-button" type="button" data-settings-tab="catalog">Catalog</button>
+        <button class="secondary-button" type="button" data-settings-tab="menu">Menu drawer</button>
+        <button class="secondary-button" type="button" data-settings-tab="social">Social</button>
+        <button class="secondary-button" type="button" data-settings-tab="footer">Footer</button>
+      </div>
+      <form id="settingsForm" class="admin-form">
+        <div class="settings-grid">
+          <label data-settings-group="branding">
+  Shop name
+  <input name="shopName" required />
+</label>
+         <div class="settings-upload-field" data-settings-group="branding">
+
+  <label for="shopLogoFile">Shop logo</label>
+
+  <input type="hidden" name="logoUrl" />
+
+  <input
+    id="shopLogoFile"
+    type="file"
+    accept="image/png,image/jpeg,image/webp"
+  />
+
+  <div class="settings-image-preview" id="shopLogoPreview">
+    <span>No logo uploaded</span>
+  </div>
+
+  <div class="settings-upload-actions">
+    <button
+      type="button"
+      class="secondary-button"
+      id="replaceShopLogoButton"
+    >
+      Upload logo
+    </button>
+
+    <button
+      type="button"
+      class="danger-button"
+      id="deleteShopLogoButton"
+      hidden
+    >
+      Delete logo
+    </button>
+  </div>
+
+</div>
+<div class="settings-upload-field" data-settings-group="hero">
+  <label for="heroImageFile">Hero image</label>
+
+  <input type="hidden" name="heroImageUrl" />
+
+  <input
+    id="heroImageFile"
+    type="file"
+    accept="image/png,image/jpeg,image/webp"
+  />
+
+  <div class="settings-image-preview" id="heroImagePreview">
+    <span>No hero image uploaded</span>
+  </div>
+
+  <div class="settings-upload-actions">
+    <button
+      type="button"
+      class="secondary-button"
+      id="replaceHeroImageButton"
+    >
+      Upload image
+    </button>
+
+    <button
+      type="button"
+      class="danger-button"
+      id="deleteHeroImageButton"
+      hidden
+    >
+      Delete image
+    </button>
+  </div>
+</div>
+<label data-settings-group="hero">
+Hero eyebrow
+<input name="heroEyebrow" />
+</label>
+          <label data-settings-group="hero">Hero title<input name="heroTitle" required /></label>
+          <label data-settings-group="hero">Hero subtitle<input name="heroSubtitle" required /></label>
+          <label data-settings-group="catalog">
+            Catalog eyebrow
+            <input name="catalogEyebrow" placeholder="OUR COLLECTION" />
+          </label>
+          <div class="settings-upload-field" data-settings-group="catalog">
+            <label for="catalogImageFile">Catalog banner image</label>
+            <input type="hidden" name="catalogImageUrl" />
+            <input id="catalogImageFile" type="file" accept="image/png,image/jpeg,image/webp" />
+            <div class="settings-image-preview" id="catalogImagePreview">
+              <span>Using the default bunny banner</span>
+            </div>
+            <div class="settings-upload-actions">
+              <button type="button" class="secondary-button" id="replaceCatalogImageButton">Upload image</button>
+              <button type="button" class="danger-button" id="deleteCatalogImageButton" hidden>Use default image</button>
+            </div>
+          </div>
+          <label data-settings-group="catalog">
+            Catalog title
+            <input name="catalogTitle" placeholder="Find your new favorite" />
+          </label>
+          <label data-settings-group="catalog">
+            Catalog subtitle
+            <input name="catalogSubtitle" placeholder="Curated beauty essentials, selected for your routine." />
+          </label>
+          <label data-settings-group="menu">
+            Menu subtitle
+            <input name="menuTagline" placeholder="Everything lovely, in one place" />
+          </label>
+          <label data-settings-group="social">Facebook link<input name="facebook" placeholder="https://facebook.com/..." /></label>
+          <label data-settings-group="social">TikTok link<input name="tiktok" placeholder="https://tiktok.com/@..." /></label>
+          <label data-settings-group="footer">Footer text<input name="footerText" placeholder="Optional footer copy" /></label>
+        </div>
+        <button class="primary-button" type="submit">Save shop profile</button>
+      </form>
+    </section>
+
+    <section id="securitySection" class="admin-card admin-panel-section security-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Security &amp; accounts</h2>
+          <p class="tiny-note">Keep the admin workspace private and under your control.</p>
+        </div>
+      </div>
+
+      <div class="admin-toolbar security-tabs" aria-label="Security settings">
+        <button id="securityAccountsTab" class="secondary-button active" type="button" data-security-tab="accounts">Accounts &amp; access</button>
+        <button class="secondary-button" type="button" data-security-tab="sessions">Password &amp; sessions</button>
+      </div>
+
+      <div class="security-grid" data-security-group="sessions" hidden>
+        <form id="changePasswordForm" class="security-card">
+          <div class="security-icon" aria-hidden="true">⌁</div>
+          <h3>Change password</h3>
+          <p>Use a strong new password for this admin account.</p>
+          <label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+          <label>New password<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+          <label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+          <button class="primary-button" type="submit">Change password</button>
+        </form>
+
+        <div class="security-card security-card-danger">
+          <div class="security-icon" aria-hidden="true">◌</div>
+          <h3>Log out all devices</h3>
+          <p>End every admin session, including this one. Sign in again with your password.</p>
+          <button id="signOutAllButton" class="secondary-button danger" type="button">Log out all devices</button>
+        </div>
+
+      </div>
+
+      <div class="security-grid security-accounts-grid" data-security-group="accounts">
+        <form id="inviteAdminForm" class="security-card">
+          <div class="security-icon" aria-hidden="true">＋</div>
+          <h3>Invite another admin</h3>
+          <p>They receive a private email invitation to set their own password.</p>
+          <label>Email address<input name="email" type="email" autocomplete="email" placeholder="admin@example.com" required /></label>
+          <label id="inviteRoleField">Role<select name="role"><option value="admin">Admin</option><option value="co_owner">Co-owner</option></select></label>
+          <button class="primary-button" type="submit">Send invitation</button>
+        </form>
+      </div>
+
+      <div class="security-admin-list-wrap" data-security-group="accounts">
+        <div class="admin-section-header compact-section-header">
+          <div><h3>Admin accounts</h3><p class="tiny-note">Owner controls co-owners. Co-owners can manage Admin accounts.</p></div>
+        </div>
+        <p id="securityStatus" class="tiny-note" role="status" aria-live="polite"></p>
+        <div id="adminAccountsList" class="admin-accounts-list"></div>
+      </div>
+    </section>
+
+    <section id="shippingFeesSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>Shipping options</h2>
+          <p class="tiny-note">Manage couriers and marketplace shipping links. Customers pay for their items first, then use Shopee or TikTok only to arrange shipping.</p>
+        </div>
+      </div>
+
+      <form id="shippingMethodForm" class="admin-form shipping-method-form">
+        <input name="id" type="hidden" />
+        <label>
+          Option name
+          <input name="name" placeholder="Example: J&amp;T Express" required />
+        </label>
+        <label>
+          Option type
+          <select name="methodType" required>
+            <option value="courier">Courier with shipping fees</option>
+            <option value="external">Marketplace shipping link</option>
+          </select>
+        </label>
+        <label class="shipping-method-description-field">
+          Short description
+          <input name="description" placeholder="Example: Nationwide delivery" />
+        </label>
+        <label class="shipping-method-link-field" hidden>
+          Shipping checkout link
+          <input name="externalUrl" type="url" inputmode="url" placeholder="https://shopee.ph/..." />
+        </label>
+        <label class="shipping-method-link-field" hidden>
+          Button label
+          <input name="buttonLabel" placeholder="Continue to Shopee" />
+        </label>
+        <label class="shipping-active-toggle">
+          <input name="isActive" type="checkbox" checked />
+          Show this shipping option at checkout
+        </label>
+        <div class="shipping-fee-form-actions">
+          <button class="primary-button" type="submit">Save shipping option</button>
+          <button id="cancelShippingMethodEdit" class="secondary-button" type="button" hidden>Cancel editing</button>
+        </div>
+      </form>
+
+      <p id="shippingMethodsStatus" class="tiny-note shipping-fees-status" role="status" aria-live="polite"></p>
+      <div id="shippingMethodsList" class="shipping-methods-admin-list"></div>
+
+      <div class="admin-section-header shipping-fee-subheading">
+        <div>
+          <h3>Courier shipping fees</h3>
+          <p class="tiny-note">Choose a courier, then add its editable delivery areas and prices.</p>
+        </div>
+      </div>
+
+      <form id="shippingFeeForm" class="admin-form shipping-fee-form">
+        <input name="id" type="hidden" />
+        <label>
+          Courier
+          <select id="shippingFeeMethodSelect" name="shippingMethodId" required></select>
+        </label>
+        <label>
+          Delivery area or label
+          <input name="label" placeholder="Example: Luzon" required />
+        </label>
+        <label>
+          Fee amount (₱)
+          <input name="amount" type="number" min="0" step="0.01" placeholder="90" required />
+        </label>
+        <label class="shipping-active-toggle">
+          <input name="isActive" type="checkbox" checked />
+          Show this choice at checkout
+        </label>
+        <div class="shipping-fee-form-actions">
+          <button class="primary-button" type="submit">Save shipping fee</button>
+          <button id="cancelShippingFeeEdit" class="secondary-button" type="button" hidden>Cancel editing</button>
+        </div>
+      </form>
+
+      <p id="shippingFeesStatus" class="tiny-note shipping-fees-status" role="status" aria-live="polite"></p>
+      <div id="shippingFeesList" class="shipping-fees-admin-list"></div>
+    </section>
+
+    <section id="paymentMethodsSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2>💳 Payment Methods</h2>
+          <p class="tiny-note">Manage the payment methods available during checkout.</p>
+        </div>
+        <button id="addPaymentMethodBtn" class="primary-button">+ Add Payment Method</button>
+      </div>
+
+      <div id="paymentMethodsContainer" class="payment-method-grid">
+        <div class="payment-method-empty">
+          <p>No payment methods loaded yet.</p>
+          <p class="tiny-note">Payment methods will automatically load from Supabase.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="addProductSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2 id="formTitle">Add product</h2>
+          <p class="tiny-note">Create or update visible storefront products.</p>
+        </div>
+      </div>
+      <form id="productForm" class="admin-form">
+        <input type="hidden" name="id" />
+        <label>Product name<input name="name" required /></label>
+        <div id="standardPricingFields" class="standard-pricing-fields">
+    <label>
+        Price (₱)
+        <input name="price" type="number" min="0" required />
+    </label>
+
+    <label>
+        Stock
+        <input name="stock" type="number" min="0" required />
+    </label>
+
+</div>
+
+<label>
+    COD fee per item (₱)
+    <input name="codFee" type="number" min="0" step="0.01" value="0" required />
+    <small class="tiny-note">Always available for this product, including products with variants.</small>
+</label>
+
+<label>
+    Product cost per item (₱)
+    <input name="costPrice" type="number" min="0" step="0.01" value="0" required />
+    <small class="tiny-note">Automatically deducted from sales profit. Variants may override this cost.</small>
+</label>
+
+<label>
+    Category
+    <select id="productCategorySelect" name="category" required>
+      <option value="">Choose an active category</option>
+    </select>
+</label>
+<label id="newProductCategoryField" hidden>
+    New category name
+    <input name="newCategory" placeholder="Example: Peptides" />
+</label>
+<label>
+    Product badge (optional)
+    <input name="badge" maxlength="24" placeholder="Example: New, Bestseller, Limited" />
+    <small class="tiny-note">Leave blank to show no badge. You can type any short badge name.</small>
+</label>
+<label>
+    Expense profile
+    <select id="productExpenseProfileSelect" name="expenseProfile">
+      <option value="">No automatic expenses</option>
+    </select>
+    <small class="tiny-note">Choose which packaging and freebies this product uses. Profiles are managed in Sales Tracker.</small>
+</label>
+
+<!-- =========================
+     PRODUCT VARIANTS START
+========================= -->
+
+<section class="product-variants-section">
+
+    <div class="variant-section-heading">
+
+        <div>
+            <h3>Product Variants</h3>
+            <p class="tiny-note">
+                Enable this if the product has multiple options.
+            </p>
+        </div>
+
+        <label class="variant-toggle">
+            <input
+                id="hasVariantsToggle"
+                type="checkbox"
+            />
+            <span>This product has variants</span>
+        </label>
+
+    </div>
+
+    <div
+        id="variantManager"
+        class="variant-manager"
+        hidden
+    >
+
+        <div id="variantRows"></div>
+
+        <button
+            id="addVariantButton"
+            type="button"
+            class="secondary-button"
+        >
+            + Add Variant
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     PRODUCT VARIANTS END
+========================= -->
+        <label class="product-image-upload-field">
+            Product image
+
+              <input
+                  id="productImageFile"
+                      type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                            />
+
+                              <input
+                                  id="productImageUrl"
+                                      name="image"
+                                          type="hidden"
+                                            />
+
+                                              <div id="productImagePreviewWrap" class="product-image-preview-wrap" hidden>
+                                                  <img
+                                                        id="productImagePreview"
+                                                              class="product-image-preview"
+                                                                    alt="Product image preview"
+                                                                        />
+
+                                                                            <button
+                                                                                  id="removeProductImageButton"
+                                                                                        class="secondary-button"
+                                                                                              type="button"
+                                                                                                  >
+                                                                                                        Remove image
+                                                                                                            </button>
+                                                                                                              </div>
+
+                                                                                                                <small class="tiny-note">
+                                                                                                                    Choose a JPG, PNG, or WebP image from your gallery. Maximum size: 5 MB.
+                                                                                                                      </small>
+                                                                                                                      </label>
+        <label>
+          Product card description
+          <textarea
+            name="description"
+            rows="4"
+            placeholder="Example: A sweet everyday favorite."
+          ></textarea>
+          <small class="tiny-note">This message appears below the product name on the storefront.</small>
+        </label>
+        <button class="primary-button full" type="submit">Save product</button>
+        <button id="cancelEdit" class="secondary-button full" type="button" hidden>Cancel editing</button>
+      </form>
+    </section>
+
+     <section id="addMenuSection" class="admin-card admin-panel-section">
+      <div class="admin-section-header">
+        <div>
+          <h2 id="menuFormTitle">Add menu item</h2>
+          <p class="tiny-note">Update storefront navigation links.</p>
+        </div>
+      </div>
+      <form id="menuForm" class="admin-form">
+        <input type="hidden" name="id" />
+        <label>
+          Menu header
+          <select id="menuSectionChoice" name="sectionChoice" required>
+            <option value="">Choose an active menu header</option>
+          </select>
+        </label>
+        <label id="newMenuSectionField" hidden>
+          New menu header
+          <input name="newSection" placeholder="Example: Contact" />
+        </label>
+        <label>
+          Menu label
+          <input name="label" placeholder="Example: Community" required />
+        </label>
+        <label>
+          Link or page
+          <input name="url" placeholder="Example: faq.html or https://m.me/..." required />
+        </label>
+        <label>
+          <input name="isVisible" type="checkbox" checked />
+          Show in menu
+        </label>
+        <label>
+          <input name="openNewTab" type="checkbox" />
+          Open in a new tab
+        </label>
+        <button class="primary-button full" type="submit">Save menu item</button>
+        <button id="cancelMenuEdit" class="secondary-button full" type="button" hidden>Cancel editing</button>
+      </form>
+    </section>
+
+    <dialog id="paymentMethodModal">
+      <form id="paymentMethodForm" class="admin-form">
+        <input type="hidden" name="id" />
+        <div class="modal-header">
+          <div>
+            <h2 id="paymentMethodModalTitle">Add payment method</h2>
+            <p class="tiny-note">Create or update a payment option available at checkout.</p>
+          </div>
+          <button type="button" class="icon-button" id="closePaymentMethodModal">✕</button>
+        </div>
+
+        <label>
+          Payment name
+          <input name="payment_name" required />
+        </label>
+
+        <label>
+          Short description
+          <input name="short_description" required />
+        </label>
+
+        <label>
+          Buyer payment note
+          <textarea name="instructions" rows="4" placeholder="Example: No payment or receipt is required now. Pay {total} when your courier delivers the order."></textarea>
+          <span class="tiny-note">Shown after this payment method is selected. You may use {total}, {cod_fee}, and {shipping_fee}.</span>
+        </label>
+
+        <label>
+          <input name="instructions_visible" type="checkbox" checked />
+          Show buyer payment note
+        </label>
+
+        <label>
+          Fallback Cash on Delivery fee (₱)
+          <input name="cod_fee" type="number" min="0" step="0.01" value="0" />
+          <span class="tiny-note">Used only when the products in the cart do not have their own COD fee.</span>
+        </label>
+
+        <label for="paymentQrFile">
+          QR image (PNG, JPG, JPEG, WebP • max 5 MB)
+          <input id="paymentQrFile" name="qr_file" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" />
+        </label>
+
+        <div class="qr-action-row">
+          <button class="secondary-button" type="button" id="paymentQrReplaceBtn">Replace QR</button>
+          <button class="secondary-button danger" type="button" id="paymentQrRemoveBtn">Remove QR</button>
+        </div>
+
+        <div id="paymentQrPreviewBox" class="qr-preview-box" hidden>
+          <div class="tiny-note" id="paymentQrPreviewText">QR preview</div>
+          <img id="paymentQrPreviewImage" class="qr-preview-image" alt="Payment QR preview" />
+        </div>
+
+        <label>
+          <input name="receipt_required" type="checkbox" />
+          Receipt required
+        </label>
+
+        <label>
+          <input name="reference_required" type="checkbox" />
+          Reference required
+        </label>
+
+        <label>
+          <input name="deposit_required" type="checkbox" />
+          Deposit required
+        </label>
+
+        <label>
+          Deposit percentage
+          <input name="deposit_percentage" type="number" min="0" max="100" step="1" />
+        </label>
+
+        <label>
+          Visible
+          <input name="is_visible" type="checkbox" checked />
+        </label>
+
+        <fieldset class="payment-courier-fieldset">
+          <legend>Available for shipping options</legend>
+          <p class="tiny-note">Choose every courier or marketplace checkout where this payment method should appear.</p>
+          <div id="paymentCourierOptions" class="payment-courier-options"></div>
+        </fieldset>
+
+        <label>
+          Sort order
+          <input name="sort_order" type="number" min="0" step="1" />
+        </label>
+
+        <div class="modal-actions">
+          <button class="secondary-button" type="button" id="cancelPaymentMethod">Cancel</button>
+          <button class="primary-button" type="submit">Save payment method</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="orderDetailsModal">
+      <div id="orderDetailsContent" class="order-details-content"></div>
+    </dialog>
+    <dialog id="invoiceDialog" class="invoice-dialog"><div id="invoiceContent"></div></dialog>
+
+  </div>   <!-- closes admin-main-content -->
+</div>   <!-- closes admin-layout -->
+</div>   <!-- closes adminContent -->
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="variants.js?v=clean-console-v1"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="admin.js?v=automatic-product-cost-v12"></script>
+<script src="admin-ui.js?v=stable-section-nav-v2"></script>
+</body>
+</html>
