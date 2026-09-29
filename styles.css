@@ -2889,24 +2889,3 @@ input[type="submit"] {
     font-size: .68rem;
   }
 }
-
-/* =========================================================
-   VIALXBEAUTY — CHERRY NOIR THEME
-   Brand presentation overrides; storefront behavior unchanged.
-========================================================= */
-:root{
-  --pink:#18090d; --pink-2:#f7f4f5; --pink-3:#a30f2d;
-  --ink:#171114; --muted:#75686d; --white:#fff; --line:#e4d9dd;
-  --shadow:0 20px 55px rgba(22,7,12,.14);
-}
-body{color:var(--ink);background:linear-gradient(180deg,#fff 0%,#f8f5f6 100%)}
-.site-header{background:rgba(10,8,9,.96);border-bottom:1px solid rgba(163,15,45,.5);box-shadow:0 10px 30px rgba(0,0,0,.18);color:#fff}
-.brand{letter-spacing:.02em}.brand small{color:#d72a4d}.brand-mark{border-radius:10px;background:linear-gradient(145deg,#c2173b,#650818);color:#fff;font-size:.72rem;letter-spacing:.04em;box-shadow:0 6px 18px rgba(163,15,45,.32)}
-.brand-heart{display:none!important}.shop-link{color:#fff}.cart-button,.icon-button{background:#20181b;color:#fff;border:1px solid #38252c}.favorite-header-icon{color:#d72a4d}.favorites-badge,#cartCount{background:#b41132;color:#fff}
-.primary-button{background:linear-gradient(135deg,#b41132,#790b21)!important;color:#fff!important;box-shadow:0 10px 25px rgba(140,10,38,.22)}
-.secondary-button{border-color:#cdbfc4!important}.eyebrow{color:#a30f2d!important;letter-spacing:.14em;text-transform:uppercase}
-.hero{border:1px solid #eadfe2;background:radial-gradient(circle at 85% 20%,rgba(174,17,48,.12),transparent 24rem),linear-gradient(145deg,#fff,#f5eff1);box-shadow:0 24px 70px rgba(35,10,18,.11)}
-.hero h1,.section-heading h2{letter-spacing:-.04em}.product-card{border-color:#e4d9dd!important;box-shadow:0 16px 42px rgba(28,8,14,.09)!important}.product-card:hover{border-color:#b41132!important}
-
-/* Remove legacy cute heart ornamentation */
-#paymentStepDialog .drawer-header h2::before{content:"×"!important}.storefront-page .hero-sparkle,.storefront-page [class*="sparkle"]{color:#b41132!important}

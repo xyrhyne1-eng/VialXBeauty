@@ -33,9 +33,3 @@ body.sales-page{min-height:100vh;margin:0;color:var(--sales-ink);background:line
 @media(max-width:820px){.expense-rule{grid-template-columns:1fr 1fr 1fr}.expense-rule>div:first-child{grid-column:1/-1}}
 @media(max-width:820px){.manual-product-row{grid-template-columns:1fr 1fr}.manual-product-row>*:first-child{grid-column:1/-1}}
 @media(max-width:520px){.expense-rule{grid-template-columns:1fr 1fr}.expense-list-tools{grid-template-columns:1fr}.expense-profile-card{align-items:flex-start;flex-direction:column}.profile-item-row{grid-template-columns:1fr 90px}.profile-item-row select{grid-column:1/-1}.sale-profile-shortcut{grid-template-columns:1fr 1fr}.sale-profile-shortcut select{grid-column:1/-1}.manual-product-row{grid-template-columns:1fr}.manual-product-row>*:first-child{grid-column:auto}}
-
-/* VialXBeauty Cherry Noir sales overrides */
-:root{--sales-pink:#b41132;--sales-ink:#171114;--sales-muted:#75686d;--sales-line:#e4d9dd;--sales-soft:#f9edf0}
-body.sales-page{color:var(--sales-ink);background:linear-gradient(180deg,#f7f4f5,#fff)}
-.sales-stat,.sales-card{box-shadow:0 12px 32px rgba(30,7,14,.08)}
-.sales-header h1{font-family:Inter,ui-sans-serif,system-ui,sans-serif;letter-spacing:-.045em}

@@ -109,7 +109,7 @@ const successExternalCheckout = document.querySelector("#successExternalCheckout
 const successExternalMessage = document.querySelector("#successExternalMessage");
 const successExternalLink = document.querySelector("#successExternalLink");
 const closeSuccess = document.querySelector("#closeSuccess");
-const CART_STORAGE_KEY = "wonderPepsCart";
+const CART_STORAGE_KEY = "vialXBeautyCart";
 
 function loadSavedCart() {
   try {
@@ -296,7 +296,7 @@ async function loadShopSettings() {
 }
 
 function applyShopSettings(settings) {
-  const shopName = settings.shop_name || "Wonder Peps PH";
+  const shopName = settings.shop_name || "VialXBeauty";
 
   document.title = shopName;
 
@@ -458,7 +458,7 @@ async function loadProducts() {
   if (productError) {
      grid.innerHTML = `
       <p class="empty">
-        Could not load products: ${escapeHtml(productError.message)}
+        Products will appear here once the VialXBeauty catalog is connected.
       </p>
     `;
     return;
@@ -2391,7 +2391,7 @@ function showAddedToBag(productName) {
         document.body.appendChild(toast);
     }
 
-    toast.textContent = `🩷 ${productName} added to your bag!`;
+    toast.textContent = `${productName} added to your bag`;
 
     toast.classList.add("show");
 

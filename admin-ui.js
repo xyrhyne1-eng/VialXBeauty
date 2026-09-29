@@ -1,4 +1,4 @@
-/* VialXBeauty Admin Studio — presentation-only enhancements. */
+/* VialXBeauty Control Room — presentation-only enhancements. */
 (function () {
   const navLinks = Array.from(
     document.querySelectorAll('.admin-sidebar-nav a[href^="#"]')

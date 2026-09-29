@@ -1,5 +1,5 @@
 /* =========================================================
-   VIALXBEAUTY ADMIN STUDIO
+   VIALXBEAUTY CONTROL ROOM
    UI-only layer: keeps the existing admin logic untouched.
 ========================================================= */
 
@@ -1391,11 +1391,3 @@ html { font-size: 112.5%; }
 .invoice-detail-rows .invoice-address-row { align-items:flex-start; }
 .invoice-detail-rows .invoice-address-row strong { max-width:70%; line-height:1.32; }
 .payment-courier-fieldset{border:1px solid #efcfdb;border-radius:18px;padding:14px;margin:10px 0}.payment-courier-fieldset legend{font-weight:800;padding:0 6px}.payment-courier-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}.payment-courier-option{display:flex!important;align-items:center;gap:8px;padding:10px 12px;border:1px solid #f2d7e1;border-radius:13px;background:#fffafd}.payment-courier-option input{width:18px!important;height:18px!important;margin:0}
-
-/* VialXBeauty Cherry Noir admin overrides */
-.admin-page{--admin-rose:#b41132;--admin-rose-dark:#790b21;--admin-plum:#181113;--admin-muted:#74666b;--admin-blush:#f8f1f3;--admin-blush-strong:#edd9df;--admin-line:#e1d4d8;--admin-success:#287a5a;--admin-warning:#a86618;color:var(--admin-plum);background:radial-gradient(circle at 5% 0%,rgba(163,15,45,.13),transparent 27rem),radial-gradient(circle at 95% 35%,rgba(24,17,19,.08),transparent 28rem),#f8f6f7;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-.admin-page::before{opacity:.22;background-image:radial-gradient(rgba(122,11,33,.18) 1px,transparent 1px)}
-.admin-site-header{border-bottom-color:#3b2028;background:rgba(13,10,11,.96);color:#fff;box-shadow:0 10px 35px rgba(0,0,0,.18)}
-.admin-brand .brand-mark{background:linear-gradient(145deg,#c2173b,#650818);border-color:#2b171d;box-shadow:0 7px 18px rgba(163,15,45,.28);font-size:.72rem}.admin-brand-copy small{color:#e24664}.skip-link{background:#171114}
-
-.invoice-head:before{content:"VX"!important;background:rgba(20,5,10,.2)!important}.invoice-head:after{content:"VIAL × BEAUTY"!important}.invoice-head,.invoice-total{background:linear-gradient(135deg,#b41132,#650818)!important}.invoice-table th{color:#790b21!important;background:#f9edf0!important;border-color:#e7cbd3!important}.invoice-summary,.invoice-payment{background:linear-gradient(145deg,#fff,#f8f1f3)!important}

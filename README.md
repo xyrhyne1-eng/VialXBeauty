@@ -1,9 +1,5 @@
-# VialXBeauty
+# VialXBeauty — Peptide Storefront
 
-Cherry Noir storefront sample.
+Fresh clinical-luxury Cherry Noir storefront. The UI is designed for peptide products and keeps the existing cart/checkout/admin logic as the functional base.
 
-## Deployment
-Static site intended for Vercel. `index.html` is the storefront, `admin.html` is the admin panel, and `sales.html` is the sales tracker.
-
-## Supabase
-Before production use, replace the existing Supabase project details in `supabase.js` with the dedicated VialXBeauty Supabase project credentials and install the required database schema separately.
+Important: `supabase.js` remains intentionally unconnected to the WonderPeps database. Add only the new VialXBeauty Supabase URL and publishable key when ready.
