@@ -1,5 +1,5 @@
 /* =========================================================
-   VIALXBEAUTY CONTROL ROOM
+   WONDER PEPS ADMIN STUDIO
    UI-only layer: keeps the existing admin logic untouched.
 ========================================================= */
 
@@ -1391,3 +1391,328 @@ html { font-size: 112.5%; }
 .invoice-detail-rows .invoice-address-row { align-items:flex-start; }
 .invoice-detail-rows .invoice-address-row strong { max-width:70%; line-height:1.32; }
 .payment-courier-fieldset{border:1px solid #efcfdb;border-radius:18px;padding:14px;margin:10px 0}.payment-courier-fieldset legend{font-weight:800;padding:0 6px}.payment-courier-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}.payment-courier-option{display:flex!important;align-items:center;gap:8px;padding:10px 12px;border:1px solid #f2d7e1;border-radius:13px;background:#fffafd}.payment-courier-option input{width:18px!important;height:18px!important;margin:0}
+
+
+/* =========================================================
+   VialXBeauty ADMIN — FINAL PREMIUM IVORY / CHAMPAGNE
+   Restores the compact dashboard proportions.
+   Visual/layout override only; no JS or database changes.
+   ========================================================= */
+
+.admin-page {
+  --admin-rose: #9b7a35;
+  --admin-rose-dark: #73571f;
+  --admin-plum: #2f2924;
+  --admin-muted: #746b61;
+  --admin-blush: #f8f1e3;
+  --admin-blush-strong: #eee0bd;
+  --admin-line: #ddceb0;
+  --admin-success: #2f7b5f;
+  --admin-warning: #9b6b22;
+
+  color: #302924 !important;
+  background:
+    radial-gradient(circle at 7% 0%, rgba(255,255,255,.96), transparent 25rem),
+    radial-gradient(circle at 94% 18%, rgba(216,183,111,.30), transparent 30rem),
+    linear-gradient(135deg, #fffdf9 0%, #f7efdf 52%, #dfc78f 100%) !important;
+}
+
+/* Kill the previous pink/red dot pattern. */
+.admin-page::before {
+  opacity: .10 !important;
+  background-image: radial-gradient(rgba(151,116,50,.12) 1px, transparent 1px) !important;
+}
+
+/* HEADER — keep original compact height and right-side storefront. */
+.admin-page .admin-site-header {
+  min-height: 72px !important;
+  height: 72px !important;
+  padding: 13px clamp(18px, 3vw, 42px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: linear-gradient(135deg, #fffefa 0%, #f3e8d0 100%) !important;
+  border-bottom: 1px solid rgba(166,130,61,.35) !important;
+  box-shadow: 0 8px 24px rgba(83,61,25,.08) !important;
+}
+
+.admin-page .admin-brand {
+  flex: 0 0 auto !important;
+}
+
+.admin-page .view-shop-button {
+  margin-left: auto !important;
+  flex: 0 0 auto !important;
+  min-height: 42px !important;
+  padding: 10px 14px !important;
+  background: linear-gradient(135deg, #fffefa, #e8d7b0) !important;
+  border-color: rgba(157,120,50,.40) !important;
+  color: #3a3028 !important;
+}
+
+/* Compact shell — same proportions as the original admin CSS. */
+.admin-page .admin-shell {
+  width: min(100%, 1540px) !important;
+  margin: 0 auto !important;
+  padding: 28px clamp(18px, 3vw, 44px) 64px !important;
+}
+
+/* Sidebar: original compact 264px layout, but gold/ivory. */
+.admin-page .admin-layout {
+  display: grid !important;
+  grid-template-columns: 264px minmax(0,1fr) !important;
+  gap: clamp(22px,3vw,38px) !important;
+  align-items: start !important;
+}
+
+.admin-page .admin-sidebar {
+  position: sticky !important;
+  top: 94px !important;
+  width: 264px !important;
+  height: calc(100vh - 122px) !important;
+  min-height: 620px !important;
+  padding: 21px 17px 18px !important;
+  overflow: hidden auto !important;
+  border-radius: 28px !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,255,255,.92), transparent 12rem),
+    linear-gradient(160deg, #fffefa 0%, #f7edda 58%, #e4ce9c 100%) !important;
+  border-color: rgba(166,130,61,.38) !important;
+  box-shadow: 0 18px 42px rgba(83,61,25,.10) !important;
+}
+
+/* Keep nav sizing compact. */
+.admin-page .admin-sidebar-nav a {
+  min-height: 42px !important;
+  padding: 6px 10px !important;
+  font-size: .88rem !important;
+}
+
+.admin-page .nav-group-label {
+  font-size: .64rem !important;
+  margin: 13px 11px 4px !important;
+  color: #8b7659 !important;
+}
+
+.admin-page .nav-icon {
+  color: #9a7730 !important;
+  background: #fffefa !important;
+  border-color: #dfcfad !important;
+}
+
+.admin-page .admin-sidebar-nav a {
+  color: #51453a !important;
+}
+
+.admin-page .admin-sidebar-nav a:hover {
+  color: #6c5325 !important;
+  background: rgba(226,207,165,.42) !important;
+}
+
+.admin-page .admin-sidebar-nav a.active {
+  color: #fff !important;
+  background: linear-gradient(135deg,#876624,#b9964b) !important;
+  box-shadow: 0 8px 18px rgba(111,78,22,.18) !important;
+}
+
+.admin-page .sidebar-session {
+  color: #685b50 !important;
+  background: rgba(255,255,255,.70) !important;
+  border-color: rgba(166,130,61,.28) !important;
+}
+
+/* Main column — prevent any accidental oversized widths. */
+.admin-page .admin-main-content {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 22px !important;
+}
+
+/* Welcome/Admin hero: restore compact original height. */
+.admin-page .admin-top {
+  min-height: 176px !important;
+  height: auto !important;
+  padding: 38px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(201,162,82,.22), transparent 13rem),
+    linear-gradient(135deg,#fffefa 0%,#f7edda 52%,#dfc690 100%) !important;
+  border-color: rgba(166,130,61,.38) !important;
+  box-shadow: 0 14px 34px rgba(83,61,25,.10) !important;
+}
+
+.admin-page .admin-top::after {
+  color: rgba(145,109,43,.08) !important;
+  font-size: 8.5rem !important;
+}
+
+.admin-page .admin-top .eyebrow {
+  color: #94702d !important;
+}
+
+.admin-page .admin-top h1 {
+  font-size: clamp(2rem,4vw,3.25rem) !important;
+  line-height: 1.08 !important;
+  color: #302924 !important;
+}
+
+.admin-page .admin-top h1 span {
+  color: #9b7a35 !important;
+}
+
+.admin-page .admin-top-note {
+  color: #6f645a !important;
+}
+
+/* Quick action buttons keep their original size. */
+.admin-page .admin-quick-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-end !important;
+}
+
+.admin-page .admin-quick-actions .secondary-button {
+  background: rgba(255,255,255,.78) !important;
+  color: #44392f !important;
+  border-color: rgba(157,120,50,.35) !important;
+}
+
+.admin-page .admin-quick-actions .primary-button {
+  background: linear-gradient(135deg,#8b6828,#bea05a) !important;
+  border-color: #a7833c !important;
+}
+
+/* ALL workspace panels — ivory/champagne gradient. */
+.admin-page .admin-card {
+  background:
+    linear-gradient(135deg,#fffefa 0%,#faf2e2 58%,#ead8ad 100%) !important;
+  color: #302924 !important;
+  border-color: rgba(166,130,61,.32) !important;
+  box-shadow: 0 10px 28px rgba(83,61,25,.075) !important;
+}
+
+.admin-page .admin-panel-section {
+  border-color: rgba(166,130,61,.32) !important;
+}
+
+/* Dashboard inner cards. */
+.admin-page .dashboard-grid .soft-card,
+.admin-page .stat-card {
+  background: linear-gradient(135deg,#fffefa 0%,#f6ead3 100%) !important;
+  border-color: rgba(166,130,61,.27) !important;
+}
+
+.admin-page .stat-card::after {
+  background: rgba(194,158,87,.16) !important;
+}
+
+/* Tables/lists remain compact and readable. */
+.admin-page .table-shell,
+.admin-page .order-card,
+.admin-page .category-card,
+.admin-page .admin-product,
+.admin-page .payment-method-card,
+.admin-page .menu-admin-group,
+.admin-page .menu-admin-item,
+.admin-page .shipping-fee-admin-card {
+  background: linear-gradient(135deg,#fffefa,#f7edda) !important;
+  border-color: rgba(166,130,61,.28) !important;
+  color: #302924 !important;
+}
+
+.admin-page .data-table th {
+  color: #66533a !important;
+  background: #eee0c0 !important;
+  border-color: rgba(166,130,61,.20) !important;
+}
+
+.admin-page .data-table td {
+  color: #332c27 !important;
+  border-color: rgba(166,130,61,.16) !important;
+}
+
+/* Inputs/settings — keep original dimensions. */
+.admin-page :is(input,textarea,select) {
+  color: #302924 !important;
+  background: rgba(255,255,255,.82) !important;
+  border-color: rgba(166,130,61,.30) !important;
+}
+
+.admin-page :is(input,textarea,select):focus {
+  border-color: #a7813a !important;
+  box-shadow: 0 0 0 4px rgba(167,129,58,.10) !important;
+}
+
+/* Gold accent buttons without increasing size. */
+.admin-page .primary-button {
+  background: linear-gradient(135deg,#8b6828,#bea05a) !important;
+  border-color: #a7833c !important;
+  box-shadow: 0 7px 16px rgba(111,78,22,.16) !important;
+}
+
+.admin-page .secondary-button {
+  color: #4b4037 !important;
+  background: rgba(255,255,255,.78) !important;
+  border-color: rgba(157,120,50,.32) !important;
+}
+
+/* Product actions — never overlap. */
+.admin-page .compact-actions {
+  min-width: 218px !important;
+  width: 218px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 7px !important;
+  align-items: stretch !important;
+}
+
+.admin-page .compact-actions .secondary-button,
+.admin-page .compact-actions button {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  padding: 7px 9px !important;
+  min-height: 36px !important;
+}
+
+/* Remove pink drag surfaces. */
+.admin-page .category-drag-handle,
+.admin-page .menu-drag-handle {
+  color: #665333 !important;
+  background: linear-gradient(145deg,#f8f0df,#e9d6a9) !important;
+  border-color: rgba(166,130,61,.30) !important;
+}
+
+/* Responsive: retain compact proportions, no giant typography. */
+@media (max-width: 900px) {
+  .admin-page .admin-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-page .admin-sidebar {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .admin-page .admin-top {
+    min-height: 176px !important;
+    padding: 24px !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-page .admin-site-header {
+    min-height: 64px !important;
+    height: 64px !important;
+  }
+
+  .admin-page .admin-top h1 {
+    font-size: 2rem !important;
+  }
+}
