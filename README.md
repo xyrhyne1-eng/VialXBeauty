@@ -1,5 +1,13 @@
-# VialXBeauty — Peptide Storefront
+# VialXBeauty — Final Mobile Fix
 
-Fresh clinical-luxury Cherry Noir storefront. The UI is designed for peptide products and keeps the existing cart/checkout/admin logic as the functional base.
+This preview keeps the VIALX hero image and the VialXBeauty wordmark in the storefront header, but removes the small red VX square from the storefront navigation.
 
-Important: `supabase.js` remains intentionally unconnected to the WonderPeps database. Add only the new VialXBeauty Supabase URL and publishable key when ready.
+Included in this pass:
+- two-column, taller mobile product cards with two demo products
+- neutral vial placeholders instead of VX artwork inside product/cart thumbnails
+- Favorites, Cart and Menu remain unboxed header icons
+- cart subtotal + Checkout are anchored at the bottom of the cart drawer
+- Cherry Noir VialXBeauty admin login remains included
+- no VialXBeauty Supabase connection; supabase.js still uses VialXBeauty placeholders
+
+Replace the Supabase placeholders only after the dedicated VialXBeauty database is created.

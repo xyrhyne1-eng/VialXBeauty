@@ -430,15 +430,28 @@ if (heroImage && heroFallback) {
 
 async function loadProducts() {
   const grid = productGrid || document.getElementById("favoritesGrid");
-   grid.innerHTML = `
-   <p class="empty">Loading products...</p>
-`;
+  const demoProducts = [
+    { id: "vialx-demo-01", name: "Radiance Peptide Serum", description: "A refined daily peptide serum for the VialXBeauty preview collection.", price: 1290, stock: 12, badge: "Featured", image_url: "", variants: [] },
+    { id: "vialx-demo-02", name: "Renewal Peptide Complex", description: "A premium peptide complex presented as a second storefront sample.", price: 1490, stock: 9, badge: "New", image_url: "", variants: [] }
+  ];
+  const useDemoCatalog = String(SUPABASE_URL || "").includes("YOUR-VIALXBEAUTY-PROJECT") || String(SUPABASE_PUBLISHABLE_KEY || "").includes("YOUR-VIALXBEAUTY-PUBLISHABLE-KEY");
+  if (useDemoCatalog) {
+    products = demoProducts;
+    productVariants = [];
+    productSoldCounts = new Map();
+    renderProducts(products, grid);
+    renderCategoryFilters();
+    return;
+  }
+  grid.innerHTML = `<p class="empty">Loading products...</p>`;
 
-  const [
-    { data: productData, error: productError },
-    { data: variantData, error: variantError },
-    { data: soldData, error: soldError }
-  ] = await Promise.all([
+  let productData, productError, variantData, variantError, soldData, soldError;
+  try {
+    [
+      { data: productData, error: productError },
+      { data: variantData, error: variantError },
+      { data: soldData, error: soldError }
+    ] = await Promise.all([
     supabaseClient
       .from("products")
       .select("*")
@@ -454,11 +467,20 @@ async function loadProducts() {
     // This RPC returns aggregate totals only, so no customer/order details are
     // exposed to storefront visitors. See supabase-sold-counts.sql.
     supabaseClient.rpc("get_product_sold_counts")
-  ]);
+    ]);
+  } catch (error) {
+    console.warn("Catalog connection unavailable; showing demo product.", error);
+    products = demoProducts;
+    productVariants = [];
+    productSoldCounts = new Map();
+    renderProducts(products, grid);
+    renderCategoryFilters();
+    return;
+  }
   if (productError) {
      grid.innerHTML = `
       <p class="empty">
-        Products will appear here once the VialXBeauty catalog is connected.
+        Could not load products: ${escapeHtml(productError.message)}
       </p>
     `;
     return;
@@ -565,7 +587,7 @@ function renderCategoryFilters() {
             <button
                 class="category-chip ${selectedCategory === category ? "active" : ""}"
                 data-category="${category}">
-                ${category}
+                ${category === "All" ? "All Products" : category}
             </button>
         `)
         .join("");
@@ -628,8 +650,8 @@ const displayedStock = hasVariants
           />
         `
         : `
-          <div class="product-image" aria-hidden="true">
-            ♡
+          <div class="product-image product-placeholder" aria-hidden="true">
+            <span class="placeholder-vial"><i></i></span>
           </div>
         `;
 
@@ -685,7 +707,7 @@ ${productBadge ? `<span class="product-badge">${productBadge}</span>` : ""}
                   ? "Out of stock"
                   : hasVariants
                     ? "Choose variant"
-                    : "Add to bag"
+                    : "Add to cart"
               }
             </button>
           </div>
@@ -1080,7 +1102,7 @@ function addToCart(productId, sourceButton = null) {
 
   if (currentQuantity >= Number(product.stock)) {
     showStoreNotice(
-      "You already have the maximum available quantity in your bag. Please check your bag.",
+      "You already have the maximum available quantity in your cart. Please check your cart.",
       "warning",
       "Oopsie! This is the last one 🌸"
     );
@@ -1144,7 +1166,7 @@ function changeQuantity(productId, variantId, amount) {
 
   if (newQuantity > stock) {
     showStoreNotice(
-      "You already have the maximum available quantity in your bag. Please check your bag.",
+      "You already have the maximum available quantity in your cart. Please check your cart.",
       "warning",
       "Oopsie! This is the last one 🌸"
     );
@@ -1248,7 +1270,7 @@ function renderShippingMethods() {
   shippingMethodOptions.innerHTML = shippingMethods.map((method) => {
     const selected = String(selectedShippingMethod?.id) === String(method.id);
     return `<button class="shipping-method-option${selected ? " selected" : ""}" type="button" data-shipping-method="${method.id}" aria-pressed="${selected}">
-      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : "♡"}</span>
+      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
       <span class="shipping-method-copy"><strong>${escapeHtml(method.name)}</strong><small>${escapeHtml(method.description || (method.method_type === "external" ? "Marketplace shipping checkout" : "Courier delivery"))}</small></span>
       <span class="shipping-method-arrow" aria-hidden="true">›</span>
     </button>`;
@@ -1287,7 +1309,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : "♡"}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1382,7 +1404,7 @@ saveCart();
 
   if (!cart.length) {
     cartItems.innerHTML =
-      `<p class="empty">Your bag is empty.</p>`;
+      `<p class="empty">Your cart is empty.</p>`;
 
     cartSubtotal.textContent = formatCurrency(0);
     checkoutButton.disabled = true;
@@ -1414,7 +1436,7 @@ const itemPrice =
       alt="${escapeHtml(product.name)}"
     />
   `
-  : "♡"
+  : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`
             }
           </div>
 
@@ -1561,7 +1583,7 @@ favoritesDrawer.addEventListener("click", (event) => {
 
 checkoutButton.addEventListener("click", () => {
   if (!cart.length) {
-    showStoreNotice("Your bag is empty.");
+    showStoreNotice("Your cart is empty.");
     return;
   }
 
@@ -1992,7 +2014,7 @@ function resetCheckoutState() {
 
 async function submitOrder() {
   if (!cart.length) {
-    showStoreNotice("Your bag is empty.");
+    showStoreNotice("Your cart is empty.");
     return;
   }
 
@@ -2186,7 +2208,7 @@ resetCheckoutState();
 checkoutForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!cart.length) {
-    showStoreNotice("Your bag is empty.");
+    showStoreNotice("Your cart is empty.");
     return;
   }
 
@@ -2261,16 +2283,14 @@ async function loadStoreMenuItems() {
 
   if (error) {
     console.error("Could not load menu items:", error.message);
-    storeMenuItems.innerHTML =
-      `<p class="empty">Menu could not be loaded.</p>`;
+    storeMenuItems.innerHTML = `<a class="store-menu-link" href="#shop"><span class="store-menu-label">Products</span><span class="store-menu-arrow" aria-hidden="true">›</span></a>`;
     return;
   }
 
   const items = data || [];
 
   if (!items.length) {
-    storeMenuItems.innerHTML =
-      `<p class="empty">No menu items available.</p>`;
+    storeMenuItems.innerHTML = `<a class="store-menu-link" href="#shop"><span class="store-menu-label">Products</span><span class="store-menu-arrow" aria-hidden="true">›</span></a>`;
     return;
   }
 
@@ -2391,7 +2411,7 @@ function showAddedToBag(productName) {
         document.body.appendChild(toast);
     }
 
-    toast.textContent = `${productName} added to your bag`;
+    toast.textContent = `🩷 ${productName} added to your cart!`;
 
     toast.classList.add("show");
 
