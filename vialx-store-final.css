@@ -1,0 +1,33 @@
+/* VialXBeauty — final storefront/cart Cherry Noir override */
+:root{--vx-store-bg:#050405;--vx-store-mid:#100509;--vx-store-red:#28050e;--vx-store-cherry:#a90d2d;--vx-store-bright:#c5143d;--vx-store-text:#f8f4f2;--vx-store-muted:#b8aaae;--vx-store-line:rgba(197,20,61,.28)}
+body.storefront-page{background:radial-gradient(circle at 85% 0%,rgba(169,13,45,.24),transparent 34rem),linear-gradient(145deg,#030304 0%,#0a0507 46%,#2a050f 100%)!important;color:var(--vx-store-text)!important;background-attachment:fixed!important}
+body.storefront-page main,body.storefront-page .vx-hero,body.storefront-page .catalog-section,body.storefront-page footer{background:transparent!important;color:var(--vx-store-text)!important}
+body.storefront-page .catalog-section{border-top:1px solid rgba(197,20,61,.18)!important}
+body.storefront-page .product-grid{background:transparent!important;border:0!important;gap:14px!important}
+body.storefront-page .product-card{background:rgba(10,7,8,.78)!important;border:1px solid var(--vx-store-line)!important;border-radius:14px!important;color:#fff!important}
+body.storefront-page .product-image{background:linear-gradient(145deg,#0d0a0b,#260810)!important;color:#b8aaae!important}
+body.storefront-page .product-body h3,body.storefront-page .product-body strong{color:#fff!important}
+body.storefront-page .product-description,body.storefront-page .product-stats{color:#b8aaae!important}
+body.storefront-page .favorite-button{background:#0b0809!important;border:1px solid rgba(255,255,255,.13)!important;color:#fff!important}
+body.storefront-page .add-button{background:linear-gradient(135deg,#950a29,#c5143d)!important;border:0!important;color:#fff!important;border-radius:9px!important}
+body.storefront-page .category-filters button,body.storefront-page .category-filter{background:rgba(255,255,255,.035)!important;border-color:var(--vx-store-line)!important;color:#ddd!important;border-radius:999px!important}
+body.storefront-page .category-filters button.active,body.storefront-page .category-filter.active{background:var(--vx-store-cherry)!important;color:#fff!important;border-color:var(--vx-store-bright)!important}
+body.storefront-page .search-wrap{background:rgba(255,255,255,.035)!important;border:1px solid rgba(255,255,255,.15)!important;padding:4px 12px!important;color:#fff!important}
+body.storefront-page .search{color:#fff!important;background:transparent!important}
+body.storefront-page .search::placeholder{color:#9f9095!important}
+/* Cart drawer: same black/deep-red visual language as storefront. */
+body.storefront-page #cartDrawer .drawer-panel,body.storefront-page #favoritesDrawer .drawer-panel{background:linear-gradient(160deg,#070607 0%,#100509 58%,#24050d 100%)!important;color:#fff!important}
+body.storefront-page #cartDrawer .drawer-header{border-bottom-color:rgba(255,255,255,.12)!important}
+body.storefront-page #cartDrawer .drawer-header h2{color:#fff!important}
+body.storefront-page #cartDrawer .cart-item{border-bottom-color:rgba(255,255,255,.10)!important}
+body.storefront-page #cartDrawer .cart-thumb{background:linear-gradient(145deg,#111013,#2b0a14)!important;border:1px solid rgba(197,20,61,.25)!important}
+body.storefront-page #cartDrawer .cart-thumb-fallback{background:linear-gradient(145deg,#111013,#2b0a14)!important;color:#d8cdd0!important}
+body.storefront-page #cartDrawer .cart-item>div:nth-child(2)>strong,body.storefront-page #cartDrawer .cart-item>div:nth-child(2)>p{color:#fff!important}
+body.storefront-page #cartDrawer .cart-item>.icon-button{color:#cbbfc3!important}
+body.storefront-page #cartDrawer .qty{background:#0b0809!important;border-color:rgba(255,255,255,.16)!important}
+body.storefront-page #cartDrawer .qty button{background:#0b0809!important;color:#fff!important}
+body.storefront-page #cartDrawer .qty span{color:#fff!important}
+body.storefront-page #cartDrawer .cart-summary{background:linear-gradient(180deg,rgba(9,6,7,.94),#16050a)!important;border-top-color:rgba(255,255,255,.12)!important;box-shadow:0 -16px 32px rgba(0,0,0,.3)!important}
+body.storefront-page #cartDrawer .cart-summary span,body.storefront-page #cartDrawer .cart-summary strong{color:#fff!important}
+body.storefront-page #cartDrawer .cart-summary .primary-button{background:linear-gradient(135deg,#950a29,#c5143d)!important;color:#fff!important;border-radius:999px!important}
+@media(max-width:760px){body.storefront-page .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}body.storefront-page #cartDrawer .drawer-panel{width:min(440px,94vw)!important}}

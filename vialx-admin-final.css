@@ -1,0 +1,50 @@
+/* VialXBeauty — final admin Cherry Noir override */
+:root{--vx-black:#050405;--vx-black2:#0b0608;--vx-wine:#26050d;--vx-cherry:#9f0b2a;--vx-red:#c5143d;--vx-text:#f7f2f3;--vx-muted:#b7a9ae;--vx-border:rgba(197,20,61,.32)}
+html,body.admin-page{background:#050405!important;color:var(--vx-text)!important}
+body.admin-page{min-height:100vh;background:radial-gradient(circle at 82% 0%,rgba(159,11,42,.22),transparent 34rem),linear-gradient(135deg,#030304 0%,#090507 48%,#25050d 100%)!important;background-attachment:fixed!important}
+body.admin-page::before,body.admin-page::after{pointer-events:none}
+.admin-page .site-header,.admin-page .admin-site-header{background:rgba(3,3,4,.94)!important;border-bottom:1px solid var(--vx-border)!important;color:#fff!important}
+.admin-page .admin-main-content,.admin-page .admin-shell{background:transparent!important;color:var(--vx-text)!important}
+.admin-page .admin-sidebar{background:rgba(5,4,5,.92)!important;border:1px solid var(--vx-border)!important;box-shadow:0 18px 50px rgba(0,0,0,.35)!important}
+.admin-page .admin-sidebar-title,.admin-page .admin-sidebar-title *{color:#fff!important}
+.admin-page .sidebar-brand-badge,.admin-page .login-icon,.admin-page .vx-admin-mark{background:linear-gradient(145deg,#12090c,#28040d)!important;color:#fff!important;border:1px solid rgba(213,28,74,.55)!important}
+.admin-page .sidebar-session{background:rgba(159,11,42,.08)!important;border:1px solid var(--vx-border)!important;color:#ddd3d6!important}
+.admin-page .admin-sidebar-nav a{color:#bdb1b5!important;background:transparent!important}
+.admin-page .admin-sidebar-nav a:hover{color:#fff!important;background:rgba(159,11,42,.12)!important}
+.admin-page .admin-sidebar-nav a.active{color:#fff!important;background:linear-gradient(100deg,#8d0826,#b91238)!important}
+.admin-page .nav-icon{color:#e62a57!important;background:#12080b!important;border-color:var(--vx-border)!important}
+.admin-page .admin-top{background:linear-gradient(135deg,rgba(8,6,7,.96),rgba(39,5,14,.92))!important;border:1px solid var(--vx-border)!important;color:#fff!important}
+.admin-page .admin-top h1,.admin-page .admin-top h2,.admin-page .admin-top p{color:#fff!important}
+.admin-page .admin-top-note{color:#b9adb1!important}
+.admin-page .eyebrow{color:#ed315d!important}
+.admin-page .admin-card,.admin-page .admin-panel-section,.admin-page .soft-card,.admin-page .form-card,.admin-page .settings-card,.admin-page .category-card,.admin-page .menu-admin-item,.admin-page .shipping-method-card,.admin-page .shipping-fee-admin-card,.admin-page .payment-method-card,.admin-page .admin-form-card{background:linear-gradient(145deg,rgba(10,7,8,.96),rgba(29,5,12,.92))!important;color:var(--vx-text)!important;border:1px solid var(--vx-border)!important;box-shadow:0 18px 50px rgba(0,0,0,.28)!important}
+.admin-page .admin-section-header h2,.admin-page .admin-section-header h3,.admin-page h2,.admin-page h3{color:#fff!important}
+.admin-page .admin-section-header .tiny-note,.admin-page .tiny-note,.admin-page .muted{color:var(--vx-muted)!important}
+.admin-page input,.admin-page select,.admin-page textarea{background:#090708!important;color:#fff!important;border:1px solid rgba(255,255,255,.14)!important}
+.admin-page input::placeholder,.admin-page textarea::placeholder{color:#77696e!important}
+.admin-page input:focus,.admin-page select:focus,.admin-page textarea:focus{border-color:#c5143d!important;outline:2px solid rgba(197,20,61,.15)!important}
+.admin-page .table-shell{background:#0a0708!important;border:1px solid var(--vx-border)!important;color:#eee!important}
+.admin-page table{background:transparent!important;color:#eee!important}
+.admin-page th{background:#16090d!important;color:#fff!important;border-color:var(--vx-border)!important}
+.admin-page td{background:transparent!important;color:#d9d0d3!important;border-color:rgba(255,255,255,.08)!important}
+.admin-page .data-table tbody tr:hover{background:rgba(159,11,42,.08)!important}
+.admin-page .primary-button,.admin-page button[type=submit],.admin-page .save-button{background:linear-gradient(135deg,#980a29,#c5143d)!important;color:#fff!important;border-color:#c5143d!important}
+.admin-page .secondary-button{background:#10090b!important;color:#eee!important;border-color:rgba(255,255,255,.15)!important}
+.admin-page .danger{color:#ff8ca7!important;border-color:rgba(213,28,74,.3)!important}
+.admin-page .empty{background:#0d080a!important;color:#9e8f94!important;border-color:var(--vx-border)!important}
+.admin-page .order-tab,.admin-page .chip-toggle{background:#0d080a!important;color:#d8ced1!important;border-color:var(--vx-border)!important}
+.admin-page .order-tab.active{background:linear-gradient(135deg,#980a29,#c5143d)!important;color:#fff!important}
+.admin-page .qr-preview-box,.admin-page .inline-form{background:#0d080a!important;border-color:var(--vx-border)!important}
+/* Hide modules the client did not request. */
+.admin-page #securitySection,.admin-page a[href="#securitySection"],.admin-page [data-section="security"],.admin-page a[href="sales.html"],.admin-page a[href*="sales"]{display:none!important}
+/* Remove old WonderPeps invoice styling if invoice is opened. */
+.admin-page .invoice-sheet,.admin-page .invoice-box,.admin-page .invoice-summary,.admin-page .invoice-payment{background:#0c080a!important;color:#fff!important;border-color:var(--vx-border)!important}
+.admin-page .invoice-head,.admin-page .invoice-total{background:linear-gradient(135deg,#8d0826,#c5143d)!important;color:#fff!important}
+.admin-page .invoice-head:before,.admin-page .invoice-head:after{content:none!important}
+.admin-page .invoice-table th{background:#16090d!important;color:#fff!important}
+.admin-page .invoice-table td{color:#ddd!important}
+/* Login */
+.admin-page .admin-login-card{background:linear-gradient(145deg,#0b0709,#25050d)!important;color:#fff!important}
+.admin-page .admin-login-card input{background:#090708!important;color:#fff!important}
+/* Mobile */
+@media(max-width:900px){.admin-page .admin-sidebar{position:relative;top:auto}.admin-page .admin-layout{grid-template-columns:1fr!important}.admin-page .admin-sidebar-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.admin-page .nav-group-label{grid-column:1/-1}}

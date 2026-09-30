@@ -1,0 +1,182 @@
+/* VialXBeauty final Cherry Noir cleanup */
+:root{
+  --vx-bg:#050405;
+  --vx-bg2:#12060a;
+  --vx-cherry:#9f0b2a;
+  --vx-cherry-2:#c5143d;
+  --vx-cherry-3:#5f0719;
+  --vx-text:#f8f4f2;
+  --vx-muted:#b8aaae;
+  --vx-line:rgba(197,20,61,.34);
+}
+
+/* ---------- ADMIN ---------- */
+body.admin-page,
+body.admin-page .admin-main-content,
+body.admin-page .admin-panel-section,
+body.admin-page .admin-card,
+body.admin-page .admin-section-card{
+  color:var(--vx-text)!important;
+}
+
+body.admin-page{
+  background:
+    radial-gradient(circle at 80% 0%,rgba(159,11,42,.22),transparent 28rem),
+    linear-gradient(135deg,#030304 0%,#080507 48%,#24040d 100%)!important;
+}
+
+/* Remove modules the client did not request. */
+body.admin-page #securitySection,
+body.admin-page a[href="sales.html"],
+body.admin-page a[href="#securitySection"],
+body.admin-page [data-section="security"],
+body.admin-page [data-section="sales"]{display:none!important}
+
+/* Force all admin controls into the Cherry Noir palette. */
+body.admin-page input,
+body.admin-page select,
+body.admin-page textarea,
+body.admin-page .admin-input,
+body.admin-page .settings-form input,
+body.admin-page .settings-form select,
+body.admin-page .settings-form textarea,
+body.admin-page .product-form input,
+body.admin-page .product-form select,
+body.admin-page .product-form textarea,
+body.admin-page .category-form input,
+body.admin-page .menu-form input,
+body.admin-page .menu-form select,
+body.admin-page .menu-form textarea{
+  color:#fff!important;
+  background:#0b0809!important;
+  border:1px solid rgba(213,28,74,.35)!important;
+  box-shadow:none!important;
+}
+body.admin-page input::placeholder,
+body.admin-page textarea::placeholder{color:#75676c!important}
+
+body.admin-page .products-table-container,
+body.admin-page .products-table,
+body.admin-page .category-card,
+body.admin-page .menu-admin-item,
+body.admin-page .shipping-method-card,
+body.admin-page .shipping-fee-admin-card,
+body.admin-page .payment-method-card,
+body.admin-page .security-card,
+body.admin-page .settings-card,
+body.admin-page .admin-form-card,
+body.admin-page .form-card{
+  color:var(--vx-text)!important;
+  background:rgba(12,7,9,.86)!important;
+  border-color:rgba(213,28,74,.28)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.25)!important;
+}
+
+body.admin-page .admin-card p,
+body.admin-page .tiny-note,
+body.admin-page .muted,
+body.admin-page .section-description{color:var(--vx-muted)!important}
+
+body.admin-page .primary-button,
+body.admin-page .save-button,
+body.admin-page button[type="submit"]{
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--vx-cherry),var(--vx-cherry-2))!important;
+  border-color:var(--vx-cherry-2)!important;
+  box-shadow:0 10px 28px rgba(197,20,61,.18)!important;
+}
+body.admin-page .secondary-button{
+  color:#eee!important;
+  background:#10090b!important;
+  border-color:rgba(213,28,74,.3)!important;
+}
+body.admin-page .admin-main-content h1,
+body.admin-page .admin-main-content h2,
+body.admin-page .admin-main-content h3,
+body.admin-page .admin-main-content strong,
+body.admin-page .admin-main-content label{color:#fff!important}
+
+/* ---------- STOREFRONT ---------- */
+body.storefront-page{
+  color:var(--vx-text)!important;
+  background:
+    radial-gradient(circle at 88% 0%,rgba(159,11,42,.24),transparent 30rem),
+    linear-gradient(145deg,#040405 0%,#0a0507 42%,#30050f 100%)!important;
+}
+body.storefront-page main,
+body.storefront-page .catalog-section,
+body.storefront-page footer{background:transparent!important}
+
+body.storefront-page .search-wrap,
+body.storefront-page .search-wrap input,
+body.storefront-page .search{
+  color:#fff!important;
+  background:rgba(255,255,255,.035)!important;
+  border-color:rgba(255,255,255,.16)!important;
+}
+body.storefront-page .search::placeholder{color:#9e8e94!important}
+
+/* Neutral product placeholder: no heart, no VX square. */
+body.storefront-page .product-image[aria-hidden="true"]{
+  position:relative;
+  display:grid!important;
+  place-items:center!important;
+  background:linear-gradient(145deg,#111,#241018)!important;
+  color:transparent!important;
+}
+body.storefront-page .product-image[aria-hidden="true"]::before{
+  content:"";
+  width:42px;
+  height:78px;
+  border:2px solid rgba(255,255,255,.72);
+  border-radius:12px 12px 9px 9px;
+  box-shadow:0 0 26px rgba(213,28,74,.15);
+}
+body.storefront-page .product-image[aria-hidden="true"]::after{
+  content:"";
+  position:absolute;
+  width:28px;
+  height:9px;
+  top:calc(50% - 48px);
+  border:2px solid rgba(255,255,255,.72);
+  border-bottom:0;
+  border-radius:5px 5px 0 0;
+}
+body.storefront-page .add-button{background:linear-gradient(135deg,var(--vx-cherry),var(--vx-cherry-2))!important;color:#fff!important}
+body.storefront-page .product-card{background:rgba(10,7,8,.72)!important;border-color:rgba(213,28,74,.25)!important;color:#fff!important}
+body.storefront-page .product-card h3,
+body.storefront-page .product-card strong{color:#fff!important}
+body.storefront-page .product-description,
+body.storefront-page .product-stats{color:#b9aaae!important}
+
+/* Cart/favorites/menu drawers match the site instead of the old cream theme. */
+body.storefront-page .drawer-panel,
+body.storefront-page #cartDrawer .drawer-panel,
+body.storefront-page #favoritesDrawer .drawer-panel,
+body.storefront-page #menuDrawer .drawer-panel{
+  color:#fff!important;
+  background:
+    radial-gradient(circle at 90% 5%,rgba(159,11,42,.18),transparent 18rem),
+    linear-gradient(145deg,#070607 0%,#12070b 55%,#30050f 100%)!important;
+  border-left:1px solid rgba(213,28,74,.3)!important;
+  box-shadow:-24px 0 70px rgba(0,0,0,.45)!important;
+}
+body.storefront-page .drawer-header{border-color:rgba(255,255,255,.12)!important}
+body.storefront-page .drawer-header h2,
+body.storefront-page .cart-summary,
+body.storefront-page .cart-summary strong,
+body.storefront-page .cart-summary span{color:#fff!important}
+body.storefront-page .cart-summary{background:rgba(0,0,0,.16)!important;border-color:rgba(255,255,255,.12)!important}
+body.storefront-page .cart-item,
+body.storefront-page .cart-line,
+body.storefront-page .drawer-body{border-color:rgba(255,255,255,.1)!important;color:#fff!important}
+body.storefront-page .cart-item-name,
+body.storefront-page .cart-item-price{color:#fff!important}
+body.storefront-page .cart-item-image{background:#140a0d!important;border-color:rgba(213,28,74,.25)!important}
+body.storefront-page .drawer .icon-button{color:#fff!important}
+body.storefront-page .primary-button.full{background:linear-gradient(135deg,#9f0b2a,#c5143d)!important;color:#fff!important}
+
+@media(max-width:760px){
+  body.admin-page .admin-sidebar{position:relative!important;top:auto!important;height:auto!important;max-height:none!important}
+  body.storefront-page .drawer-panel{width:min(92vw,430px)!important}
+}
