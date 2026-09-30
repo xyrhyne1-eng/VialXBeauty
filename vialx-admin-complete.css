@@ -356,52 +356,98 @@ body.admin-page .admin-login-card input { background:#090708!important;color:#ff
   body.admin-page .admin-quick-actions{grid-template-columns:1fr!important;}
 }
 
-/* Final layout refinement requested by client: keep storefront action on the far right
-   and keep the desktop admin sidebar anchored while the main content scrolls. */
-@media (min-width: 901px) {
-  body.admin-page .admin-site-header {
-    display:flex!important;
-    flex-direction:row!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-    width:100%!important;
-    gap:24px!important;
-  }
-  body.admin-page .admin-brand {
-    flex:0 1 auto!important;
-    min-width:0!important;
-  }
-  body.admin-page .admin-site-header .view-shop-button {
-    margin-left:auto!important;
-    flex:0 0 auto!important;
-    white-space:nowrap!important;
-  }
-
-  body.admin-page .admin-layout {
-    align-items:start!important;
-  }
-  body.admin-page .admin-sidebar {
-    position:sticky!important;
-    top:84px!important;
-    align-self:start!important;
-    height:calc(100vh - 104px)!important;
-    max-height:calc(100vh - 104px)!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    z-index:20!important;
-  }
+/* VialXBeauty admin patch: product actions + category/menu drag surfaces */
+body.admin-page .products-table-container {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 900px) {
-  body.admin-page .admin-site-header {
-    display:flex!important;
-    flex-direction:row!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-    gap:12px!important;
-  }
-  body.admin-page .admin-site-header .view-shop-button {
-    margin-left:auto!important;
-    flex:0 0 auto!important;
-  }
+body.admin-page .products-table {
+  min-width: 1360px !important;
+  table-layout: fixed !important;
+}
+
+body.admin-page .products-table th:last-child,
+body.admin-page .products-table td:last-child {
+  width: 255px !important;
+  min-width: 255px !important;
+}
+
+body.admin-page .products-table td:last-child {
+  vertical-align: middle !important;
+  padding: 14px 12px !important;
+}
+
+body.admin-page .products-table .compact-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+body.admin-page .products-table .compact-actions .secondary-button {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  min-height: 38px !important;
+}
+
+/* Keep the drag controls dark — no blush/white surfaces. */
+body.admin-page .category-drag-handle,
+body.admin-page .menu-drag-handle,
+body.admin-page .menu-group-drag-handle {
+  color: #f4eef0 !important;
+  background: #0c080a !important;
+  border: 1px solid rgba(197,20,61,.42) !important;
+  box-shadow: none !important;
+}
+
+body.admin-page .category-drag-handle:hover,
+body.admin-page .category-drag-handle:focus-visible,
+body.admin-page .menu-drag-handle:hover,
+body.admin-page .menu-drag-handle:focus-visible,
+body.admin-page .menu-group-drag-handle:hover,
+body.admin-page .menu-group-drag-handle:focus-visible {
+  color: #fff !important;
+  background: #16090d !important;
+  border-color: #c5143d !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(197,20,61,.10) !important;
+}
+
+/* Menu group itself stays black/deep-cherry instead of pink. */
+body.admin-page .menu-admin-group,
+body.admin-page .menu-admin-group-header,
+body.admin-page .menu-admin-group-items {
+  background: #0c080a !important;
+}
+
+body.admin-page .menu-admin-group {
+  border-color: rgba(197,20,61,.38) !important;
+  box-shadow: none !important;
+}
+
+body.admin-page .menu-admin-group-header {
+  border-bottom-color: rgba(197,20,61,.28) !important;
+}
+
+body.admin-page .menu-section-badge {
+  color: #e8dfe2 !important;
+  background: #10090b !important;
+  border-color: rgba(197,20,61,.30) !important;
+}
+
+/* Category cards and list rows remain dark and even. */
+body.admin-page .category-card,
+body.admin-page .category-editor-form {
+  background: #0c080a !important;
+  border-color: rgba(197,20,61,.38) !important;
+  box-shadow: none !important;
+}
+
+body.admin-page .category-card:hover {
+  border-color: rgba(197,20,61,.58) !important;
 }
