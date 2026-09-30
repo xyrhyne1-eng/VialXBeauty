@@ -3,168 +3,67 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#f9d8e5" />
-  <title>VialXBeauty</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23df4f86'/%3E%3Cpath d='M32 48S13 37 13 23c0-7 5-11 11-11 4 0 7 2 8 5 2-3 5-5 9-5 6 0 11 4 11 11 0 14-20 25-20 25Z' fill='white'/%3E%3C/svg%3E" />
-  <script>
-    // Shared links opened by Messenger can restore a stale vertical position.
-    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-    const startAtTop = () => {
-      document.documentElement.scrollTop = 0;
-      if (document.body) document.body.scrollTop = 0;
-      window.scrollTo(0, 0);
-    };
-    [0, 60, 180, 450].forEach((delay) => setTimeout(startAtTop, delay));
-    window.addEventListener("pageshow", startAtTop);
-  </script>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="storefront.css" />
-  <link rel="stylesheet" href="vialx-final.css" />
+  <meta name="theme-color" content="#0b090a" />
+  <title>VialXBeauty — Beauty in a darker shade</title>
+  <meta name="description" content="VialXBeauty — curated beauty essentials in a modern Cherry Noir storefront." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b090a'/%3E%3Cpath d='M14 18h9l9 28 9-28h9L37 52H27z' fill='%23b41435'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="vialx-store.css?v=final-mobile-1" />
+  <link rel="stylesheet" href="vialx-final-fixes.css?v=final-1" />
+  <link rel="stylesheet" href="vialx-store-final.css?v=20260930-1" />
 </head>
 <body class="storefront-page settings-loading">
-  <header class="site-header">
+  <header class="vx-header">
     <a class="brand" href="#home" aria-label="VialXBeauty home">
-      <img id="brandLogo" class="brand-logo" alt="Shop logo" hidden />
-      <span id="brandFallback" class="brand-mark" aria-hidden="true"></span>
+      <img id="brandLogo" class="brand-logo" alt="VialXBeauty logo" hidden />
       <span id="brandName">VialXBeauty</span>
     </a>
     <nav class="storefront-nav" aria-label="Storefront navigation">
-      <a class="shop-link" href="#shop">Shop</a>
-
-      <button
-        id="favoritesButton"
-        class="icon-button favorite-header-button"
-        type="button"
-        aria-label="Open favorites"
-      >
-        <svg class="header-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 20.5S4 15.8 4 9.5A4.5 4.5 0 0 1 12 6.7a4.5 4.5 0 0 1 8 2.8c0 6.3-8 11-8 11Z" />
-        </svg>
-        <span id="favoritesCount" class="favorites-badge" hidden>0</span>
-      </button>
-
-      <button
-        id="cartButton"
-        class="cart-button"
-        type="button"
-        aria-label="Open shopping cart"
-      >
-        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6.4 8.5h11.2l.8 11H5.6l.8-11Z" />
-          <path d="M9 9V6.8a3 3 0 0 1 6 0V9" />
-        </svg>
-        <span id="cartCount">0</span>
-      </button>
-
-      <button
-        id="menuButton"
-        class="icon-button menu-button"
-        type="button"
-        aria-label="Open menu"
-      >
-        <svg class="header-icon menu-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5 7h14M5 12h14M5 17h14" />
-        </svg>
-      </button>
+      <a class="shop-link" href="#shop">Products</a>
+      <button id="favoritesButton" class="icon-button" type="button" aria-label="Open favorites"><span class="header-heart" aria-hidden="true">♡</span><span id="favoritesCount" class="count-badge" hidden>0</span></button>
+      <button id="cartButton" class="icon-button cart-button" type="button" aria-label="Open cart"><svg class="header-cart" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L20.4 8H6.2M9.5 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg><span id="cartCount" class="count-badge">0</span></button>
+      <button id="menuButton" class="icon-button menu-button" type="button" aria-label="Open menu"><span class="menu-lines" aria-hidden="true"></span></button>
     </nav>
   </header>
-<aside id="menuDrawer" class="drawer menu-drawer" aria-hidden="true">
-  <div class="drawer-panel">
-    <div class="menu-drawer-brand">
-      <div class="menu-brand-identity">
-        <img id="menuBrandLogo" class="menu-brand-logo" alt="Shop logo" hidden />
-        <span id="menuBrandFallback" class="menu-brand-fallback" aria-hidden="true"></span>
-        <div>
-          <h2 id="menuBrandName">VialXBeauty</h2>
-          <p id="menuBrandTagline">Premium beauty, precisely selected.</p>
+
+  <aside id="menuDrawer" class="drawer menu-drawer" aria-hidden="true">
+    <div class="drawer-panel menu-panel">
+      <div class="menu-drawer-brand">
+        <div class="menu-brand-identity">
+          <img id="menuBrandLogo" class="menu-brand-logo" alt="VialXBeauty logo" hidden />
+          <div><h2 id="menuBrandName">VialXBeauty</h2><p id="menuBrandTagline">Beauty in a darker shade.</p></div>
         </div>
+        <button id="closeMenu" class="icon-button" type="button" aria-label="Close menu">×</button>
       </div>
-      <button
-        id="closeMenu"
-        class="icon-button menu-close-button"
-        type="button"
-        aria-label="Close menu"
-      >
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M6 6l12 12M18 6 6 18" />
-        </svg>
-      </button>
+      <nav id="storeMenuItems" class="store-menu-items" aria-label="Shop menu"></nav>
     </div>
+  </aside>
 
-    <nav id="storeMenuItems" class="store-menu-items" aria-label="Shop menu"></nav>
-  </div>
-</aside>
   <main>
-    <section id="home" class="hero" aria-labelledby="heroTitle">
-      <div class="hero-media">
-        <div class="hero-image-frame">
-          <img
-            src="vialx-hero-logo.jpg"
-            id="heroImage"
-            class="hero-image"
-            alt="VialXBeauty"
-          />
-          <div id="heroFallback" class="bunny-card" aria-hidden="true" hidden>
-            <div class="ears">◡ ◡</div>
-            <div class="face">◠ ᴥ ◠</div>
-            <div class="hearts">• • •</div>
-          </div>
-        </div>
-        
-        
+    <section id="home" class="vx-hero" aria-labelledby="heroTitle">
+      <div class="hero-logo-wrap">
+        <img class="hero-logo-image" src="vialx-hero-logo.jpg" alt="VIALX" />
       </div>
-
       <div class="hero-copy">
-        <p id="heroEyebrow" class="eyebrow">
-          PREMIUM BEAUTY ESSENTIALS
-        </p>
-        <h1 id="heroTitle">Premium beauty essentials. Precisely selected.</h1>
-        <p id="heroSubtitle">Discover premium beauty essentials, add your favorites to cart, and complete your order in a few simple steps.</p>
-        <a class="primary-button hero-button" href="#shop">
-          Shop now
-          <span aria-hidden="true">→</span>
-        </a>
+        <p id="heroEyebrow" class="eyebrow">VIALXBEAUTY</p>
+        <h1 id="heroTitle">Premium essentials. Precisely selected.</h1>
+        <p id="heroSubtitle" class="hero-subtitle">Explore the VialXBeauty product range with clear details and a simple shopping experience.</p>
+        <a class="primary-button" href="#shop">Shop products</a>
       </div>
     </section>
 
-    <section id="shop" class="section catalog-section" aria-labelledby="catalogTitle">
-      <div class="section-heading">
-        <div>
-          <p id="catalogEyebrow" class="eyebrow">PRODUCTS</p>
-          <h2 id="catalogTitle">Shop products</h2>
-          <p id="catalogSubtitle" class="catalog-subtitle">Curated beauty essentials for your routine.</p>
-        </div>
-
+    <section id="shop" class="catalog-section" aria-labelledby="catalogTitle">
+      <div class="catalog-top">
+        <div class="section-heading"><p id="catalogEyebrow" class="eyebrow">PRODUCTS</p><h2 id="catalogTitle">Shop products</h2><p id="catalogSubtitle" class="catalog-subtitle">Find your VialXBeauty essentials.</p></div>
+        <label class="search-wrap" for="searchInput"><span>⌕</span><input id="searchInput" class="search" type="search" placeholder="Search products" autocomplete="off" /></label>
       </div>
-
-        <label class="search-wrap catalog-search" for="searchInput">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="11" cy="11" r="6.5" />
-            <path d="m16 16 4 4" />
-          </svg>
-          <input
-            id="searchInput"
-            class="search"
-            type="search"
-            placeholder="Search products"
-            autocomplete="off"
-          />
-        </label>
-
-      <div class="category-area" aria-label="Product categories">
-        <div id="categoryFilters" class="category-filters"></div>
-      </div>
-
+      <div class="category-area" aria-label="Product categories"><div id="categoryFilters" class="category-filters"></div></div>
       <div id="productGrid" class="product-grid"></div>
     </section>
-
-
   </main>
-
   <aside id="cartDrawer" class="drawer" aria-hidden="true">
     <div class="drawer-panel">
       <div class="drawer-header">
-        <h2>Your bag</h2>
+        <h2>Your cart</h2>
         <button id="closeCart" class="icon-button" type="button" aria-label="Close cart">×</button>
       </div>
       <div id="cartItems"></div>
@@ -197,7 +96,7 @@
 
     <div id="favoritesItems" class="drawer-body">
         <p class="empty">
-            No favorites yet.
+            Your saved products will appear here.
         </p>
     </div>
 </div>
@@ -238,7 +137,7 @@
           class="variant-dialog-image-fallback"
           aria-hidden="true"
         >
-          •
+          ♡
         </div>
       </div>
 
@@ -299,7 +198,7 @@
       type="button"
       disabled
     >
-      Add to Bag
+      Add to cart
     </button>
   </div>
 </dialog>
@@ -316,7 +215,7 @@
 
       <section class="checkout-section-card checkout-customer-card" aria-labelledby="customerInformationTitle">
         <div class="checkout-section-heading">
-          <span class="checkout-section-icon" aria-hidden="true">•</span>
+          <span class="checkout-section-icon" aria-hidden="true">VX</span>
           <div>
             <h3 id="customerInformationTitle">Customer information</h3>
             <p>Who should we contact about this order?</p>
@@ -368,7 +267,7 @@
           </span>
           <div>
             <h3 id="shippingAddressTitle">Shipping address</h3>
-            <p>Where should we send your lovely order?</p>
+            <p>Where should we deliver your order?</p>
           </div>
         </div>
 
@@ -501,7 +400,7 @@
 
   <dialog id="successDialog">
     <div class="success-card">
-      <div class="success-icon">•</div>
+      <div class="success-icon">VX</div>
       <h2>Order received!</h2>
       <p>Your order reference is:</p>
       <strong id="orderReference"></strong>
@@ -524,9 +423,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<script src="app.js?v=vialx-final-1"></script>
 <script src="variants.js"></script>
-<script src="favorites.js"></script>
-<script src="philippine-address.js"></script>
-<script src="checkout-payment-v18.js"></script>
+<script src="favorites.js?v=vialx-1"></script>
+<script src="philippine-address.js?v=vialx-1"></script>
+<script src="checkout-payment-v18.js?v=final-mobile-1"></script>
 </body>
 </html>

@@ -468,7 +468,7 @@ dialog::backdrop{background:rgba(41,24,31,.45)}
     background:transparent;
   }
   #paymentStepDialog .payment-step-content::before{
-    content:"WonderPeps PH";
+    content:"VialXBeauty";
     display:block;
     padding:4px 8px 0;
     color:#df3f7d;
@@ -996,7 +996,7 @@ footer{display:flex;justify-content:space-between;padding:26px clamp(20px,6vw,80
 @media(max-width:620px){.settings-grid{grid-template-columns:1fr}}
 
 /* =========================================
-   WONDER PEPS V2 — PRODUCT CATALOG
+   VIALXBEAUTY V2 — PRODUCT CATALOG
 ========================================= */
 
 /* Catalog area */
