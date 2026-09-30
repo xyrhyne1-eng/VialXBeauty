@@ -1,609 +1,272 @@
-/* VialXBeauty — Complete Cherry Noir Admin UI
-   Final visual layer. No database/auth logic. */
 
-body.admin-page,
-body.admin-page * { box-sizing:border-box; }
+/* VialXBeauty PATCH 09
+   Premium ivory + champagne-gold admin theme.
+   IMPORTANT: visual-only overrides. No global font-size, shell width,
+   grid sizing, or placement changes.
+*/
 
-body.admin-page {
-  --vx-bg:#050405;
-  --vx-panel:#0b0709;
-  --vx-panel-2:#12080c;
-  --vx-wine:#24050d;
-  --vx-cherry:#9d092b;
-  --vx-red:#c5143d;
-  --vx-text:#f8f3f4;
-  --vx-muted:#b8aaae;
-  --vx-line:rgba(197,20,61,.30);
-  min-height:100vh;
-  color:var(--vx-text)!important;
+/* ---------- page background ---------- */
+.admin-page {
   background:
-    radial-gradient(circle at 84% 0%,rgba(157,9,43,.20),transparent 30rem),
-    linear-gradient(135deg,#030304 0%,#090507 48%,#28050e 100%)!important;
-  background-attachment:fixed!important;
+    radial-gradient(circle at 8% 0%, rgba(246, 225, 174, .72), transparent 28rem),
+    radial-gradient(circle at 92% 18%, rgba(215, 180, 102, .24), transparent 30rem),
+    linear-gradient(135deg, #fffdf8 0%, #f8f0df 48%, #e5cf9c 100%) !important;
+  color: #302824 !important;
 }
 
-/* No WonderPeps pink surfaces anywhere in the control room. */
-body.admin-page :is(
-  .admin-card,.admin-panel-section,.soft-card,.stat-card,.table-shell,
-  .category-card,.admin-product,.order-card,.payment-method-card,
-  .payment-method-empty,.settings-upload-field,.product-variants-section,
-  .product-image-upload-field,.variant-card,.category-editor-form,
-  .category-product-row,.menu-admin-group,.menu-admin-group-header,
-  .menu-admin-item,.shipping-method-form,.shipping-fee-form,
-  .shipping-method-card,.shipping-fee-admin-card,.payment-courier-fieldset,
-  .payment-courier-options,.qr-preview-box,.settings-image-preview,
-  .product-image-preview-wrap,.form-card,.settings-card,.admin-form-card,
-  .inline-form,.chip-toggle,.empty
-) {
-  color:var(--vx-text)!important;
-  background:linear-gradient(145deg,rgba(9,6,8,.97),rgba(26,6,12,.94))!important;
-  border-color:var(--vx-line)!important;
-  box-shadow:0 12px 34px rgba(0,0,0,.20)!important;
+.admin-page::before {
+  opacity: .16 !important;
+  background-image: radial-gradient(rgba(163, 126, 51, .16) 1px, transparent 1px) !important;
 }
 
-/* Main sizing: compact desktop control room, no giant blank panels. */
-body.admin-page .admin-shell {
-  width:min(100%,1440px)!important;
-  padding:22px 28px 48px!important;
-}
-body.admin-page .admin-layout {
-  grid-template-columns:240px minmax(0,1fr)!important;
-  gap:24px!important;
-}
-body.admin-page .admin-sidebar {
-  width:240px!important;
-  min-height:0!important;
-  height:calc(100vh - 112px)!important;
-  padding:18px 14px!important;
-  background:#060506!important;
-  border:1px solid var(--vx-line)!important;
-  border-radius:24px!important;
-}
-body.admin-page .admin-main-content { min-width:0!important; gap:18px!important; }
-body.admin-page .admin-panel-section { padding:24px!important; border-radius:22px!important; }
-
-/* Remove every link underline in the admin panel. */
-body.admin-page a,
-body.admin-page a:visited,
-body.admin-page a:hover,
-body.admin-page a:active,
-body.admin-page a:focus,
-body.admin-page .admin-sidebar-nav a,
-body.admin-page .admin-quick-actions a { text-decoration:none!important; }
-
-/* Header / brand */
-body.admin-page .admin-site-header {
-  min-height:64px!important;
-  padding:10px 28px!important;
-  background:rgba(3,3,4,.94)!important;
-  border-bottom:1px solid var(--vx-line)!important;
-  box-shadow:none!important;
-}
-body.admin-page .admin-brand,
-body.admin-page .admin-brand-copy,
-body.admin-page .admin-brand-copy strong { color:#fff!important; }
-body.admin-page .admin-brand .brand-mark,
-body.admin-page .vx-admin-mark {
-  background:linear-gradient(145deg,#12090c,#9d092b)!important;
-  border:1px solid rgba(255,255,255,.16)!important;
-  box-shadow:none!important;
-}
-body.admin-page .admin-brand-copy small { color:#d48a9c!important; }
-body.admin-page .view-shop-button {
-  background:#0e080a!important;
-  color:#fff!important;
-  border:1px solid var(--vx-line)!important;
+/* ---------- header: preserve height, move storefront button right ---------- */
+.admin-page .admin-site-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 72px !important;
+  background: linear-gradient(135deg, #fffdf9 0%, #f4ead4 100%) !important;
+  border-bottom-color: rgba(176, 139, 65, .34) !important;
+  box-shadow: 0 8px 26px rgba(89, 67, 29, .08) !important;
 }
 
-/* Sidebar */
-body.admin-page .admin-sidebar-title,
-body.admin-page .admin-sidebar-title * { color:#fff!important; }
-body.admin-page .sidebar-session {
-  background:rgba(157,9,43,.08)!important;
-  border-color:var(--vx-line)!important;
-  color:#eee!important;
-}
-body.admin-page .admin-sidebar-nav a {
-  color:#c8bdc1!important;
-  background:transparent!important;
-  border:1px solid transparent!important;
-}
-body.admin-page .admin-sidebar-nav a:hover {
-  color:#fff!important;
-  background:rgba(157,9,43,.10)!important;
-  border-color:var(--vx-line)!important;
-}
-body.admin-page .admin-sidebar-nav a.active {
-  color:#fff!important;
-  background:linear-gradient(100deg,#8d0826,#bf1239)!important;
-  border-color:rgba(255,255,255,.08)!important;
-}
-body.admin-page .nav-icon {
-  color:#ed315d!important;
-  background:#10080a!important;
-  border-color:var(--vx-line)!important;
-}
-body.admin-page .admin-sidebar-nav a.active .nav-icon {
-  color:#fff!important;
-  background:rgba(0,0,0,.16)!important;
-}
-body.admin-page .nav-group-label { color:#a98792!important; }
-body.admin-page .admin-sidebar .secondary-button {
-  color:#eee!important;
-  background:#0c0809!important;
-  border-color:var(--vx-line)!important;
+.admin-page .admin-brand {
+  display: flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
 }
 
-/* Remove unwanted modules. */
-body.admin-page #securitySection,
-body.admin-page a[href="#securitySection"],
-body.admin-page [data-section="security"],
-body.admin-page a[href="sales.html"],
-body.admin-page a[href*="sales"] { display:none!important; }
-
-/* Hero + equal action buttons */
-body.admin-page .admin-top {
-  padding:28px 30px!important;
-  min-height:0!important;
-  background:linear-gradient(145deg,#0a0608 0%,#14070b 55%,#30050f 100%)!important;
-  border:1px solid var(--vx-line)!important;
-  box-shadow:0 18px 48px rgba(0,0,0,.24)!important;
-}
-body.admin-page .admin-top h1,
-body.admin-page .admin-top h1 span { color:#fff!important; }
-body.admin-page .admin-top-note { color:#bcaeb2!important; }
-body.admin-page .eyebrow { color:#ef315e!important; }
-body.admin-page .admin-quick-actions {
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(160px,1fr))!important;
-  gap:10px!important;
-  width:min(360px,100%)!important;
-}
-body.admin-page .admin-quick-actions > a {
-  width:100%!important;
-  min-height:50px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  padding:0 14px!important;
-  border-radius:11px!important;
-}
-body.admin-page .admin-quick-actions .secondary-button {
-  background:#0d080a!important;
-  color:#fff!important;
-  border-color:rgba(255,255,255,.15)!important;
-}
-body.admin-page .admin-quick-actions .primary-button {
-  background:linear-gradient(135deg,#980a29,#c5143d)!important;
-  color:#fff!important;
+.admin-page .view-shop-button {
+  margin-left: auto !important;
+  flex: 0 0 auto !important;
+  background: linear-gradient(135deg, #fffefa 0%, #eee0c1 100%) !important;
+  color: #3b312b !important;
+  border-color: rgba(159, 123, 48, .42) !important;
+  box-shadow: 0 7px 18px rgba(86, 62, 23, .10) !important;
 }
 
-/* Dashboard / summary cards: 4 compact columns on desktop. */
-body.admin-page .dashboard-stats {
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:12px!important;
-  margin-bottom:16px!important;
-}
-body.admin-page .stat-card {
-  min-height:112px!important;
-  padding:18px!important;
-  background:linear-gradient(145deg,#0d080a,#18090e)!important;
-  border:1px solid var(--vx-line)!important;
-}
-body.admin-page .stat-card small { color:#b7a6ac!important; }
-body.admin-page .stat-card strong { color:#fff!important; }
-body.admin-page .stat-card::after { background:rgba(197,20,61,.08)!important; }
-body.admin-page .dashboard-grid {
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:14px!important;
+.admin-page .view-shop-button:hover {
+  background: linear-gradient(135deg, #fffefa 0%, #e7d3a8 100%) !important;
+  border-color: #b08a3f !important;
 }
 
-/* All headings/text */
-body.admin-page h1,body.admin-page h2,body.admin-page h3,body.admin-page h4,
-body.admin-page strong,body.admin-page label { color:#fff!important; }
-body.admin-page p,body.admin-page .tiny-note,body.admin-page .muted,
-body.admin-page .section-description { color:var(--vx-muted)!important; }
-
-/* Forms: compact two-column desktop layout instead of enormous vertical pages. */
-body.admin-page .admin-form {
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:14px!important;
-  padding:0!important;
-  background:transparent!important;
-}
-body.admin-page .admin-form > label,
-body.admin-page .admin-form > .settings-grid,
-body.admin-page .admin-form > .product-variants-section,
-body.admin-page .admin-form > .product-image-upload-field,
-body.admin-page .admin-form > .category-products-editor,
-body.admin-page .admin-form > textarea,
-body.admin-page .admin-form > .full,
-body.admin-page .admin-form > button.full { grid-column:1/-1!important; }
-body.admin-page .admin-form label { color:#e9e0e3!important; }
-body.admin-page .admin-form small { color:#9f9196!important; }
-
-/* Settings and product sub-panels stay dark. */
-body.admin-page .settings-upload-field,
-body.admin-page .product-variants-section,
-body.admin-page .product-image-upload-field,
-body.admin-page .category-editor-form,
-body.admin-page .shipping-method-form,
-body.admin-page .shipping-fee-form,
-body.admin-page .payment-courier-fieldset {
-  padding:16px!important;
-  background:linear-gradient(145deg,#0c080a,#16090d)!important;
-}
-body.admin-page .settings-grid {
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:14px!important;
-}
-body.admin-page .settings-upload-field,
-body.admin-page .product-image-upload-field { min-height:0!important; }
-body.admin-page .product-variants-section { margin:0!important; }
-body.admin-page .variant-card,
-body.admin-page .category-product-row,
-body.admin-page .menu-admin-item,
-body.admin-page .payment-method-card,
-body.admin-page .shipping-method-card,
-body.admin-page .shipping-fee-admin-card,
-body.admin-page .order-card,
-body.admin-page .admin-product {
-  background:#0c080a!important;
-  border-color:var(--vx-line)!important;
-  box-shadow:none!important;
-}
-
-/* Inputs / selects / textareas */
-body.admin-page :is(input,textarea,select),
-body.admin-page .search-field,
-body.admin-page .chip-toggle {
-  min-height:42px!important;
-  color:#fff!important;
-  background:#080607!important;
-  border:1px solid rgba(197,20,61,.34)!important;
-  border-radius:10px!important;
-}
-body.admin-page textarea { min-height:96px!important; }
-body.admin-page :is(input,textarea)::placeholder { color:#74676c!important; }
-body.admin-page :is(input,textarea,select):focus {
-  border-color:#c5143d!important;
-  box-shadow:0 0 0 3px rgba(197,20,61,.12)!important;
-  background:#0d080a!important;
-}
-body.admin-page input[type="checkbox"] { accent-color:#c5143d!important; }
-
-/* Buttons */
-body.admin-page .primary-button,
-body.admin-page button[type="submit"],
-body.admin-page .save-button {
-  color:#fff!important;
-  background:linear-gradient(135deg,#980a29,#c5143d)!important;
-  border-color:#c5143d!important;
-}
-body.admin-page .secondary-button,
-body.admin-page .danger-button {
-  color:#f3edef!important;
-  background:#0d080a!important;
-  border-color:rgba(197,20,61,.34)!important;
-}
-body.admin-page .secondary-button:hover { background:#16090d!important; }
-
-/* Tables and list shells */
-body.admin-page .table-shell,
-body.admin-page .products-table-container,
-body.admin-page .products-table {
-  background:#0a0708!important;
-  color:#eee!important;
-  border-color:var(--vx-line)!important;
-}
-body.admin-page table,body.admin-page td,body.admin-page th {
-  background:transparent!important;
-  color:#eee!important;
-  border-color:rgba(255,255,255,.08)!important;
-}
-body.admin-page th { background:#16090d!important;color:#fff!important; }
-
-/* Preview boxes / images */
-body.admin-page .settings-image-preview,
-body.admin-page .product-image-preview-wrap,
-body.admin-page .qr-preview-box,
-body.admin-page .payment-method-empty {
-  background:#090708!important;
-  border-color:var(--vx-line)!important;
-}
-
-/* Modals/invoices match the dark theme too. */
-body.admin-page dialog,
-body.admin-page .invoice-sheet,
-body.admin-page .invoice-box,
-body.admin-page .invoice-summary,
-body.admin-page .invoice-payment {
-  color:#fff!important;
-  background:#0b0709!important;
-  border-color:var(--vx-line)!important;
-}
-body.admin-page .invoice-head,
-body.admin-page .invoice-total { background:linear-gradient(135deg,#8d0826,#c5143d)!important;color:#fff!important; }
-body.admin-page .invoice-head::before,body.admin-page .invoice-head::after { display:none!important; }
-
-/* Login */
-body.admin-page .admin-login-card {
-  background:linear-gradient(145deg,#0b0709,#25050d)!important;
-  color:#fff!important;
-  border-color:var(--vx-line)!important;
-}
-body.admin-page .admin-login-card input { background:#090708!important;color:#fff!important; }
-
-@media(max-width:1120px){
-  body.admin-page .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-  body.admin-page .settings-grid{grid-template-columns:1fr!important;}
-}
-@media(max-width:900px){
-  body.admin-page .admin-shell{padding:16px 14px 40px!important;}
-  body.admin-page .admin-layout{grid-template-columns:1fr!important;}
-  body.admin-page .admin-sidebar{position:relative!important;top:auto!important;width:100%!important;height:auto!important;}
-  body.admin-page .admin-form{grid-template-columns:1fr!important;}
-  body.admin-page .admin-form > *{grid-column:1!important;}
-  body.admin-page .dashboard-grid{grid-template-columns:1fr!important;}
-}
-@media(max-width:560px){
-  body.admin-page .dashboard-stats{grid-template-columns:1fr!important;}
-  body.admin-page .admin-panel-section{padding:18px!important;}
-  body.admin-page .admin-quick-actions{grid-template-columns:1fr!important;}
-}
-
-
-/* =========================================================
-   VialXBeauty PATCH 08
-   Premium Ivory + Champagne-Gold Admin Workspace
-   Visual-only: preserves existing layout/sizing.
-   ========================================================= */
-
-/* Workspace background — light, warm, premium */
-body.admin-page .admin-main-content {
+/* ---------- left admin panel: same size/placement, premium gold gradient ---------- */
+.admin-page .admin-sidebar {
   background:
-    radial-gradient(circle at 92% 4%, rgba(212, 174, 92, .20), transparent 30rem),
-    linear-gradient(135deg, #fffdf9 0%, #f8f1e4 52%, #ead9b5 100%) !important;
-  color: #2b2523 !important;
-}
-
-/* Keep the existing shell/layout dimensions unchanged. */
-body.admin-page .admin-main-content,
-body.admin-page .admin-main-content * {
-  scrollbar-color: #c9a95e #f3ecdf;
-}
-
-/* All admin workspace cards: ivory -> champagne gold */
-body.admin-page :is(
-  .admin-card,
-  .admin-panel-section,
-  .soft-card,
-  .stat-card,
-  .table-shell,
-  .category-card,
-  .admin-product,
-  .order-card,
-  .payment-method-card,
-  .payment-method-empty,
-  .settings-upload-field,
-  .product-variants-section,
-  .product-image-upload-field,
-  .variant-card,
-  .category-editor-form,
-  .category-product-row,
-  .menu-admin-group,
-  .menu-admin-group-header,
-  .menu-admin-item,
-  .shipping-method-form,
-  .shipping-fee-form,
-  .shipping-method-card,
-  .shipping-fee-admin-card,
-  .payment-courier-fieldset,
-  .payment-courier-options,
-  .qr-preview-box,
-  .settings-image-preview,
-  .product-image-preview-wrap,
-  .form-card,
-  .settings-card,
-  .admin-form-card,
-  .inline-form,
-  .empty
-) {
-  color: #2b2523 !important;
-  background:
-    linear-gradient(135deg, #fffefa 0%, #faf4e8 58%, #eee1c5 100%) !important;
-  border-color: rgba(180, 145, 72, .38) !important;
+    radial-gradient(circle at 100% 0%, rgba(255,255,255,.90), transparent 12rem),
+    linear-gradient(155deg, #fffefa 0%, #f8efdc 58%, #e8d4a5 100%) !important;
+  border-color: rgba(176, 139, 65, .38) !important;
   box-shadow:
-    0 10px 28px rgba(92, 69, 32, .10),
+    0 20px 46px rgba(91, 67, 27, .11),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+
+.admin-page .sidebar-session {
+  background: rgba(255,255,255,.66) !important;
+  border-color: rgba(176,139,65,.28) !important;
+  color: #65594f !important;
+}
+
+.admin-page .admin-sidebar-nav a {
+  color: #493e37 !important;
+}
+
+.admin-page .admin-sidebar-nav a:hover {
+  color: #5a431c !important;
+  background: rgba(238, 218, 175, .50) !important;
+}
+
+.admin-page .admin-sidebar-nav a.active {
+  color: #fff !important;
+  background: linear-gradient(135deg, #8f6b28, #c3a052) !important;
+  border-color: #aa843a !important;
+  box-shadow: 0 8px 18px rgba(125, 91, 28, .18) !important;
+}
+
+.admin-page .admin-sidebar .secondary-button {
+  background: rgba(255,255,255,.78) !important;
+  color: #594a3e !important;
+  border-color: rgba(166,129,55,.38) !important;
+}
+
+/* ---------- Welcome Admin hero: preserve exact sizing, change only finish ---------- */
+.admin-page .admin-top {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(225, 190, 108, .26), transparent 13rem),
+    linear-gradient(135deg, #fffdf9 0%, #f8edda 52%, #e3ca91 100%) !important;
+  border-color: rgba(176,139,65,.42) !important;
+  box-shadow:
+    0 16px 38px rgba(92,67,28,.11),
+    inset 0 1px 0 rgba(255,255,255,.92) !important;
+  color: #2f2824 !important;
+}
+
+.admin-page .admin-top .eyebrow {
+  color: #96712e !important;
+}
+
+.admin-page .admin-top h1,
+.admin-page .admin-top h1 span {
+  color: #302824 !important;
+}
+
+.admin-page .admin-top-note {
+  color: #6f6258 !important;
+}
+
+/* Quick actions retain their dimensions */
+.admin-page .admin-quick-actions .secondary-button {
+  background: rgba(255,255,255,.72) !important;
+  color: #40352f !important;
+  border-color: rgba(160,124,53,.40) !important;
+}
+
+.admin-page .admin-quick-actions .primary-button {
+  background: linear-gradient(135deg, #8f6b28, #c3a052) !important;
+  border-color: #aa843a !important;
+}
+
+/* ---------- all workspace cards: ivory/champagne, not oversized ---------- */
+.admin-page .admin-card,
+.admin-page .admin-panel-section {
+  background:
+    linear-gradient(135deg, #fffefa 0%, #faf2e2 62%, #ead8af 100%) !important;
+  color: #302824 !important;
+  border-color: rgba(176,139,65,.34) !important;
+  box-shadow:
+    0 10px 28px rgba(92,67,28,.08),
     inset 0 1px 0 rgba(255,255,255,.90) !important;
 }
 
-/* Typography inside light cards */
-body.admin-page :is(
-  .admin-card,
-  .admin-panel-section,
-  .soft-card,
-  .stat-card,
-  .table-shell,
-  .category-card,
-  .payment-method-card,
-  .settings-card,
-  .shipping-method-card,
-  .shipping-fee-admin-card
-) :is(h1,h2,h3,h4,h5,h6,strong,th,td,label) {
-  color: #2b2523 !important;
+.admin-page .admin-section-header h2,
+.admin-page .admin-section-header h3,
+.admin-page .admin-card h2,
+.admin-page .admin-card h3,
+.admin-page .admin-card h4,
+.admin-page .admin-panel-section h2,
+.admin-page .admin-panel-section h3 {
+  color: #302824 !important;
 }
 
-body.admin-page :is(
-  .admin-card,
-  .admin-panel-section,
-  .soft-card,
-  .stat-card,
-  .table-shell,
-  .category-card,
-  .payment-method-card,
-  .settings-card,
-  .shipping-method-card,
-  .shipping-fee-admin-card
-) :is(p,.tiny-note,.admin-muted,.payment-meta,.menu-url) {
-  color: #756a61 !important;
+.admin-page .tiny-note,
+.admin-page .admin-top-note,
+.admin-page .admin-card p {
+  color: #766a60 !important;
 }
 
-/* Forms stay light and premium */
-body.admin-page :is(input,select,textarea) {
-  background: rgba(255,255,255,.82) !important;
-  color: #2b2523 !important;
-  border-color: rgba(160,128,65,.34) !important;
+/* ---------- dashboard stat cards ---------- */
+.admin-page .stat-card {
+  background: linear-gradient(135deg, #fffefa 0%, #f7edd9 100%) !important;
+  border-color: rgba(176,139,65,.30) !important;
+  box-shadow: 0 8px 20px rgba(92,67,28,.07) !important;
 }
 
-body.admin-page :is(input,select,textarea)::placeholder {
-  color: #9b9085 !important;
+.admin-page .stat-card small {
+  color: #786d63 !important;
 }
 
-body.admin-page :is(input,select,textarea):focus {
-  border-color: #b18a3d !important;
-  outline: 3px solid rgba(177,138,61,.13) !important;
+/* ---------- forms / settings ---------- */
+.admin-page :is(input, textarea, select) {
+  background: rgba(255,255,255,.78) !important;
+  color: #302824 !important;
+  border-color: rgba(168,132,62,.34) !important;
 }
 
-/* Gold accent without changing button dimensions */
-body.admin-page .primary-button,
-body.admin-page button[type="submit"],
-body.admin-page .save-button {
-  background: linear-gradient(135deg, #8f6a22, #c7a552) !important;
-  border-color: #b18a3d !important;
-  color: #fff !important;
-  box-shadow: 0 7px 16px rgba(126,91,24,.18) !important;
+.admin-page :is(input, textarea, select):focus {
+  border-color: #ad863c !important;
+  box-shadow: 0 0 0 3px rgba(173,134,60,.11) !important;
 }
 
-body.admin-page .secondary-button,
-body.admin-page .danger-button {
-  background: rgba(255,255,255,.74) !important;
-  color: #3b312c !important;
-  border-color: rgba(150,116,51,.42) !important;
+.admin-page :is(.settings-upload-field,
+.product-image-upload-field,
+.product-variants-section,
+.variant-card,
+.shipping-method-form,
+.shipping-fee-form,
+.payment-method-card,
+.payment-method-empty,
+.qr-preview-box,
+.empty) {
+  background: linear-gradient(135deg, #fffefa 0%, #f7edda 100%) !important;
+  border-color: rgba(176,139,65,.30) !important;
+  color: #302824 !important;
 }
 
-body.admin-page .secondary-button:hover,
-body.admin-page .danger-button:hover {
-  background: #f4ead6 !important;
-  border-color: #b18a3d !important;
-}
-
-/* Category/menu drag controls: no pink/white blocks */
-body.admin-page :is(
-  .category-drag-handle,
-  .menu-drag-handle,
-  [class*="drag-handle"]
-) {
-  background: linear-gradient(145deg,#f8f1e4,#ead9b5) !important;
-  color: #665333 !important;
-  border-color: rgba(160,128,65,.38) !important;
-}
-
-/* =========================================================
-   PRODUCT TABLE — ACTIONS CANNOT OVERLAP
-   ========================================================= */
-
-body.admin-page #productsTableContainer {
+/* ---------- product table: guaranteed action separation ---------- */
+.admin-page #productsTableContainer,
+.admin-page #productsTableContainer > .table-shell {
   min-width: 0 !important;
+  max-width: 100% !important;
   overflow-x: auto !important;
   overflow-y: visible !important;
-  width: 100% !important;
 }
 
-body.admin-page #productsTableContainer > .table-shell {
-  min-width: 0 !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  width: 100% !important;
-}
-
-body.admin-page #productsTableContainer .data-table {
-  width: 100% !important;
+.admin-page #productsTableContainer .data-table {
   min-width: 1320px !important;
+  width: 100% !important;
   table-layout: fixed !important;
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
 }
 
-body.admin-page #productsTableContainer .data-table th,
-body.admin-page #productsTableContainer .data-table td {
-  vertical-align: middle !important;
-  overflow-wrap: anywhere !important;
-}
-
-body.admin-page #productsTableContainer .data-table th:last-child,
-body.admin-page #productsTableContainer .data-table td:last-child {
-  width: 255px !important;
-  min-width: 255px !important;
-  max-width: 255px !important;
-  overflow: visible !important;
+.admin-page #productsTableContainer .data-table th:last-child,
+.admin-page #productsTableContainer .data-table td:last-child {
+  width: 270px !important;
+  min-width: 270px !important;
+  max-width: 270px !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
   white-space: normal !important;
-  padding-left: 12px !important;
-  padding-right: 12px !important;
+  overflow: visible !important;
 }
 
-/* The four product actions get their own two-column grid. */
-body.admin-page #productsTableContainer .data-table .compact-actions {
+/* Existing compact-actions class used by the product renderer */
+.admin-page #productsTableContainer .compact-actions {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: 1fr 1fr !important;
   gap: 8px !important;
   width: 100% !important;
   min-width: 0 !important;
   margin: 0 !important;
 }
 
-body.admin-page #productsTableContainer .data-table .compact-actions > button {
+.admin-page #productsTableContainer .compact-actions > button {
   width: 100% !important;
   min-width: 0 !important;
   max-width: none !important;
   margin: 0 !important;
   white-space: nowrap !important;
-  justify-self: stretch !important;
 }
 
-body.admin-page #productsTableContainer .data-table .compact-actions > button:nth-child(3),
-body.admin-page #productsTableContainer .data-table .compact-actions > button:nth-child(4) {
-  grid-row: 2 !important;
+.admin-page #productsTableContainer .data-table th {
+  background: rgba(231, 211, 168, .50) !important;
+  color: #4c4036 !important;
+  border-color: rgba(176,139,65,.22) !important;
 }
 
-body.admin-page #productsTableContainer .data-table .compact-actions > button:nth-child(4) {
-  grid-column: 1 !important;
+.admin-page #productsTableContainer .data-table td {
+  color: #332b26 !important;
+  border-color: rgba(176,139,65,.17) !important;
 }
 
-/* Make the product table itself light/gold */
-body.admin-page #productsTableContainer .data-table {
-  background: transparent !important;
+/* Gold buttons, without changing their size */
+.admin-page .primary-button {
+  background: linear-gradient(135deg, #8f6b28, #c3a052) !important;
+  border-color: #aa843a !important;
+  box-shadow: 0 7px 16px rgba(125,91,28,.16) !important;
 }
 
-body.admin-page #productsTableContainer .data-table th {
-  background: rgba(239,225,197,.72) !important;
-  color: #4b3c2f !important;
-  border-color: rgba(160,128,65,.22) !important;
+.admin-page .secondary-button {
+  color: #4a3d34 !important;
+  background: rgba(255,255,255,.74) !important;
+  border-color: rgba(166,129,55,.34) !important;
 }
 
-body.admin-page #productsTableContainer .data-table td {
-  background: rgba(255,253,249,.38) !important;
-  color: #302824 !important;
-  border-color: rgba(160,128,65,.16) !important;
-}
-
-body.admin-page #productsTableContainer .data-table tbody tr:hover td {
-  background: rgba(255,255,255,.70) !important;
-}
-
-/* Keep sidebar/header placement and dimensions exactly as the existing project. */
-body.admin-page .admin-sidebar,
-body.admin-page .admin-site-header {
-  /* intentionally unchanged */
-}
-
-/* Mobile: preserve safe horizontal table scroll rather than squeezing actions. */
+/* Keep mobile/tablet placement and sizes; only recolor. */
 @media (max-width: 900px) {
-  body.admin-page #productsTableContainer .data-table {
-    min-width: 1220px !important;
+  .admin-page .admin-sidebar {
+    background: linear-gradient(155deg, #fffefa 0%, #f7edda 100%) !important;
+  }
+
+  .admin-page .admin-top {
+    background: linear-gradient(135deg, #fffefa 0%, #ead8af 100%) !important;
   }
 }
