@@ -96,7 +96,7 @@ const successDialog = document.querySelector("#successDialog");
 
 const orderReference = document.querySelector("#orderReference");
 const closeSuccess = document.querySelector("#closeSuccess");
-const CART_STORAGE_KEY = "vialXBeautyCart";
+const CART_STORAGE_KEY = "wonderPepsCart";
 
 function loadSavedCart() {
   try {
@@ -274,7 +274,7 @@ async function loadShopSettings() {
 }
 
 function applyShopSettings(settings) {
-  const shopName = settings.shop_name || "VialXBeauty";
+  const shopName = settings.shop_name || "Wonder Peps PH";
 
   document.title = shopName;
 
@@ -291,18 +291,18 @@ function applyShopSettings(settings) {
 
   if (menuBrandTagline) {
     menuBrandTagline.textContent =
-      settings.menu_tagline || "Beauty in a darker shade.";
+      settings.menu_tagline || "Everything lovely, in one place";
   }
 
   if (heroTitle) {
     heroTitle.textContent =
-      settings.hero_title || "Premium essentials. Precisely selected.";
+      settings.hero_title || "Soft pink shopping made easy.";
   }
 
   if (heroSubtitle) {
     heroSubtitle.textContent =
       settings.hero_subtitle ||
-      "Explore the VialXBeauty product range with clear details and a simple shopping experience.";
+      "Browse products, add them to your bag, and send your order details in just a few taps.";
   }
 
   if (heroEyebrow) {
@@ -311,18 +311,18 @@ function applyShopSettings(settings) {
 
   if (catalogEyebrow) {
     catalogEyebrow.textContent =
-      settings.catalog_eyebrow || "PRODUCTS";
+      settings.catalog_eyebrow || "OUR COLLECTION";
   }
 
   if (catalogTitle) {
     catalogTitle.textContent =
-      settings.catalog_title || "Shop products";
+      settings.catalog_title || "Find your new favorite";
   }
 
   if (catalogSubtitle) {
     catalogSubtitle.textContent =
       settings.catalog_subtitle ||
-      "Find your VialXBeauty essentials.";
+      "Sweet little picks, chosen just for you.";
   }
 
   if (catalogHeading) {
