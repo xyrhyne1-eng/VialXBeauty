@@ -4,20 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>VialXBeauty Admin</title>
-  <meta name="theme-color" content="#09090b" />
-    <link rel="stylesheet" href="admin.css?v=grouped-address-v4" />
-    <link rel="stylesheet" href="vialx-admin.css?v=cherry-noir-admin-v3" />
-<link rel="stylesheet" href="vialx-admin-final.css?v=20260930-1" />
-  <link rel="stylesheet" href="vialx-final-fixes.css?v=final-1" />
-  <link rel="stylesheet" href="vialx-admin-complete.css?v=20260930-final" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%238d1027'/%3E%3Cpath d='M32 48S13 37 13 23c0-7 5-11 11-11 4 0 7 2 8 5 2-3 5-5 9-5 6 0 11 4 11 11 0 14-20 25-20 25Z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="vialx-final.css" />
 </head>
 <body class="admin-page">
   <a class="skip-link" href="#dashboardSection">Skip to dashboard</a>
 
   <header class="site-header admin-site-header">
     <a class="brand admin-brand" href="index.html" aria-label="VialXBeauty shop home">
-      <span class="brand-mark vx-admin-mark" aria-hidden="true">VX</span>
-      <span class="admin-brand-copy">VialXBeauty <small>BEAUTY REIMAGINED</small></span>
+      <span class="brand-mark" aria-hidden="true">VX</span>
+      <span class="admin-brand-copy">VialXBeauty <small>ADMIN</small></span>
     </a>
     <a class="secondary-button view-shop-button" href="index.html">
       <span>View storefront</span><span aria-hidden="true">↗</span>
@@ -27,9 +25,9 @@
   <main class="admin-shell">
   <section id="loginSection" class="admin-card admin-login-card">
   <div class="login-icon" aria-hidden="true">VX</div>
-  <p class="eyebrow">VIALXBEAUTY CONTROL ROOM</p>
-  <h1>Store management</h1>
-  <p class="login-intro">Sign in to manage products, orders, payments and store settings.</p>
+  <p class="eyebrow">Store management</p>
+  <h1>Admin login</h1>
+  <p class="login-intro">Sign in to manage the VialXBeauty store.</p>
 
   <form id="loginForm" class="admin-form">
     <label>
@@ -56,7 +54,7 @@
     <div class="admin-sidebar-title">
       <span class="sidebar-brand-badge" aria-hidden="true">VX</span>
       <span>VialXBeauty</span>
-      <small>Store management</small>
+      <small>Shop control center</small>
     </div>
 
     <div class="sidebar-session"><span aria-hidden="true"></span> Admin workspace</div>
@@ -65,7 +63,8 @@
       <div class="nav-group-label">Overview</div>
       <a class="active" href="#dashboardSection"><span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span></a>
       <a href="#ordersSection"><span class="nav-icon" aria-hidden="true">◫</span><span>Orders</span></a>
-      
+      <a href="sales.html"><span class="nav-icon" aria-hidden="true">₱</span><span>Sales tracker</span></a>
+
       <div class="nav-group-label">Catalog</div>
       <a href="#productsSection"><span class="nav-icon" aria-hidden="true">◇</span><span>Products</span></a>
       <a href="#categoriesSection"><span class="nav-icon" aria-hidden="true">✿</span><span>Categories</span></a>
@@ -73,13 +72,14 @@
 
       <div class="nav-group-label">Store</div>
       <a href="#shippingFeesSection"><span class="nav-icon" aria-hidden="true">♢</span><span>Shipping options</span></a>
-      <a id="paymentMethodsNav" href="#paymentMethodsSection"><span class="nav-icon" aria-hidden="true">₱</span><span>Payment methods</span></a>
+      <a id="paymentMethodsNav" href="#paymentMethodsSection"><span class="nav-icon" aria-hidden="true">▣</span><span>Payment methods</span></a>
       <a href="#addProductSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add product</span></a>
       <a href="#addMenuSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add menu item</span></a>
 
       <div class="nav-group-label">Settings</div>
       <a href="#shopSettingsSection"><span class="nav-icon" aria-hidden="true">⚙</span><span>Shop settings</span></a>
-          </nav>
+      <a href="#securitySection"><span class="nav-icon" aria-hidden="true">⌘</span><span>Security &amp; accounts</span></a>
+    </nav>
 
     <button
       id="sidebarLogoutButton"
@@ -94,11 +94,12 @@
     <div class="admin-top">
       <div>
         <p class="eyebrow">VialXBeauty workspace</p>
-        <h1>Welcome, Admin!</h1>
-        <p class="admin-top-note">Manage your VialXBeauty store, products, orders, and settings in one place.</p>
+        <h1>VialXBeauty Admin</h1>
+        <p class="admin-top-note">Manage products, orders, payments, shipping, and store settings.</p>
       </div>
       <div class="admin-quick-actions" aria-label="Quick actions">
         <a class="secondary-button" href="#ordersSection">View orders</a>
+        <a class="secondary-button" href="sales.html">Sales tracker</a>
         <a class="primary-button" href="#addProductSection"><span aria-hidden="true">＋</span> New product</a>
       </div>
     </div>
@@ -301,14 +302,14 @@ Hero eyebrow
           <label data-settings-group="hero">Hero subtitle<input name="heroSubtitle" required /></label>
           <label data-settings-group="catalog">
             Catalog eyebrow
-            <input name="catalogEyebrow" placeholder="OUR COLLECTION" />
+            <input name="catalogEyebrow" placeholder="PRODUCTS" />
           </label>
           <div class="settings-upload-field" data-settings-group="catalog">
             <label for="catalogImageFile">Catalog banner image</label>
             <input type="hidden" name="catalogImageUrl" />
             <input id="catalogImageFile" type="file" accept="image/png,image/jpeg,image/webp" />
             <div class="settings-image-preview" id="catalogImagePreview">
-              <span>Using the default bunny banner</span>
+              <span>Using the VialXBeauty hero artwork</span>
             </div>
             <div class="settings-upload-actions">
               <button type="button" class="secondary-button" id="replaceCatalogImageButton">Upload image</button>
@@ -321,7 +322,7 @@ Hero eyebrow
           </label>
           <label data-settings-group="catalog">
             Catalog subtitle
-            <input name="catalogSubtitle" placeholder="A concise introduction to your collection." />
+            <input name="catalogSubtitle" placeholder="Curated beauty essentials for your routine." />
           </label>
           <label data-settings-group="menu">
             Menu subtitle
@@ -541,7 +542,7 @@ Hero eyebrow
     <select id="productExpenseProfileSelect" name="expenseProfile">
       <option value="">No automatic expenses</option>
     </select>
-    <small class="tiny-note">Choose which packaging and freebies this product uses. Profiles are managed from the product and shop settings in this control room.</small>
+    <small class="tiny-note">Choose which packaging and freebies this product uses. Profiles are managed in Sales Tracker.</small>
 </label>
 
 <!-- =========================
@@ -792,7 +793,7 @@ Hero eyebrow
 <script src="supabase.js"></script>
 <script src="variants.js?v=clean-console-v1"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="admin.js?v=automatic-product-cost-v12"></script>
-<script src="admin-ui.js?v=stable-section-nav-v2"></script>
+<script src="admin.js"></script>
+<script src="admin-ui.js"></script>
 </body>
 </html>

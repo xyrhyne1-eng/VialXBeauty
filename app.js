@@ -96,7 +96,7 @@ const successDialog = document.querySelector("#successDialog");
 
 const orderReference = document.querySelector("#orderReference");
 const closeSuccess = document.querySelector("#closeSuccess");
-const CART_STORAGE_KEY = "wonderPepsCart";
+const CART_STORAGE_KEY = "vialXBeautyCart";
 
 function loadSavedCart() {
   try {
@@ -197,7 +197,7 @@ function showStoreNotice(message, type = "warning", title = "Just a moment 🌸"
     notice.id = "storeNotice";
     notice.setAttribute("role", "status");
     notice.setAttribute("aria-live", "polite");
-    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">♡</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
+    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">!</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
     document.body.appendChild(notice);
   }
 
@@ -274,7 +274,7 @@ async function loadShopSettings() {
 }
 
 function applyShopSettings(settings) {
-  const shopName = settings.shop_name || "Wonder Peps PH";
+  const shopName = settings.shop_name || "VialXBeauty";
 
   document.title = shopName;
 
@@ -291,12 +291,12 @@ function applyShopSettings(settings) {
 
   if (menuBrandTagline) {
     menuBrandTagline.textContent =
-      settings.menu_tagline || "Everything lovely, in one place";
+      settings.menu_tagline || "Premium beauty, precisely selected.";
   }
 
   if (heroTitle) {
     heroTitle.textContent =
-      settings.hero_title || "Soft pink shopping made easy.";
+      settings.hero_title || "Premium beauty essentials. Precisely selected.";
   }
 
   if (heroSubtitle) {
@@ -311,18 +311,18 @@ function applyShopSettings(settings) {
 
   if (catalogEyebrow) {
     catalogEyebrow.textContent =
-      settings.catalog_eyebrow || "OUR COLLECTION";
+      settings.catalog_eyebrow || "PRODUCTS";
   }
 
   if (catalogTitle) {
     catalogTitle.textContent =
-      settings.catalog_title || "Find your new favorite";
+      settings.catalog_title || "Shop products";
   }
 
   if (catalogSubtitle) {
     catalogSubtitle.textContent =
       settings.catalog_subtitle ||
-      "Sweet little picks, chosen just for you.";
+      "Curated beauty essentials for your routine.";
   }
 
   if (catalogHeading) {
@@ -368,8 +368,9 @@ if (heroImage && heroFallback) {
     heroImage.hidden = false;
     heroFallback.hidden = true;
   } else {
-    heroImage.hidden = true;
-    heroFallback.hidden = false;
+    heroImage.src = "vialx-hero-logo.jpg";
+    heroImage.hidden = false;
+    heroFallback.hidden = true;
   }
 }
   if (facebookLink) {
@@ -604,7 +605,7 @@ const displayedStock = hasVariants
         `
         : `
           <div class="product-image" aria-hidden="true">
-            ♡
+            <span class="vial-placeholder" aria-hidden="true"></span>
           </div>
         `;
 
@@ -1217,7 +1218,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : "♡"}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : ""}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1755,7 +1756,7 @@ function openPaymentStep() {
       <div class="cart-summary"><div><span>Product subtotal</span><strong>${formatCurrency(subtotal)}</strong></div></div>
       <div class="cart-summary"><div><span>Shipping fee</span><strong>${formatCurrency(shippingFee)}</strong></div></div>
       ${paymentBalanceRows}
-      ${buyerPaymentNote ? `<p class="payment-step-custom-note">♡ ${escapeHtml(buyerPaymentNote)}</p>` : ""}
+      ${buyerPaymentNote ? `<p class="payment-step-custom-note">${escapeHtml(buyerPaymentNote)}</p>` : ""}
     </div>
     ${requiresReceipt ? `
       <label class="payment-step-field">
@@ -2219,42 +2220,7 @@ function animateBag() {
 
     bagButton.classList.add("bag-bounce");
 }
-function flyHeartToBag(sourceButton) {
-  if (!sourceButton || !cartButton) return;
-
-  const startRect = sourceButton.getBoundingClientRect();
-  const endRect = cartButton.getBoundingClientRect();
-
-  const startX = startRect.left + startRect.width / 2;
-  const startY = startRect.top + startRect.height / 2;
-  const endX = endRect.left + endRect.width / 2;
-  const endY = endRect.top + endRect.height / 2;
-
-  // 3 flying hearts
-  for (let i = 0; i < 3; i++) {
-    const heart = document.createElement("span");
-    heart.className = "flying-heart";
-    heart.textContent = "♥";
-
-    heart.style.left = `${startX + (Math.random() * 24 - 12)}px`;
-    heart.style.top = `${startY + (Math.random() * 24 - 12)}px`;
-
-    document.body.appendChild(heart);
-
-    requestAnimationFrame(() => {
-      heart.style.setProperty("--fly-x", `${endX - startX}px`);
-      heart.style.setProperty("--fly-y", `${endY - startY}px`);
-      heart.style.animationDelay = `${i * 0.08}s`;
-      heart.classList.add("fly");
-    });
-
-    setTimeout(() => {
-      heart.remove();
-    }, 1100);
-  }
-
-  createBagSparkles(endX, endY);
-}
+function flyHeartToBag(sourceButton) { return; }
 
 function createBagSparkles(x, y) {
   for (let i = 0; i < 10; i++) {

@@ -119,7 +119,7 @@
         const option = document.createElement("button");
         option.type = "button";
         option.className = "address-combobox-option";
-        option.innerHTML = `<span aria-hidden="true">♡</span><strong></strong>`;
+        option.innerHTML = `<span aria-hidden="true">•</span><strong></strong>`;
         option.querySelector("strong").textContent = String(item.name || "");
         if (normalize(item.name) === normalize(input.value)) option.classList.add("is-selected");
         option.addEventListener("click", () => {
@@ -221,7 +221,7 @@
       localities = results;
       renderOptions(cityList, localities);
       cityInput.placeholder = "Choose a city / municipality";
-      setStatus("♡ Now choose your city or municipality.");
+      setStatus("• Now choose your city or municipality.");
     } catch (error) {
       cityInput.placeholder = "City choices unavailable";
       setStatus("City choices could not load. Please choose the province again.", true);
@@ -253,7 +253,7 @@
       barangays = results;
       renderOptions(barangayList, barangays);
       barangayInput.placeholder = "Choose a barangay / district";
-      setStatus("♡ Your Philippine address choices are ready.");
+      setStatus("• Your Philippine address choices are ready.");
     } catch (error) {
       barangayInput.placeholder = "Barangay choices unavailable";
       setStatus("Barangay choices could not load. Please choose the city again.", true);
@@ -303,7 +303,7 @@
       renderOptions(provinceList, provinces);
       strictSelection = true;
       provinceInput.placeholder = "Choose a province";
-      setStatus("♡ Start with your province, then choose your city and barangay.");
+      setStatus("• Start with your province, then choose your city and barangay.");
     } catch (error) {
       provinceInput.placeholder = "Province choices unavailable";
       cityInput.placeholder = "Choose a province first";

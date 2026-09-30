@@ -557,18 +557,18 @@ if (data.catalog_image_url) {
   catalogImagePreview.innerHTML = `<img src="${escapeHtml(data.catalog_image_url)}" alt="Catalog banner" />`;
   deleteCatalogImageButton.hidden = false;
 } else {
-  catalogImagePreview.innerHTML = `<span>Using the default bunny banner</span>`;
+  catalogImagePreview.innerHTML = `<span>Using the VialXBeauty hero artwork</span>`;
   deleteCatalogImageButton.hidden = true;
 }
   settingsForm.elements.heroEyebrow.value = data.hero_eyebrow || "";
   settingsForm.elements.heroTitle.value = data.hero_title || "";
   settingsForm.elements.heroSubtitle.value = data.hero_subtitle || "";
   settingsForm.elements.catalogEyebrow.value =
-    data.catalog_eyebrow || "OUR COLLECTION";
+    data.catalog_eyebrow || "PRODUCTS";
   settingsForm.elements.catalogTitle.value =
     data.catalog_title || "Find your new favorite";
   settingsForm.elements.catalogSubtitle.value =
-    data.catalog_subtitle || "Sweet little picks, chosen just for you.";
+    data.catalog_subtitle || "Curated beauty essentials for your routine.";
   if (settingsForm.elements.menuTagline) {
     settingsForm.elements.menuTagline.value =
       data.menu_tagline || "Everything lovely, in one place";
@@ -595,13 +595,13 @@ settingsForm.addEventListener("submit", async (event) => {
     hero_subtitle: String(formData.get("heroSubtitle") || "").trim(),
     catalog_eyebrow:
       String(formData.get("catalogEyebrow") || "").trim() ||
-      "OUR COLLECTION",
+      "PRODUCTS",
     catalog_title:
       String(formData.get("catalogTitle") || "").trim() ||
       "Find your new favorite",
     catalog_subtitle:
       String(formData.get("catalogSubtitle") || "").trim() ||
-      "Sweet little picks, chosen just for you.",
+      "Curated beauty essentials for your routine.",
     menu_tagline:
       String(formData.get("menuTagline") || "").trim() ||
       "Everything lovely, in one place",
@@ -2667,7 +2667,7 @@ deleteCatalogImageButton?.addEventListener("click", () => {
   temporaryCatalogImagePreviewUrl = "";
   catalogImageFileInput.value = "";
   settingsForm.elements.catalogImageUrl.value = "";
-  catalogImagePreview.innerHTML = `<span>Using the default bunny banner</span>`;
+  catalogImagePreview.innerHTML = `<span>Using the VialXBeauty hero artwork</span>`;
   deleteCatalogImageButton.hidden = true;
 });
 /* =========================================================
