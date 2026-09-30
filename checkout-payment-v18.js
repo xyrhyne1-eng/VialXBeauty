@@ -219,7 +219,7 @@ function showStoreNotice(message, type = "warning", title = "Just a moment 🌸"
     notice.id = "storeNotice";
     notice.setAttribute("role", "status");
     notice.setAttribute("aria-live", "polite");
-    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">♡</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
+    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">!</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
     document.body.appendChild(notice);
   }
 
@@ -304,7 +304,7 @@ function applyShopSettings(settings) {
     brandName.innerHTML = escapeHtml(shopName).replace(
       /\sPH$/i,
       " <small>PH</small>"
-    ) + '<span class="brand-heart" aria-hidden="true">♥</span>';
+    ) + '';
   }
 
   if (menuBrandName) {
@@ -316,12 +316,12 @@ function applyShopSettings(settings) {
 
   if (menuBrandTagline) {
     menuBrandTagline.textContent =
-      settings.menu_tagline || "Everything lovely, in one place";
+      settings.menu_tagline || "Beauty in a darker shade.";
   }
 
   if (heroTitle) {
     const configuredHeroTitle =
-      settings.hero_title || "Soft pink shopping made easy.";
+      settings.hero_title || "Premium essentials. Precisely selected.";
     heroTitle.innerHTML = escapeHtml(configuredHeroTitle).replace(
       /\sPH$/i,
       ' <small class="hero-title-ph">PH</small>'
@@ -331,7 +331,7 @@ function applyShopSettings(settings) {
   if (heroSubtitle) {
     heroSubtitle.textContent =
       settings.hero_subtitle ||
-      "Browse products, add them to your bag, and send your order details in just a few taps.";
+      "Explore the VialXBeauty product range with clear details and a simple shopping experience.";
   }
 
   if (heroEyebrow) {
@@ -1922,7 +1922,7 @@ function openPaymentStep() {
       ${qrUrl
         ? `<img src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
         : payOnDeliveryOnly
-        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
+        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">✓</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
         : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><span><strong>No QR code available</strong><small>Follow the payment instructions below.</small></span></div>`}
     </div>
     <div class="payment-step-summary payment-step-order-summary">
@@ -1936,7 +1936,7 @@ function openPaymentStep() {
       <div class="cart-summary payment-row payment-fee-row"><div><span>Shipping fee</span><strong class="${selectedShippingMethod?.method_type === "external" ? "external-shipping-fee-value" : ""}">${selectedShippingMethod?.method_type === "external" ? `Paid separately via ${escapeHtml(selectedShippingMethod.name)}` : formatCurrency(shippingFee)}</strong></div></div>
       ${codFeeRow}
       ${paymentBalanceRows}
-      ${buyerPaymentNote ? `<p class="payment-step-custom-note">♡ ${escapeHtml(buyerPaymentNote)}</p>` : ""}
+      ${buyerPaymentNote ? `<p class="payment-step-custom-note">${escapeHtml(buyerPaymentNote)}</p>` : ""}
     </div>
     ${requiresReceipt ? `
       <label class="payment-step-field">

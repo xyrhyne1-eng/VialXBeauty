@@ -557,7 +557,7 @@ if (data.catalog_image_url) {
   catalogImagePreview.innerHTML = `<img src="${escapeHtml(data.catalog_image_url)}" alt="Catalog banner" />`;
   deleteCatalogImageButton.hidden = false;
 } else {
-  catalogImagePreview.innerHTML = `<span>Using the default bunny banner</span>`;
+  catalogImagePreview.innerHTML = `<span>Using the default VialXBeauty banner</span>`;
   deleteCatalogImageButton.hidden = true;
 }
   settingsForm.elements.heroEyebrow.value = data.hero_eyebrow || "";
@@ -571,7 +571,7 @@ if (data.catalog_image_url) {
     data.catalog_subtitle || "Sweet little picks, chosen just for you.";
   if (settingsForm.elements.menuTagline) {
     settingsForm.elements.menuTagline.value =
-      data.menu_tagline || "Everything lovely, in one place";
+      data.menu_tagline || "Beauty in a darker shade.";
   }
   settingsForm.elements.facebook.value = data.facebook_url || "";
   settingsForm.elements.tiktok.value = data.tiktok_url || "";
@@ -604,7 +604,7 @@ settingsForm.addEventListener("submit", async (event) => {
       "Sweet little picks, chosen just for you.",
     menu_tagline:
       String(formData.get("menuTagline") || "").trim() ||
-      "Everything lovely, in one place",
+      "Beauty in a darker shade.",
     facebook_url:
       String(formData.get("facebook") || "").trim() || null,
     tiktok_url:
@@ -2667,7 +2667,7 @@ deleteCatalogImageButton?.addEventListener("click", () => {
   temporaryCatalogImagePreviewUrl = "";
   catalogImageFileInput.value = "";
   settingsForm.elements.catalogImageUrl.value = "";
-  catalogImagePreview.innerHTML = `<span>Using the default bunny banner</span>`;
+  catalogImagePreview.innerHTML = `<span>Using the default VialXBeauty banner</span>`;
   deleteCatalogImageButton.hidden = true;
 });
 /* =========================================================
