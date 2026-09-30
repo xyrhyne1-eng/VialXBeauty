@@ -1,5 +1,19 @@
-// VialXBeauty database connection.
-// Replace these two placeholders after creating the NEW VialXBeauty Supabase project.
-const SUPABASE_URL = "https://YOUR-VIALXBEAUTY-PROJECT.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "YOUR-VIALXBEAUTY-PUBLISHABLE-KEY";
-window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const SUPABASE_URL = "https://bwyugnuwiodfjhoapxuq.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_RIEBzXGjCixorYBXBvZ-Lg_OpdvCMdP";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);
+
+// Keep the client available to the existing VialXBeauty scripts.
+window.supabaseClient = supabaseClient;
