@@ -1,13 +1,15 @@
-# VialXBeauty — Final Mobile Fix
+# VialXBeauty — Cherry Noir
 
-This preview keeps the VIALX hero image and the VialXBeauty wordmark in the storefront header, but removes the small red VX square from the storefront navigation.
+VialXBeauty storefront + admin package using the dedicated VialXBeauty Supabase project.
 
-Included in this pass:
-- two-column, taller mobile product cards with two demo products
-- neutral vial placeholders instead of VX artwork inside product/cart thumbnails
-- Favorites, Cart and Menu remain unboxed header icons
-- cart subtotal + Checkout are anchored at the bottom of the cart drawer
-- Cherry Noir VialXBeauty admin login remains included
-- no VialXBeauty Supabase connection; supabase.js still uses VialXBeauty placeholders
+## Admin
+- Admin page: `/admin.html`
+- Sales Tracker and Security & Accounts are removed from the visible admin navigation.
+- Admin dashboard uses a black-to-deep-cherry visual system.
 
-Replace the Supabase placeholders only after the dedicated VialXBeauty database is created.
+## Supabase admin access
+Run `VialXBeauty-Admin-Access.sql` in the VialXBeauty Supabase SQL Editor. It grants admin access to the current admin UID:
+`e92620bb-7816-4439-a10d-3e0eeb58ad35`
+
+## Deploy
+Upload the contents of this folder to Vercel with `index.html` at the project root.
