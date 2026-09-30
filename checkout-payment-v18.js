@@ -219,7 +219,7 @@ function showStoreNotice(message, type = "warning", title = "Just a moment 🌸"
     notice.id = "storeNotice";
     notice.setAttribute("role", "status");
     notice.setAttribute("aria-live", "polite");
-    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">♡</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
+    notice.innerHTML = '<span class="store-notice-icon" aria-hidden="true">•</span><span class="store-notice-copy"><strong class="store-notice-title"></strong><span class="store-notice-message"></span></span>';
     document.body.appendChild(notice);
   }
 
@@ -304,7 +304,7 @@ function applyShopSettings(settings) {
     brandName.innerHTML = escapeHtml(shopName).replace(
       /\sPH$/i,
       " <small>PH</small>"
-    ) + '<span class="brand-heart" aria-hidden="true">♥</span>';
+    );
   }
 
   if (menuBrandName) {
@@ -316,12 +316,12 @@ function applyShopSettings(settings) {
 
   if (menuBrandTagline) {
     menuBrandTagline.textContent =
-      settings.menu_tagline || "Everything lovely, in one place";
+      settings.menu_tagline || "Premium beauty, precisely selected.";
   }
 
   if (heroTitle) {
     const configuredHeroTitle =
-      settings.hero_title || "Soft pink shopping made easy.";
+      settings.hero_title || "Premium beauty essentials. Precisely selected.";
     heroTitle.innerHTML = escapeHtml(configuredHeroTitle).replace(
       /\sPH$/i,
       ' <small class="hero-title-ph">PH</small>'
@@ -331,7 +331,7 @@ function applyShopSettings(settings) {
   if (heroSubtitle) {
     heroSubtitle.textContent =
       settings.hero_subtitle ||
-      "Browse products, add them to your bag, and send your order details in just a few taps.";
+      "Discover premium beauty essentials, add your favorites to cart, and complete your order in a few simple steps.";
   }
 
   if (heroEyebrow) {
@@ -340,18 +340,18 @@ function applyShopSettings(settings) {
 
   if (catalogEyebrow) {
     catalogEyebrow.textContent =
-      settings.catalog_eyebrow || "OUR COLLECTION";
+      settings.catalog_eyebrow || "PRODUCTS";
   }
 
   if (catalogTitle) {
     catalogTitle.textContent =
-      settings.catalog_title || "Find your new favorite";
+      settings.catalog_title || "Shop products";
   }
 
   if (catalogSubtitle) {
     catalogSubtitle.textContent =
       settings.catalog_subtitle ||
-      "Sweet little picks, chosen just for you.";
+      "Curated beauty essentials for your routine.";
   }
 
   if (catalogHeading) {
@@ -362,7 +362,7 @@ function applyShopSettings(settings) {
         `url(${JSON.stringify(catalogImageUrl)})`
       );
     } else {
-      // Never fall back to a bundled bunny image. The catalog artwork is
+      // Never fall back to a bundled legacy image. The catalog artwork is
       // controlled only by the image selected in Admin settings.
       catalogHeading.style.setProperty("--catalog-image", "none");
     }
@@ -430,28 +430,15 @@ if (heroImage && heroFallback) {
 
 async function loadProducts() {
   const grid = productGrid || document.getElementById("favoritesGrid");
-  const demoProducts = [
-    { id: "vialx-demo-01", name: "Radiance Peptide Serum", description: "A refined daily peptide serum for the VialXBeauty preview collection.", price: 1290, stock: 12, badge: "Featured", image_url: "", variants: [] },
-    { id: "vialx-demo-02", name: "Renewal Peptide Complex", description: "A premium peptide complex presented as a second storefront sample.", price: 1490, stock: 9, badge: "New", image_url: "", variants: [] }
-  ];
-  const useDemoCatalog = String(SUPABASE_URL || "").includes("YOUR-VIALXBEAUTY-PROJECT") || String(SUPABASE_PUBLISHABLE_KEY || "").includes("YOUR-VIALXBEAUTY-PUBLISHABLE-KEY");
-  if (useDemoCatalog) {
-    products = demoProducts;
-    productVariants = [];
-    productSoldCounts = new Map();
-    renderProducts(products, grid);
-    renderCategoryFilters();
-    return;
-  }
-  grid.innerHTML = `<p class="empty">Loading products...</p>`;
+   grid.innerHTML = `
+   <p class="empty">Loading products...</p>
+`;
 
-  let productData, productError, variantData, variantError, soldData, soldError;
-  try {
-    [
-      { data: productData, error: productError },
-      { data: variantData, error: variantError },
-      { data: soldData, error: soldError }
-    ] = await Promise.all([
+  const [
+    { data: productData, error: productError },
+    { data: variantData, error: variantError },
+    { data: soldData, error: soldError }
+  ] = await Promise.all([
     supabaseClient
       .from("products")
       .select("*")
@@ -467,16 +454,7 @@ async function loadProducts() {
     // This RPC returns aggregate totals only, so no customer/order details are
     // exposed to storefront visitors. See supabase-sold-counts.sql.
     supabaseClient.rpc("get_product_sold_counts")
-    ]);
-  } catch (error) {
-    console.warn("Catalog connection unavailable; showing demo product.", error);
-    products = demoProducts;
-    productVariants = [];
-    productSoldCounts = new Map();
-    renderProducts(products, grid);
-    renderCategoryFilters();
-    return;
-  }
+  ]);
   if (productError) {
      grid.innerHTML = `
       <p class="empty">
@@ -587,7 +565,7 @@ function renderCategoryFilters() {
             <button
                 class="category-chip ${selectedCategory === category ? "active" : ""}"
                 data-category="${category}">
-                ${category === "All" ? "All Products" : category}
+                ${category}
             </button>
         `)
         .join("");
@@ -650,8 +628,8 @@ const displayedStock = hasVariants
           />
         `
         : `
-          <div class="product-image product-placeholder" aria-hidden="true">
-            <span class="placeholder-vial"><i></i></span>
+          <div class="product-image" aria-hidden="true">
+            •
           </div>
         `;
 
@@ -707,7 +685,7 @@ ${productBadge ? `<span class="product-badge">${productBadge}</span>` : ""}
                   ? "Out of stock"
                   : hasVariants
                     ? "Choose variant"
-                    : "Add to cart"
+                    : "Add to bag"
               }
             </button>
           </div>
@@ -1102,7 +1080,7 @@ function addToCart(productId, sourceButton = null) {
 
   if (currentQuantity >= Number(product.stock)) {
     showStoreNotice(
-      "You already have the maximum available quantity in your cart. Please check your cart.",
+      "You already have the maximum available quantity in your bag. Please check your bag.",
       "warning",
       "Oopsie! This is the last one 🌸"
     );
@@ -1166,7 +1144,7 @@ function changeQuantity(productId, variantId, amount) {
 
   if (newQuantity > stock) {
     showStoreNotice(
-      "You already have the maximum available quantity in your cart. Please check your cart.",
+      "You already have the maximum available quantity in your bag. Please check your bag.",
       "warning",
       "Oopsie! This is the last one 🌸"
     );
@@ -1270,7 +1248,7 @@ function renderShippingMethods() {
   shippingMethodOptions.innerHTML = shippingMethods.map((method) => {
     const selected = String(selectedShippingMethod?.id) === String(method.id);
     return `<button class="shipping-method-option${selected ? " selected" : ""}" type="button" data-shipping-method="${method.id}" aria-pressed="${selected}">
-      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : "•"}</span>
       <span class="shipping-method-copy"><strong>${escapeHtml(method.name)}</strong><small>${escapeHtml(method.description || (method.method_type === "external" ? "Marketplace shipping checkout" : "Courier delivery"))}</small></span>
       <span class="shipping-method-arrow" aria-hidden="true">›</span>
     </button>`;
@@ -1309,7 +1287,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : "•"}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1404,7 +1382,7 @@ saveCart();
 
   if (!cart.length) {
     cartItems.innerHTML =
-      `<p class="empty">Your cart is empty.</p>`;
+      `<p class="empty">Your bag is empty.</p>`;
 
     cartSubtotal.textContent = formatCurrency(0);
     checkoutButton.disabled = true;
@@ -1436,7 +1414,7 @@ const itemPrice =
       alt="${escapeHtml(product.name)}"
     />
   `
-  : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`
+  : "•"
             }
           </div>
 
@@ -1583,7 +1561,7 @@ favoritesDrawer.addEventListener("click", (event) => {
 
 checkoutButton.addEventListener("click", () => {
   if (!cart.length) {
-    showStoreNotice("Your cart is empty.");
+    showStoreNotice("Your bag is empty.");
     return;
   }
 
@@ -1922,7 +1900,7 @@ function openPaymentStep() {
       ${qrUrl
         ? `<img src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
         : payOnDeliveryOnly
-        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
+        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">•</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
         : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><span><strong>No QR code available</strong><small>Follow the payment instructions below.</small></span></div>`}
     </div>
     <div class="payment-step-summary payment-step-order-summary">
@@ -1936,7 +1914,7 @@ function openPaymentStep() {
       <div class="cart-summary payment-row payment-fee-row"><div><span>Shipping fee</span><strong class="${selectedShippingMethod?.method_type === "external" ? "external-shipping-fee-value" : ""}">${selectedShippingMethod?.method_type === "external" ? `Paid separately via ${escapeHtml(selectedShippingMethod.name)}` : formatCurrency(shippingFee)}</strong></div></div>
       ${codFeeRow}
       ${paymentBalanceRows}
-      ${buyerPaymentNote ? `<p class="payment-step-custom-note">♡ ${escapeHtml(buyerPaymentNote)}</p>` : ""}
+      ${buyerPaymentNote ? `<p class="payment-step-custom-note">• ${escapeHtml(buyerPaymentNote)}</p>` : ""}
     </div>
     ${requiresReceipt ? `
       <label class="payment-step-field">
@@ -2014,7 +1992,7 @@ function resetCheckoutState() {
 
 async function submitOrder() {
   if (!cart.length) {
-    showStoreNotice("Your cart is empty.");
+    showStoreNotice("Your bag is empty.");
     return;
   }
 
@@ -2208,7 +2186,7 @@ resetCheckoutState();
 checkoutForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!cart.length) {
-    showStoreNotice("Your cart is empty.");
+    showStoreNotice("Your bag is empty.");
     return;
   }
 
@@ -2283,14 +2261,16 @@ async function loadStoreMenuItems() {
 
   if (error) {
     console.error("Could not load menu items:", error.message);
-    storeMenuItems.innerHTML = `<a class="store-menu-link" href="#shop"><span class="store-menu-label">Products</span><span class="store-menu-arrow" aria-hidden="true">›</span></a>`;
+    storeMenuItems.innerHTML =
+      `<p class="empty">Menu could not be loaded.</p>`;
     return;
   }
 
   const items = data || [];
 
   if (!items.length) {
-    storeMenuItems.innerHTML = `<a class="store-menu-link" href="#shop"><span class="store-menu-label">Products</span><span class="store-menu-arrow" aria-hidden="true">›</span></a>`;
+    storeMenuItems.innerHTML =
+      `<p class="empty">No menu items available.</p>`;
     return;
   }
 
@@ -2411,7 +2391,7 @@ function showAddedToBag(productName) {
         document.body.appendChild(toast);
     }
 
-    toast.textContent = `🩷 ${productName} added to your cart!`;
+    toast.textContent = `🩷 ${productName} added to your bag!`;
 
     toast.classList.add("show");
 
@@ -2433,42 +2413,7 @@ function animateBag() {
 
     bagButton.classList.add("bag-bounce");
 }
-function flyHeartToBag(sourceButton) {
-  if (!sourceButton || !cartButton) return;
-
-  const startRect = sourceButton.getBoundingClientRect();
-  const endRect = cartButton.getBoundingClientRect();
-
-  const startX = startRect.left + startRect.width / 2;
-  const startY = startRect.top + startRect.height / 2;
-  const endX = endRect.left + endRect.width / 2;
-  const endY = endRect.top + endRect.height / 2;
-
-  // 3 flying hearts
-  for (let i = 0; i < 3; i++) {
-    const heart = document.createElement("span");
-    heart.className = "flying-heart";
-    heart.textContent = "♥";
-
-    heart.style.left = `${startX + (Math.random() * 24 - 12)}px`;
-    heart.style.top = `${startY + (Math.random() * 24 - 12)}px`;
-
-    document.body.appendChild(heart);
-
-    requestAnimationFrame(() => {
-      heart.style.setProperty("--fly-x", `${endX - startX}px`);
-      heart.style.setProperty("--fly-y", `${endY - startY}px`);
-      heart.style.animationDelay = `${i * 0.08}s`;
-      heart.classList.add("fly");
-    });
-
-    setTimeout(() => {
-      heart.remove();
-    }, 1100);
-  }
-
-  createBagSparkles(endX, endY);
-}
+function flyHeartToBag(sourceButton) { return; }
 
 function createBagSparkles(x, y) {
   for (let i = 0; i < 10; i++) {
