@@ -355,3 +355,206 @@ body.admin-page .admin-login-card input { background:#090708!important;color:#ff
   body.admin-page .admin-panel-section{padding:18px!important;}
   body.admin-page .admin-quick-actions{grid-template-columns:1fr!important;}
 }
+
+
+/* =========================================================
+   VialXBeauty Admin — final Cherry Noir alignment + cleanup
+   Built on the user's current working VialXBeauty admin file.
+   ========================================================= */
+
+/* Keep the sidebar and the main content starting on the same visual line. */
+body.admin-page .admin-layout{
+  align-items:start !important;
+  grid-template-columns:240px minmax(0,1fr) !important;
+  gap:24px !important;
+}
+body.admin-page .admin-sidebar{
+  top:86px !important;
+  height:calc(100vh - 108px) !important;
+  min-height:0 !important;
+  box-sizing:border-box !important;
+}
+body.admin-page .admin-main-content{
+  min-width:0 !important;
+  width:100% !important;
+  gap:18px !important;
+}
+body.admin-page .admin-main-content > .admin-panel-section,
+body.admin-page .admin-main-content > .admin-top{
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+
+/* Product table: give the action column enough room so buttons never overlap. */
+body.admin-page .products-table-container{
+  width:100% !important;
+  max-width:100% !important;
+  overflow-x:auto !important;
+  overflow-y:visible !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+body.admin-page .products-table{
+  width:100% !important;
+  min-width:1180px !important;
+  table-layout:auto !important;
+}
+body.admin-page .products-table th:last-child,
+body.admin-page .products-table td:last-child{
+  min-width:225px !important;
+  width:225px !important;
+}
+body.admin-page .products-table td:last-child{
+  vertical-align:middle !important;
+  white-space:normal !important;
+}
+body.admin-page .admin-actions.compact-actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:7px !important;
+  min-width:0 !important;
+  width:100% !important;
+}
+body.admin-page .admin-actions.compact-actions .secondary-button{
+  flex:0 0 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  white-space:nowrap !important;
+  margin:0 !important;
+}
+
+/* Dark Cherry Noir category drag handle — no blush/pink surface. */
+body.admin-page .category-drag-handle{
+  width:38px !important;
+  height:38px !important;
+  display:grid !important;
+  place-items:center !important;
+  box-sizing:border-box !important;
+  padding:0 !important;
+  border:1px solid rgba(197,20,61,.34) !important;
+  border-radius:10px !important;
+  color:#d7cdd0 !important;
+  background:#0b0809 !important;
+}
+body.admin-page .category-card:hover .category-drag-handle,
+body.admin-page .category-drag-handle:focus-visible{
+  color:#fff !important;
+  background:#1a080d !important;
+  border-color:#c5143d !important;
+  outline:2px solid rgba(197,20,61,.14) !important;
+}
+
+/* Menu item + menu group drag handles — dark, not pink/white. */
+body.admin-page .menu-drag-handle,
+body.admin-page .menu-group-drag-handle{
+  border:1px solid rgba(197,20,61,.34) !important;
+  color:#d7cdd0 !important;
+  background:#0b0809 !important;
+  box-shadow:none !important;
+}
+body.admin-page .menu-drag-handle:hover,
+body.admin-page .menu-drag-handle:focus-visible,
+body.admin-page .menu-group-drag-handle:hover,
+body.admin-page .menu-group-drag-handle:focus-visible{
+  color:#fff !important;
+  background:#1a080d !important;
+  border-color:#c5143d !important;
+  outline:2px solid rgba(197,20,61,.14) !important;
+}
+
+/* Menu group itself and its header stay dark. */
+body.admin-page .menu-admin-group{
+  background:#0b0809 !important;
+  border-color:rgba(197,20,61,.28) !important;
+  box-shadow:none !important;
+}
+body.admin-page .menu-admin-group-header{
+  background:linear-gradient(135deg,#0d080a,#16090d) !important;
+  border-bottom-color:rgba(255,255,255,.08) !important;
+}
+body.admin-page .menu-admin-group-title strong{
+  color:#fff !important;
+}
+body.admin-page .menu-admin-group-title small{
+  color:#9f9297 !important;
+}
+body.admin-page .menu-admin-group-items{
+  background:#090708 !important;
+}
+
+/* Payment methods: remove the pale/pink QR strip, tags and surfaces. */
+body.admin-page .payment-method-card{
+  background:linear-gradient(145deg,#0b0809,#16090d) !important;
+  border:1px solid rgba(197,20,61,.28) !important;
+  color:#f8f4f3 !important;
+  box-shadow:none !important;
+}
+body.admin-page .payment-method-card .payment-tag{
+  color:#e7dce0 !important;
+  background:#10090b !important;
+  border:1px solid rgba(197,20,61,.24) !important;
+}
+body.admin-page .payment-method-card .payment-meta{
+  color:#a99da2 !important;
+}
+body.admin-page .payment-method-card .payment-qr-placeholder,
+body.admin-page .payment-method-empty,
+body.admin-page .qr-preview-box{
+  color:#8f8288 !important;
+  background:#090708 !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+}
+body.admin-page .payment-method-card .payment-qr-preview{
+  background:#090708 !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+}
+body.admin-page .payment-method-card .admin-actions{
+  gap:7px !important;
+  flex-wrap:wrap !important;
+}
+
+/* Keep red as a controlled accent only; eliminate old blush surfaces in these areas. */
+body.admin-page .category-card,
+body.admin-page #adminMenuItems .menu-admin-item{
+  background:linear-gradient(145deg,#0b0809,#14080c) !important;
+  border-color:rgba(197,20,61,.25) !important;
+  box-shadow:none !important;
+}
+body.admin-page .category-card:hover,
+body.admin-page #adminMenuItems .menu-admin-item:hover{
+  border-color:rgba(197,20,61,.45) !important;
+}
+
+/* Settings cards use the same dimensions/spacing as the other main cards. */
+body.admin-page .admin-panel-section{
+  margin:0 !important;
+  box-sizing:border-box !important;
+}
+body.admin-page .admin-panel-section + .admin-panel-section{
+  margin-top:0 !important;
+}
+
+/* Tablet/mobile: stack cleanly and let the product table scroll instead of overlap. */
+@media (max-width:900px){
+  body.admin-page .admin-layout{
+    grid-template-columns:1fr !important;
+    gap:16px !important;
+  }
+  body.admin-page .admin-sidebar{
+    top:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+  }
+  body.admin-page .products-table{
+    min-width:1080px !important;
+  }
+}
+@media (max-width:560px){
+  body.admin-page .admin-main-content{
+    gap:14px !important;
+  }
+  body.admin-page .products-table{
+    min-width:1020px !important;
+  }
+}
