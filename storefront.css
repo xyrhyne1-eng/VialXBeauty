@@ -1388,30 +1388,21 @@ body.storefront-page.page-scroll-locked {
   cursor:pointer;
   caret-color:transparent;
 }
-.storefront-page .address-combobox-toggle{
+.storefront-page .address-combobox::after{
   position:absolute;
   z-index:4;
   top:50%;
-  right:9px;
-  display:none;
-  place-items:center;
-  width:34px;
-  height:34px;
-  padding:0;
-  border:0;
-  border-radius:50%;
-  background:#ffe5ef;
-  color:#c93670;
-  font-size:1.15rem;
+  right:13px;
+  color:#d2b36d;
+  content:"⌄";
+  font-size:1rem;
   line-height:1;
+  pointer-events:none;
   transform:translateY(-50%);
-  transition:transform .18s ease,background .18s ease;
+  transition:transform .18s ease;
 }
-.storefront-page .address-combobox.is-open .address-combobox-toggle{
-  background:#f8c7da;
-  transform:translateY(-50%) rotate(180deg);
-}
-.storefront-page .address-combobox.is-disabled .address-combobox-toggle{opacity:.45;pointer-events:none}
+.storefront-page .address-combobox.is-open::after{transform:translateY(-50%) rotate(180deg)}
+.storefront-page .address-combobox.is-disabled::after{opacity:.45}
 .storefront-page .address-combobox-panel{
   position:absolute;
   z-index:50;
@@ -1441,16 +1432,6 @@ body.storefront-page.page-scroll-locked {
   background:transparent;
   color:#553142;
   text-align:left;
-}
-.storefront-page .address-combobox-option>span{
-  display:grid;
-  place-items:center;
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  background:#ffe5ef;
-  color:#d83d79;
-  font-size:.92rem;
 }
 .storefront-page .address-combobox-option strong{overflow:hidden;text-overflow:ellipsis;font-size:.84rem;white-space:nowrap}
 .storefront-page .address-combobox-option:hover,
@@ -2656,11 +2637,6 @@ body.storefront-page.page-scroll-locked {
 
 .storefront-page .address-combobox-option {
   color: #eee8ea;
-}
-
-.storefront-page .address-combobox-option > span {
-  background: rgba(156, 20, 58, .18);
-  color: #e86a8c;
 }
 
 .storefront-page .address-combobox-option:hover,

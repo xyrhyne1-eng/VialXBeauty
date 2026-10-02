@@ -1,3 +1,4 @@
+(() => {
 const currency = new Intl.NumberFormat("en-PH", {
   style: "currency",
   currency: "PHP",
@@ -5,7 +6,7 @@ const currency = new Intl.NumberFormat("en-PH", {
 });
 
 const brandName = document.querySelector("#brandName");
-const brandLogo = document.querySelector("#brandLogo");
+const checkoutBrandLogo = document.querySelector("#brandLogo");
 const brandFallback = document.querySelector("#brandFallback");
 const menuBrandName = document.querySelector("#menuBrandName");
 const menuBrandLogo = document.querySelector("#menuBrandLogo");
@@ -21,7 +22,7 @@ const catalogTitle = document.querySelector("#catalogTitle");
 const catalogSubtitle = document.querySelector("#catalogSubtitle");
 const catalogHeading = document.querySelector(".section-heading");
 const footerBrand = document.querySelector("#footerBrand");
-const facebookLink = document.querySelector("#facebookLink");
+const checkoutFacebookLink = document.querySelector("#facebookLink");
 const tiktokLink = document.querySelector("#tiktokLink");
 
 const productGrid = document.querySelector("#productGrid");
@@ -102,13 +103,13 @@ const paymentStepBackButton = document.querySelector("#paymentStepBackButton");
 const paymentStepContinueButton = document.querySelector("#paymentStepContinueButton");
 const paymentStepCloseButton = document.querySelector("#paymentStepCloseButton");
 
-const successDialog = document.querySelector("#successDialog");
+const checkoutSuccessDialog = document.querySelector("#successDialog");
 
 const orderReference = document.querySelector("#orderReference");
-const successExternalCheckout = document.querySelector("#successExternalCheckout");
-const successExternalMessage = document.querySelector("#successExternalMessage");
-const successExternalLink = document.querySelector("#successExternalLink");
-const closeSuccess = document.querySelector("#closeSuccess");
+const checkoutSuccessExternalCheckout = document.querySelector("#successExternalCheckout");
+const checkoutSuccessExternalMessage = document.querySelector("#successExternalMessage");
+const checkoutSuccessExternalLink = document.querySelector("#successExternalLink");
+const closeSuccessDialog = document.querySelector("#closeSuccess");
 const CART_STORAGE_KEY = "vialXBeautyCart";
 
 function loadSavedCart() {
@@ -153,7 +154,20 @@ let paymentMethods = [];
 let paymentMethodShippingLinks = [];
 let selectedPaymentMethod = null;
 let shippingFees = [];
+let shippingFeesLoadError = null;
 let selectedShippingFee = null;
+window.__vialxShippingState = window.__vialxShippingState || {};
+
+function getSharedSelectedShippingFee() {
+  const sharedState = window.__vialxShippingState || (window.__vialxShippingState = {});
+  return sharedState.selectedShippingFee ?? selectedShippingFee ?? null;
+}
+
+function setSharedSelectedShippingFee(fee) {
+  const sharedState = window.__vialxShippingState || (window.__vialxShippingState = {});
+  sharedState.selectedShippingFee = fee;
+  selectedShippingFee = fee;
+}
 let shippingMethods = [];
 let selectedShippingMethod = null;
 let paymentStepReceiptFile = null;
@@ -372,8 +386,8 @@ function applyShopSettings(settings) {
     footerBrand.textContent = `© ${shopName}`;
   }
 
-  if (brandLogo && brandFallback) {
-    brandLogo.hidden = true;
+  if (checkoutBrandLogo && brandFallback) {
+    checkoutBrandLogo.hidden = true;
     brandFallback.hidden = true;
   }
 
@@ -397,12 +411,12 @@ if (heroImage && heroFallback) {
     heroFallback.hidden = false;
   }
 }
-  if (facebookLink) {
+  if (checkoutFacebookLink) {
     if (settings.facebook_url) {
-      facebookLink.href = settings.facebook_url;
-      facebookLink.hidden = false;
+      checkoutFacebookLink.href = settings.facebook_url;
+      checkoutFacebookLink.hidden = false;
     } else {
-      facebookLink.hidden = true;
+      checkoutFacebookLink.hidden = true;
     }
   }
 
@@ -1220,8 +1234,10 @@ function getCodFeeForCart() {
 }
 
 function getSelectedShippingFee() {
-  return selectedShippingFee
-    ? Number(selectedShippingFee.amount || 0)
+  const activeSelectedShippingFee = getSharedSelectedShippingFee();
+
+  return activeSelectedShippingFee
+    ? Number(activeSelectedShippingFee.amount || 0)
     : Number(selectedShippingInput?.value || 0);
 }
 
@@ -1243,19 +1259,26 @@ async function loadShippingOptions() {
     supabaseClient.from("shipping_fees").select("*").eq("is_active", true).order("sort_order", { ascending: true }).order("id", { ascending: true })
   ]);
 
-  if (methodError || feeError) {
+  if (methodError) {
     shippingMethods = [];
     shippingFees = [];
+    shippingFeesLoadError = null;
     shippingMethodOptions.innerHTML = `<div class="shipping-fee-empty"><strong>Shipping options are unavailable.</strong><span>Please try again shortly.</span></div>`;
-    console.error("Could not load shipping options:", methodError?.message || feeError?.message);
+    console.error("Could not load shipping options:", methodError.message);
     updateProceedPaymentAvailability();
     return;
   }
 
   shippingMethods = methodData || [];
-  shippingFees = feeData || [];
+  shippingFeesLoadError = feeError;
+  if (feeError) {
+    shippingFees = [];
+    console.error("Could not load shipping fees:", feeError.message);
+  } else {
+    shippingFees = feeData || [];
+  }
   selectedShippingMethod = null;
-  selectedShippingFee = null;
+  setSharedSelectedShippingFee(null);
   renderShippingMethods();
   renderShippingFees();
   updateShippingChoiceVisibility();
@@ -1270,7 +1293,7 @@ function renderShippingMethods() {
   shippingMethodOptions.innerHTML = shippingMethods.map((method) => {
     const selected = String(selectedShippingMethod?.id) === String(method.id);
     return `<button class="shipping-method-option${selected ? " selected" : ""}" type="button" data-shipping-method="${method.id}" aria-pressed="${selected}">
-      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<svg viewBox="0 0 24 24" fill="none"><path d="M3.5 7.5h10v9h-10z"/><path d="M13.5 10h3.4l3.6 3.6v2.9h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/></svg>`}</span>
       <span class="shipping-method-copy"><strong>${escapeHtml(method.name)}</strong><small>${escapeHtml(method.description || (method.method_type === "external" ? "Marketplace shipping checkout" : "Courier delivery"))}</small></span>
       <span class="shipping-method-arrow" aria-hidden="true">›</span>
     </button>`;
@@ -1287,11 +1310,16 @@ function feesForSelectedMethod() {
 
 function renderShippingFees() {
   if (!shippingFeeOptions) return;
-  const availableFees = feesForSelectedMethod();
   if (!selectedShippingMethod || selectedShippingMethod.method_type !== "courier") {
     shippingFeeOptions.innerHTML = "";
     return;
   }
+  if (shippingFeesLoadError) {
+    shippingFeeOptions.innerHTML = `<div class="shipping-fee-empty"><strong>Shipping fees are unavailable.</strong><span>Please try again shortly.</span></div>`;
+    updateProceedPaymentAvailability();
+    return;
+  }
+  const availableFees = feesForSelectedMethod();
   if (!availableFees.length) {
     shippingFeeOptions.innerHTML = `<div class="shipping-fee-empty"><strong>No fees are configured for this courier.</strong><span>Please choose another option or contact the shop.</span></div>`;
     updateProceedPaymentAvailability();
@@ -1299,8 +1327,9 @@ function renderShippingFees() {
   }
   shippingFeeOptions.innerHTML = availableFees
     .map((fee) => {
-      const isSelected = selectedShippingFee &&
-        String(selectedShippingFee.id) === String(fee.id);
+      const activeSelectedShippingFee = getSharedSelectedShippingFee();
+      const isSelected = activeSelectedShippingFee &&
+        String(activeSelectedShippingFee.id) === String(fee.id);
 
       return `
         <button
@@ -1309,7 +1338,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : "₱"}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1346,7 +1375,7 @@ function selectShippingMethod(methodId) {
   const method = shippingMethods.find((item) => String(item.id) === String(methodId));
   if (!method) return;
   selectedShippingMethod = method;
-  selectedShippingFee = null;
+  setSharedSelectedShippingFee(null);
   if (selectedPaymentMethod && !availablePaymentMethods().some((payment) => String(payment.id) === String(selectedPaymentMethod.id))) {
     selectedPaymentMethod = null;
     if (selectedPaymentInput) selectedPaymentInput.value = "";
@@ -1370,7 +1399,7 @@ function selectShippingFee(feeId) {
   );
 
   if (!fee) return;
-  selectedShippingFee = fee;
+  setSharedSelectedShippingFee(fee);
   if (selectedShippingInput) {
     selectedShippingInput.value = String(Number(fee.amount || 0));
     selectedShippingInput.dataset.shippingId = String(fee.id);
@@ -1696,11 +1725,17 @@ function renderPaymentMethods() {
           type="button"
           data-payment-select="${method.id}"
         >
-          <div class="payment-option-header">
+          <span class="payment-option-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+              <path d="M3.5 9.5h17M7 14h4" />
+            </svg>
+          </span>
+          <div class="payment-option-copy">
             <strong>${escapeHtml(method.payment_name || "Payment method")}</strong>
-            <span class="payment-option-pill">${escapeHtml(depositText)}</span>
+            <p>${escapeHtml(method.short_description || "Please follow the payment instructions provided.")}</p>
           </div>
-          <p>${escapeHtml(method.short_description || "Please follow the payment instructions provided.")}</p>
+          <span class="payment-option-pill">${escapeHtml(depositText)}</span>
         </button>
       `;
     })
@@ -1845,7 +1880,9 @@ function openPaymentStep() {
     return;
   }
 
-  if (selectedShippingMethod.method_type === "courier" && !selectedShippingFee) {
+  const activeSelectedShippingFee = getSharedSelectedShippingFee();
+
+  if (selectedShippingMethod.method_type === "courier" && !activeSelectedShippingFee) {
     showCheckoutError("Please choose a shipping fee to continue.");
     shippingFeeOptions?.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
@@ -1936,7 +1973,7 @@ function openPaymentStep() {
       <div class="cart-summary payment-row payment-fee-row"><div><span>Shipping fee</span><strong class="${selectedShippingMethod?.method_type === "external" ? "external-shipping-fee-value" : ""}">${selectedShippingMethod?.method_type === "external" ? `Paid separately via ${escapeHtml(selectedShippingMethod.name)}` : formatCurrency(shippingFee)}</strong></div></div>
       ${codFeeRow}
       ${paymentBalanceRows}
-      ${buyerPaymentNote ? `<p class="payment-step-custom-note">♡ ${escapeHtml(buyerPaymentNote)}</p>` : ""}
+      ${buyerPaymentNote ? `<p class="payment-step-custom-note">${escapeHtml(buyerPaymentNote)}</p>` : ""}
     </div>
     ${requiresReceipt ? `
       <label class="payment-step-field">
@@ -1994,7 +2031,7 @@ function resetCheckoutState() {
   checkoutForm.reset();
   selectedPaymentMethod = null;
   selectedShippingMethod = null;
-  selectedShippingFee = null;
+  setSharedSelectedShippingFee(null);
   clearPaymentStepReceiptState();
   showPaymentStepFeedback("");
   if (selectedPaymentInput) {
@@ -2179,16 +2216,16 @@ resetCheckoutState();
 
     orderReference.textContent = order.order_ref;
     const usesExternalShipping = completedShippingMethod?.method_type === "external";
-    successDialog.classList.toggle("external-shipping-success", usesExternalShipping);
-    if (successExternalCheckout) successExternalCheckout.hidden = !usesExternalShipping;
-    if (usesExternalShipping && successExternalMessage) {
-      successExternalMessage.textContent = `Your item payment was submitted. Now continue to ${completedShippingMethod.name} to arrange and pay for shipping.`;
+    checkoutSuccessDialog.classList.toggle("external-shipping-success", usesExternalShipping);
+    if (checkoutSuccessExternalCheckout) checkoutSuccessExternalCheckout.hidden = !usesExternalShipping;
+    if (usesExternalShipping && checkoutSuccessExternalMessage) {
+      checkoutSuccessExternalMessage.textContent = `Your item payment was submitted. Now continue to ${completedShippingMethod.name} to arrange and pay for shipping.`;
     }
-    if (usesExternalShipping && successExternalLink) {
-      successExternalLink.href = completedShippingMethod.external_url || "#";
-      successExternalLink.textContent = completedShippingMethod.button_label || `Continue to ${completedShippingMethod.name}`;
+    if (usesExternalShipping && checkoutSuccessExternalLink) {
+      checkoutSuccessExternalLink.href = completedShippingMethod.external_url || "#";
+      checkoutSuccessExternalLink.textContent = completedShippingMethod.button_label || `Continue to ${completedShippingMethod.name}`;
     }
-    successDialog.showModal();
+    checkoutSuccessDialog.showModal();
   } catch (error) {
     console.error("Checkout error:", error);
     if (uploadedReceiptPath) {
@@ -2234,14 +2271,14 @@ proceedPaymentButton?.addEventListener("click", () => {
   checkoutForm.requestSubmit();
 });
 
-closeSuccess.addEventListener("click", () => {
-  successDialog.close();
+closeSuccessDialog.addEventListener("click", () => {
+  checkoutSuccessDialog.close();
   unlockPageScroll("checkout-flow");
 });
 
-successDialog.addEventListener("click", (event) => {
-  if (event.target === successDialog) {
-    successDialog.close();
+checkoutSuccessDialog.addEventListener("click", (event) => {
+  if (event.target === checkoutSuccessDialog) {
+    checkoutSuccessDialog.close();
     unlockPageScroll("checkout-flow");
   }
 });
@@ -2265,7 +2302,7 @@ paymentStepCloseButton?.addEventListener("click", () => {
   unlockPageScroll("checkout-flow");
 });
 
-[checkoutDialog, paymentStepDialog, successDialog].forEach((dialog) => {
+[checkoutDialog, paymentStepDialog, checkoutSuccessDialog].forEach((dialog) => {
   dialog?.addEventListener("cancel", () => {
     unlockPageScroll("checkout-flow");
   });
@@ -2510,3 +2547,4 @@ function createBagSparkles(x, y) {
   }
 }
 initializeStorefront();
+})();

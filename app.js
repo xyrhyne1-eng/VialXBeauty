@@ -140,6 +140,18 @@ let paymentMethods = [];
 let selectedPaymentMethod = null;
 let shippingFees = [];
 let selectedShippingFee = null;
+window.__vialxShippingState = window.__vialxShippingState || {};
+
+function getSharedSelectedShippingFee() {
+  const sharedState = window.__vialxShippingState || (window.__vialxShippingState = {});
+  return sharedState.selectedShippingFee ?? selectedShippingFee ?? null;
+}
+
+function setSharedSelectedShippingFee(fee) {
+  const sharedState = window.__vialxShippingState || (window.__vialxShippingState = {});
+  sharedState.selectedShippingFee = fee;
+  selectedShippingFee = fee;
+}
 let paymentStepReceiptFile = null;
 let paymentStepReceiptPreviewUrl = null;
 let storefrontCategoryOrder = [];
@@ -1147,8 +1159,10 @@ return total + itemPrice * Number(item.quantity || 0);
 }
 
 function getSelectedShippingFee() {
-  return selectedShippingFee
-    ? Number(selectedShippingFee.amount || 0)
+  const activeSelectedShippingFee = getSharedSelectedShippingFee();
+
+  return activeSelectedShippingFee
+    ? Number(activeSelectedShippingFee.amount || 0)
     : Number(selectedShippingInput?.value || 0);
 }
 
@@ -1171,7 +1185,7 @@ async function loadShippingFees() {
 
   if (error) {
     shippingFees = [];
-    selectedShippingFee = null;
+    setSharedSelectedShippingFee(null);
     if (selectedShippingInput) selectedShippingInput.value = "";
     shippingFeeOptions.innerHTML = `
       <div class="shipping-fee-empty">
@@ -1185,7 +1199,7 @@ async function loadShippingFees() {
   }
 
   shippingFees = data || [];
-  selectedShippingFee = null;
+  setSharedSelectedShippingFee(null);
   if (selectedShippingInput) selectedShippingInput.value = "";
   renderShippingFees();
   updateProceedPaymentAvailability();
@@ -1207,8 +1221,9 @@ function renderShippingFees() {
 
   shippingFeeOptions.innerHTML = shippingFees
     .map((fee) => {
-      const isSelected = selectedShippingFee &&
-        String(selectedShippingFee.id) === String(fee.id);
+      const activeSelectedShippingFee = getSharedSelectedShippingFee();
+      const isSelected = activeSelectedShippingFee &&
+        String(activeSelectedShippingFee.id) === String(fee.id);
 
       return `
         <button
@@ -1240,7 +1255,7 @@ function selectShippingFee(feeId) {
   );
 
   if (!fee) return;
-  selectedShippingFee = fee;
+  setSharedSelectedShippingFee(fee);
   if (selectedShippingInput) {
     selectedShippingInput.value = String(Number(fee.amount || 0));
     selectedShippingInput.dataset.shippingId = String(fee.id);
@@ -1805,7 +1820,7 @@ function openPaymentStep() {
 function resetCheckoutState() {
   checkoutForm.reset();
   selectedPaymentMethod = null;
-  selectedShippingFee = null;
+  setSharedSelectedShippingFee(null);
   clearPaymentStepReceiptState();
   showPaymentStepFeedback("");
   if (selectedPaymentInput) {

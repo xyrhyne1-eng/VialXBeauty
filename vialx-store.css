@@ -77,8 +77,8 @@ footer{align-items:center}footer p{margin:0}.footer-links{margin-left:auto}
 .placeholder-vial:before{content:"";position:absolute;left:7px;right:7px;top:-19px;height:20px;border:2px solid #b6aaad;border-bottom:0;border-radius:5px 5px 0 0;background:#e4dcda}
 .placeholder-vial i{position:absolute;left:7px;right:7px;top:43px;height:2px;background:var(--cherry);opacity:.7}
 .cart-thumb-fallback{background:linear-gradient(145deg,#eee8e5,#ded5d2)!important;color:transparent!important}
-.mini-vial{display:block;width:24px;height:52px;border:1.5px solid #9d9093;border-radius:5px 5px 8px 8px;position:relative;background:rgba(255,255,255,.4)}
-.mini-vial:before{content:"";position:absolute;left:4px;right:4px;top:-9px;height:9px;border:1.5px solid #9d9093;border-bottom:0;border-radius:3px 3px 0 0}
+.cart-item .mini-vial{display:block;width:24px;height:52px;border:1.5px solid #9d9093;border-radius:5px 5px 8px 8px;position:relative;background:rgba(255,255,255,.4)}
+.cart-item .mini-vial:before{content:"";position:absolute;left:4px;right:4px;top:-9px;height:9px;border:1.5px solid #9d9093;border-bottom:0;border-radius:3px 3px 0 0}
 .drawer-panel{display:flex;flex-direction:column;overflow:auto}
 #cartItems{flex:0 0 auto}
 .cart-summary{margin-top:auto!important;position:sticky!important;bottom:-1px!important;z-index:4;border-top:1px solid #d7cfcc!important;background:#f6f2ef!important;padding:20px 0 18px!important;box-shadow:0 -12px 24px rgba(20,10,12,.04)}
