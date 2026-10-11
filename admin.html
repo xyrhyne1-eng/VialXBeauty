@@ -2,23 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
   <title>VialXBeauty Admin</title>
-  <meta name="theme-color" content="#09090b" />
-  <link rel="stylesheet" href="styles.css?v=cute-payment-v2" />
-  <link rel="stylesheet" href="admin.css?v=grouped-address-v4" />
-  <link rel="stylesheet" href="vialx-admin.css?v=cherry-noir-login-v2" />
+  <meta name="theme-color" content="#8b0028" />
+  <link rel="stylesheet" href="admin-v2.css?v=20261011-final-redesign-1" />
 </head>
 <body class="admin-page">
   <a class="skip-link" href="#dashboardSection">Skip to dashboard</a>
 
   <header class="site-header admin-site-header">
+    <span class="admin-header-side-spacer" aria-hidden="true"></span>
     <a class="brand admin-brand" href="index.html" aria-label="VialXBeauty shop home">
-      <span class="brand-mark vx-admin-mark" aria-hidden="true">VX</span>
-      <span class="admin-brand-copy">VialXBeauty <small>CONTROL ROOM</small></span>
+      VialXBeauty
     </a>
     <a class="secondary-button view-shop-button" href="index.html">
-      <span>View storefront</span><span aria-hidden="true">↗</span>
+      <span>View Shop</span><span aria-hidden="true">↗</span>
     </a>
   </header>
 
@@ -54,32 +52,30 @@
     <div class="admin-sidebar-title">
       <span class="sidebar-brand-badge" aria-hidden="true">VX</span>
       <span>VialXBeauty</span>
-      <small>Shop control center</small>
+      <small>Store management</small>
     </div>
 
     <div class="sidebar-session"><span aria-hidden="true"></span> Admin workspace</div>
 
     <nav class="admin-sidebar-nav" aria-label="Admin sections">
       <div class="nav-group-label">Overview</div>
-      <a class="active" href="#dashboardSection"><span class="nav-icon" aria-hidden="true">⌂</span><span>Dashboard</span></a>
-      <a href="#ordersSection"><span class="nav-icon" aria-hidden="true">◫</span><span>Orders</span></a>
-      <a href="sales.html"><span class="nav-icon" aria-hidden="true">₱</span><span>Sales tracker</span></a>
-
+      <a class="active" href="#dashboardSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><span>Dashboard</span></a>
+      <a href="#ordersSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h10l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 13h10M7 17h7"/></svg></span><span>Orders</span></a>
+      
       <div class="nav-group-label">Catalog</div>
-      <a href="#productsSection"><span class="nav-icon" aria-hidden="true">◇</span><span>Products</span></a>
-      <a href="#categoriesSection"><span class="nav-icon" aria-hidden="true">✿</span><span>Categories</span></a>
-      <a href="#menuSection"><span class="nav-icon" aria-hidden="true">☰</span><span>Menu</span></a>
+      <a href="#productsSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14l-1 14H6L5 7Z"/><path d="M9 7a3 3 0 0 1 6 0M4 4h16"/></svg></span><span>Products</span></a>
+      <a href="#categoriesSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span><span>Categories</span></a>
+      <a href="#menuSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span><span>Menu</span></a>
 
       <div class="nav-group-label">Store</div>
-      <a href="#shippingFeesSection"><span class="nav-icon" aria-hidden="true">♢</span><span>Shipping options</span></a>
-      <a id="paymentMethodsNav" href="#paymentMethodsSection"><span class="nav-icon" aria-hidden="true">₱</span><span>Payment methods</span></a>
-      <a href="#addProductSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add product</span></a>
-      <a href="#addMenuSection"><span class="nav-icon" aria-hidden="true">＋</span><span>Add menu item</span></a>
+      <a href="#shippingFeesSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z"/><circle cx="7.5" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg></span><span>Shipping options</span></a>
+      <a id="paymentMethodsNav" href="#paymentMethodsSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><span>Payment methods</span></a>
+      <a href="#addProductSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></span><span>Add product</span></a>
+      <a href="#addMenuSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h11M4 12h11M4 18h11M19 9v6M16 12h6"/></svg></span><span>Add menu item</span></a>
 
       <div class="nav-group-label">Settings</div>
-      <a href="#shopSettingsSection"><span class="nav-icon" aria-hidden="true">⚙</span><span>Shop settings</span></a>
-      <a href="#securitySection"><span class="nav-icon" aria-hidden="true">⌘</span><span>Security &amp; accounts</span></a>
-    </nav>
+      <a href="#shopSettingsSection"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.6a8 8 0 0 1-1.5.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.5-.9l-1.7.6-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.6a8 8 0 0 1 1.5-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.5.9l1.7-.6 1.4 2.4-1.4 1.1a7 7 0 0 1 0 1.8Z"/></svg></span><span>Shop settings</span></a>
+          </nav>
 
     <button
       id="sidebarLogoutButton"
@@ -93,29 +89,23 @@
   <div class="admin-main-content">
     <div class="admin-top">
       <div>
-        <p class="eyebrow">VialXBeauty workspace</p>
-        <h1>Good day, Admin!</h1>
-        <p class="admin-top-note">Everything you need to keep the shop lovely and running smoothly.</p>
+        <div class="dashboard-welcome-label"><span class="dashboard-brand-gem" aria-hidden="true">V</span><p class="eyebrow">VialXBeauty <span>•</span> YOUR BOUTIQUE</p></div>
+        <h1>Welcome back,<br /><span>Admin!</span></h1>
+        <p class="admin-top-note">Your store, beautifully in view.</p>
       </div>
       <div class="admin-quick-actions" aria-label="Quick actions">
-        <a class="secondary-button" href="#ordersSection">View orders</a>
-        <a class="secondary-button" href="sales.html">Sales tracker</a>
-        <a class="primary-button" href="#addProductSection"><span aria-hidden="true">＋</span> New product</a>
+        <a class="secondary-button" href="#ordersSection"><span aria-hidden="true">↗</span> All orders</a>
+        <a class="primary-button" href="#addProductSection"><span aria-hidden="true">＋</span> Add product</a>
       </div>
     </div>
 
     <section id="dashboardSection" class="admin-card admin-panel-section">
-      <div class="admin-section-header">
-        <div>
-          <h2>Dashboard</h2>
-          <p class="tiny-note">Live store overview from your existing Supabase tables.</p>
-        </div>
-      </div>
       <div id="dashboardStats" class="dashboard-stats"></div>
       <div class="dashboard-grid">
         <div class="admin-card soft-card">
           <div class="admin-section-header">
             <div><h3>Recent orders</h3></div>
+            <a class="dashboard-see-all" href="#ordersSection">See all <span aria-hidden="true">→</span></a>
           </div>
           <div id="dashboardRecentOrders"></div>
         </div>
@@ -129,12 +119,6 @@
     </section>
 
     <section id="ordersSection" class="admin-card admin-panel-section">
-      <div class="admin-section-header">
-        <div>
-          <h2>Orders</h2>
-          <p class="tiny-note">Filter by payment status or archive orders when they are no longer active.</p>
-        </div>
-      </div>
       <div class="admin-toolbar">
         <input id="ordersSearch" class="search-field" type="search" placeholder="Search orders" />
         <div id="ordersTabs" class="order-tabs" role="tablist"></div>
@@ -144,10 +128,7 @@
 
     <section id="productsSection" class="admin-card admin-panel-section">
       <div class="admin-section-header">
-        <div>
-          <h2>Products</h2>
-          <p class="tiny-note">Manage your catalog with live inventory and sales summaries.</p>
-        </div>
+        <button id="addProductBtn" class="primary-button" type="button">＋ Add product</button>
       </div>
       <div id="productsSummary" class="dashboard-stats"></div>
       <div class="admin-toolbar product-toolbar">
@@ -166,11 +147,10 @@
 
     <section id="categoriesSection" class="admin-card admin-panel-section">
       <div class="admin-section-header">
-        <div>
-          <h2>Categories</h2>
-          <p class="tiny-note">Organize product categories using the existing product.category field.</p>
-        </div>
+        <button class="primary-button" type="button" data-category-add>＋ Add category</button>
       </div>
+      <details id="categoryEditor" class="admin-form-disclosure">
+        <summary>Add or edit category</summary>
       <form id="categoryForm" class="admin-form category-editor-form">
         <input type="hidden" name="id" />
         <label>Category name<input name="categoryName" required /></label>
@@ -188,15 +168,13 @@
           <button id="cancelCategoryEdit" class="secondary-button" type="button" hidden>Cancel</button>
         </div>
       </form>
+      </details>
       <div id="categoriesList" class="category-list"></div>
     </section>
 
     <section id="menuSection" class="admin-card admin-panel-section">
       <div class="admin-section-header">
-        <div>
-          <h2>Menu</h2>
-          <p class="tiny-note">Drag the handle to reorder links. Items are grouped by their editable menu header.</p>
-        </div>
+        <button class="primary-button" type="button" data-menu-add>＋ Add menu item</button>
       </div>
       <p id="menuOrderStatus" class="menu-order-status" role="status" aria-live="polite"></p>
       <div id="adminMenuItems" class="admin-products"></div>
@@ -204,12 +182,6 @@
 
 
     <section id="shopSettingsSection" class="admin-card admin-panel-section">
-      <div class="admin-section-header">
-        <div>
-          <h2>Shop settings</h2>
-          <p class="tiny-note">Branding, storefront messaging, and social links.</p>
-        </div>
-      </div>
       <div class="admin-toolbar">
         <button class="secondary-button" type="button" data-settings-tab="branding">Branding</button>
         <button class="secondary-button" type="button" data-settings-tab="hero">Hero</button>
@@ -337,66 +309,18 @@ Hero eyebrow
     </section>
 
     <section id="securitySection" class="admin-card admin-panel-section security-section">
-      <div class="admin-section-header">
-        <div>
-          <h2>Security &amp; accounts</h2>
-          <p class="tiny-note">Keep the admin workspace private and under your control.</p>
-        </div>
-      </div>
-
-      <div class="admin-toolbar security-tabs" aria-label="Security settings">
-        <button id="securityAccountsTab" class="secondary-button active" type="button" data-security-tab="accounts">Accounts &amp; access</button>
-        <button class="secondary-button" type="button" data-security-tab="sessions">Password &amp; sessions</button>
-      </div>
-
-      <div class="security-grid" data-security-group="sessions" hidden>
-        <form id="changePasswordForm" class="security-card">
-          <div class="security-icon" aria-hidden="true">⌁</div>
-          <h3>Change password</h3>
-          <p>Use a strong new password for this admin account.</p>
-          <label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
-          <label>New password<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
-          <label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
-          <button class="primary-button" type="submit">Change password</button>
-        </form>
-
-        <div class="security-card security-card-danger">
-          <div class="security-icon" aria-hidden="true">◌</div>
-          <h3>Log out all devices</h3>
-          <p>End every admin session, including this one. Sign in again with your password.</p>
-          <button id="signOutAllButton" class="secondary-button danger" type="button">Log out all devices</button>
-        </div>
-
-      </div>
-
-      <div class="security-grid security-accounts-grid" data-security-group="accounts">
-        <form id="inviteAdminForm" class="security-card">
-          <div class="security-icon" aria-hidden="true">＋</div>
-          <h3>Invite another admin</h3>
-          <p>They receive a private email invitation to set their own password.</p>
-          <label>Email address<input name="email" type="email" autocomplete="email" placeholder="admin@example.com" required /></label>
-          <label id="inviteRoleField">Role<select name="role"><option value="admin">Admin</option><option value="co_owner">Co-owner</option></select></label>
-          <button class="primary-button" type="submit">Send invitation</button>
-        </form>
-      </div>
-
-      <div class="security-admin-list-wrap" data-security-group="accounts">
-        <div class="admin-section-header compact-section-header">
-          <div><h3>Admin accounts</h3><p class="tiny-note">Owner controls co-owners. Co-owners can manage Admin accounts.</p></div>
-        </div>
+      <form id="changePasswordForm" class="admin-form security-password-form">
+        <label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+        <label>New password<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="primary-button" type="submit">Change password</button>
         <p id="securityStatus" class="tiny-note" role="status" aria-live="polite"></p>
-        <div id="adminAccountsList" class="admin-accounts-list"></div>
-      </div>
+      </form>
     </section>
 
     <section id="shippingFeesSection" class="admin-card admin-panel-section">
-      <div class="admin-section-header">
-        <div>
-          <h2>Shipping options</h2>
-          <p class="tiny-note">Manage couriers and marketplace shipping links. Customers pay for their items first, then use Shopee or TikTok only to arrange shipping.</p>
-        </div>
-      </div>
-
+      <details id="shippingMethodEditor" class="admin-form-disclosure">
+        <summary>Add shipping option</summary>
       <form id="shippingMethodForm" class="admin-form shipping-method-form">
         <input name="id" type="hidden" />
         <label>
@@ -431,6 +355,7 @@ Hero eyebrow
           <button id="cancelShippingMethodEdit" class="secondary-button" type="button" hidden>Cancel editing</button>
         </div>
       </form>
+      </details>
 
       <p id="shippingMethodsStatus" class="tiny-note shipping-fees-status" role="status" aria-live="polite"></p>
       <div id="shippingMethodsList" class="shipping-methods-admin-list"></div>
@@ -442,6 +367,8 @@ Hero eyebrow
         </div>
       </div>
 
+      <details id="shippingFeeEditor" class="admin-form-disclosure">
+        <summary>Add delivery fee</summary>
       <form id="shippingFeeForm" class="admin-form shipping-fee-form">
         <input name="id" type="hidden" />
         <label>
@@ -465,6 +392,7 @@ Hero eyebrow
           <button id="cancelShippingFeeEdit" class="secondary-button" type="button" hidden>Cancel editing</button>
         </div>
       </form>
+      </details>
 
       <p id="shippingFeesStatus" class="tiny-note shipping-fees-status" role="status" aria-live="polite"></p>
       <div id="shippingFeesList" class="shipping-fees-admin-list"></div>
@@ -472,11 +400,7 @@ Hero eyebrow
 
     <section id="paymentMethodsSection" class="admin-card admin-panel-section">
       <div class="admin-section-header">
-        <div>
-          <h2>💳 Payment Methods</h2>
-          <p class="tiny-note">Manage the payment methods available during checkout.</p>
-        </div>
-        <button id="addPaymentMethodBtn" class="primary-button">+ Add Payment Method</button>
+        <button id="addPaymentMethodBtn" class="primary-button" type="button">＋ Add payment method</button>
       </div>
 
       <div id="paymentMethodsContainer" class="payment-method-grid">
@@ -542,7 +466,7 @@ Hero eyebrow
     <select id="productExpenseProfileSelect" name="expenseProfile">
       <option value="">No automatic expenses</option>
     </select>
-    <small class="tiny-note">Choose which packaging and freebies this product uses. Profiles are managed in Sales Tracker.</small>
+    <small class="tiny-note">Choose which packaging and freebies this product uses. Profiles are managed from the product and shop settings in this control room.</small>
 </label>
 
 <!-- =========================
@@ -646,9 +570,10 @@ Hero eyebrow
       <div class="admin-section-header">
         <div>
           <h2 id="menuFormTitle">Add menu item</h2>
-          <p class="tiny-note">Update storefront navigation links.</p>
         </div>
       </div>
+      <details id="menuItemEditor" class="admin-form-disclosure">
+        <summary>Add storefront menu item</summary>
       <form id="menuForm" class="admin-form">
         <input type="hidden" name="id" />
         <label>
@@ -680,6 +605,7 @@ Hero eyebrow
         <button class="primary-button full" type="submit">Save menu item</button>
         <button id="cancelMenuEdit" class="secondary-button full" type="button" hidden>Cancel editing</button>
       </form>
+      </details>
     </section>
 
     <dialog id="paymentMethodModal">
@@ -781,10 +707,38 @@ Hero eyebrow
     <dialog id="orderDetailsModal">
       <div id="orderDetailsContent" class="order-details-content"></div>
     </dialog>
+    <dialog id="receiptViewerDialog" class="receipt-viewer-dialog" aria-labelledby="receiptViewerTitle">
+      <div class="receipt-viewer-content">
+        <header class="receipt-viewer-header">
+          <h2 id="receiptViewerTitle">Payment receipt</h2>
+          <button id="closeReceiptViewer" class="secondary-button" type="button">Close</button>
+        </header>
+        <p id="receiptViewerStatus" class="tiny-note" role="status" aria-live="polite">Loading receipt…</p>
+        <a id="receiptViewerFullSize" class="secondary-button" href="#" target="_blank" rel="noopener noreferrer" hidden>Open full size</a>
+        <img id="receiptViewerImage" class="receipt-viewer-image" alt="Uploaded payment receipt" hidden />
+      </div>
+    </dialog>
     <dialog id="invoiceDialog" class="invoice-dialog"><div id="invoiceContent"></div></dialog>
 
   </div>   <!-- closes admin-main-content -->
 </div>   <!-- closes admin-layout -->
+  <nav id="mobileAdminNav" class="admin-mobile-nav" aria-label="Admin navigation">
+    <a href="#dashboardSection" aria-current="location">
+      <span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></span><span>Dashboard</span>
+    </a>
+    <a href="#ordersSection">
+      <span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h10l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 13h10M7 17h7"/></svg></span><span>Orders</span>
+    </a>
+    <a href="#productsSection">
+      <span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14l-1 14H6L5 7Z"/><path d="M9 7a3 3 0 0 1 6 0M4 4h16"/></svg></span><span>Products</span>
+    </a>
+    <a href="#categoriesSection">
+      <span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span><span>Categories</span>
+    </a>
+    <a href="#menuSection">
+      <span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="18" r="1"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></span><span>Menu</span>
+    </a>
+  </nav>
 </div>   <!-- closes adminContent -->
 
   </main>
@@ -793,7 +747,7 @@ Hero eyebrow
 <script src="supabase.js"></script>
 <script src="variants.js?v=clean-console-v1"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="admin.js?v=automatic-product-cost-v12"></script>
-<script src="admin-ui.js?v=stable-section-nav-v2"></script>
+<script src="admin.js?v=20261011-payment-auth-fix-1"></script>
+<script src="admin-ui.js?v=20261011-mobile-visual-final-1"></script>
 </body>
 </html>
