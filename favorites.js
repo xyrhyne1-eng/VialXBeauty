@@ -98,6 +98,7 @@ function getFavorites() {
 }
 
 function getFavoriteProducts() {
+  const getProductById = window.VialXStorefront?.getProductById;
   if (typeof getProductById !== "function") {
     return [];
   }
@@ -128,6 +129,7 @@ function pruneMissingFavorites(existingProducts = []) {
 }
 
 function getFavoriteProductName(productId) {
+  const getProductById = window.VialXStorefront?.getProductById;
   if (typeof getProductById !== "function") {
     return "Product";
   }
@@ -136,25 +138,7 @@ function getFavoriteProductName(productId) {
 }
 
 function showFavoritesToast(message) {
-  let toast = document.getElementById("favoritesToast");
-
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "favoritesToast";
-    toast.setAttribute("role", "status");
-    toast.setAttribute("aria-live", "polite");
-    document.body.appendChild(toast);
-  }
-
-  toast.textContent = message;
-  toast.classList.remove("show");
-  void toast.offsetWidth;
-  toast.classList.add("show");
-
-  clearTimeout(toast.timeout);
-  toast.timeout = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2100);
+  window.VialXStorefront?.notify?.(message);
 }
 
 function updateFavoritesBadge() {
@@ -193,66 +177,48 @@ function renderFavoritesDrawer() {
     }
 
     const favoriteProducts = getFavoriteProducts();
+    const formatCurrency = window.VialXStorefront?.formatCurrency;
     if (!favoriteProducts.length) {
         container.innerHTML = `
-            <p class="empty">
-                No favorites yet.
-            </p>
+          <p class="favorites-empty">No favorites yet. Save a product with the heart button and it will appear here.</p>
         `;
         return;
     }
 
-    container.innerHTML = favoriteProducts
-  .map((product) => `
-    <div class="favorite-item">
-
-      ${
-        product.image_url
-          ? `
-            <img
-              class="favorite-thumb"
-              src="${product.image_url}"
-              alt="${product.name}">
-          `
-          : `
-            <div class="favorite-thumb favorite-thumb-placeholder">
-              ♡
-            </div>
-          `
-      }
-
-      <div class="favorite-details">
-        <strong>${product.name}</strong>
-        <span>${formatCurrency(product.price)}</span>
-      </div>
-
-      <button
-        class="favorite-remove"
-        data-favorite-product="${product.id}">
-        ♥
-      </button>
-
-    </div>
-  `)
-  .join("");
-    container
-    .querySelectorAll(".favorite-remove")
-    .forEach((button) => {
-   button.addEventListener("click", () => {
-
-    removeFavorite(button.dataset.favoriteProduct);
-
-    showFavoritesToast("Removed from favorites");
-
-    renderFavoritesDrawer();
-
-    updateFavoritesBadge();
-
-    // Refresh the product cards so the heart icon updates
-    if (typeof renderProducts === "function") {
-        renderProducts(products);
-    }
-
-});
-    });
+    const escapeHtml = window.VialXStorefront?.escapeHtml || ((value) => String(value ?? ""));
+    container.innerHTML = favoriteProducts.map((product) => `
+        <article class="favorite-item">
+          ${
+            product.image_url
+              ? `<img class="favorite-thumb" src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy">`
+              : `<div class="favorite-thumb favorite-thumb-placeholder" aria-hidden="true">♡</div>`
+          }
+          <div class="favorite-details">
+            <strong>${escapeHtml(product.name)}</strong>
+            <span>${typeof formatCurrency === "function" ? formatCurrency(product.price) : ""}</span>
+          </div>
+          <div class="favorite-actions">
+            <button class="favorite-add" type="button" data-favorite-add="${escapeHtml(String(product.id))}">Add to cart</button>
+            <button class="favorite-remove" type="button" data-favorite-remove="${escapeHtml(String(product.id))}" aria-label="Remove ${escapeHtml(product.name)} from favorites">Remove</button>
+          </div>
+        </article>
+    `).join("");
 }
+
+document.getElementById("favoritesItems")?.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest("button");
+    if (!button) return;
+
+    if (button.dataset.favoriteRemove) {
+        const productId = button.dataset.favoriteRemove;
+        const productName = getFavoriteProductName(productId);
+        removeFavorite(productId);
+        renderFavoritesDrawer();
+        updateFavoritesBadge();
+        window.VialXStorefront?.renderProducts?.();
+        showFavoritesToast(`${productName} removed from favorites`);
+    } else if (button.dataset.favoriteAdd) {
+        window.VialXStorefront?.addProductToCart?.(button.dataset.favoriteAdd);
+    }
+});

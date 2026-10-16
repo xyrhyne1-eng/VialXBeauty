@@ -405,14 +405,14 @@ if (heroImage && heroFallback) {
 
 async function loadProducts() {
   const grid = productGrid || document.getElementById("favoritesGrid");
+  productSoldCounts = new Map();
    grid.innerHTML = `
    <p class="empty">Loading products...</p>
 `;
 
   const [
     { data: productData, error: productError },
-    { data: variantData, error: variantError },
-    { data: soldData, error: soldError }
+    { data: variantData, error: variantError }
   ] = await Promise.all([
     supabaseClient
       .from("products")
@@ -425,10 +425,6 @@ async function loadProducts() {
       .select("*")
       .eq("is_active", true)
       .order("sort_order", { ascending: true }),
-
-    // This RPC returns aggregate totals only, so no customer/order details are
-    // exposed to storefront visitors. See supabase-sold-counts.sql.
-    supabaseClient.rpc("get_product_sold_counts")
   ]);
   if (productError) {
      grid.innerHTML = `
@@ -447,16 +443,6 @@ async function loadProducts() {
   }
 
   productVariants = variantData || [];
-  productSoldCounts = new Map(
-    (soldError ? [] : soldData || []).map((row) => [
-      String(row.product_id),
-      Number(row.sold_count || 0)
-    ])
-  );
-
-  if (soldError) {
-    console.warn("Could not load sold counts:", soldError.message);
-  }
 
   products = (productData || []).map((product) => ({
     ...product,

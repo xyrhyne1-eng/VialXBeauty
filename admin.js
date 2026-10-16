@@ -69,6 +69,13 @@ const ordersSearch = document.querySelector("#ordersSearch");
 const dashboardStats = document.querySelector("#dashboardStats");
 const dashboardRecentOrders = document.querySelector("#dashboardRecentOrders");
 const dashboardBestSellers = document.querySelector("#dashboardBestSellers");
+const dashboardOrderDateFormatter = new Intl.DateTimeFormat("en-PH", {
+  timeZone: "Asia/Manila",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
 const productsSummary = document.querySelector("#productsSummary");
 const productsTableContainer = document.querySelector("#productsTableContainer");
 const productsPagination = document.querySelector("#productsPagination");
@@ -79,6 +86,11 @@ const categoriesList = document.querySelector("#categoriesList");
 const customersList = document.querySelector("#customersList");
 const orderDetailsModal = document.querySelector("#orderDetailsModal");
 const orderDetailsContent = document.querySelector("#orderDetailsContent");
+const receiptViewerDialog = document.querySelector("#receiptViewerDialog");
+const receiptViewerStatus = document.querySelector("#receiptViewerStatus");
+const receiptViewerImage = document.querySelector("#receiptViewerImage");
+const receiptViewerFullSize = document.querySelector("#receiptViewerFullSize");
+const closeReceiptViewer = document.querySelector("#closeReceiptViewer");
 const invoiceDialog = document.querySelector("#invoiceDialog");
 const invoiceContent = document.querySelector("#invoiceContent");
 const formTitle = document.querySelector("#formTitle");
@@ -128,14 +140,13 @@ const inviteRoleField = document.querySelector("#inviteRoleField");
 const paymentMethodsNav = document.querySelector("#paymentMethodsNav");
 const paymentMethodsSection = document.querySelector("#paymentMethodsSection");
 const securityAccountsTab = document.querySelector("#securityAccountsTab");
-let currentAdminRole = "admin";
-let activeSecurityTab = "accounts";
 
 let menuItems = [];
 let products = [];
 let expenseProfiles = [];
 let paymentMethods = [];
 let paymentMethodShippingLinks = [];
+let paymentMethodShippingLinksError = null;
 let orders = [];
 let orderItemsByOrder = {};
 let activeOrderFilter = "all";
@@ -144,6 +155,8 @@ const orderPageSize = 5;
 let dashboardOrderPage = 1;
 const dashboardOrderPageSize = 3;
 let activeSettingsTab = "branding";
+let activeSecurityTab = "accounts";
+let currentAdminRole = "admin";
 let categoryRegistry = [];
 let categoryVisibilityState = {};
 let categoryOrder = [];
@@ -162,58 +175,6 @@ let shippingMethods = [];
    LOGIN AND ADMIN CHECK
 ------------------------- */
 
-function setupAdminUI() {
-  sidebarLogoutButton?.addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
-    await showLogin("You have been logged out.");
-  });
-
-  document.querySelectorAll("[data-settings-tab]").forEach((button) => {
-    button.addEventListener("click", () => {
-      setActiveSettingsTab(button.dataset.settingsTab);
-    });
-  });
-
-  document.querySelectorAll("[data-security-tab]").forEach((button) => {
-    if (button.dataset.bound) return;
-    button.dataset.bound = "true";
-    button.addEventListener("click", () => setActiveSecurityTab(button.dataset.securityTab));
-  });
-
-  document.querySelectorAll("[data-security-tab]").forEach((button) => {
-    button.addEventListener("click", () => setActiveSecurityTab(button.dataset.securityTab));
-  });
-
-  ordersSearch?.addEventListener("input", () => {
-    orderPage = 1;
-    renderOrders(getFilteredOrders());
-  });
-
-  productsSearch?.addEventListener("input", () => {
-    productFilters.search = String(productsSearch.value || "").trim().toLowerCase();
-    productPage = 1;
-    renderProducts();
-  });
-
-  productsCategoryFilter?.addEventListener("change", () => {
-    productFilters.category = productsCategoryFilter.value || "all";
-    productPage = 1;
-    renderProducts();
-  });
-
-  productsLowStockFilter?.addEventListener("change", () => {
-    productFilters.lowStock = Boolean(productsLowStockFilter.checked);
-    productPage = 1;
-    renderProducts();
-  });
-
-  orderDetailsModal?.addEventListener("click", (event) => {
-    if (event.target === orderDetailsModal) {
-      orderDetailsModal.close();
-    }
-  });
-}
-
 function setActiveSettingsTab(tab) {
   activeSettingsTab = tab;
   document.querySelectorAll("[data-settings-group]").forEach((field) => {
@@ -227,12 +188,14 @@ function setActiveSettingsTab(tab) {
 async function showLogin(message = "") {
   loginSection.hidden = false;
   adminContent.hidden = true;
+  document.body.classList.remove("admin-authenticated");
   loginMessage.textContent = message;
 }
 
 async function showAdmin() {
   loginSection.hidden = true;
   adminContent.hidden = false;
+  document.body.classList.add("admin-authenticated");
 
   setupAdminUI();
   setActiveSettingsTab(activeSettingsTab);
@@ -290,6 +253,8 @@ async function loadAdminAccounts() {
     if (!["owner", "co_owner"].includes(currentAdminRole)) setActiveSecurityTab("sessions");
     const canManagePayments = ["owner", "co_owner"].includes(currentAdminRole);
     if (paymentMethodsNav) paymentMethodsNav.hidden = !canManagePayments;
+    const paymentMenuOption = document.querySelector("#adminMenuPaymentsOption");
+    if (paymentMenuOption) paymentMenuOption.hidden = !canManagePayments;
     if (paymentMethodsSection) paymentMethodsSection.hidden = !canManagePayments;
     adminAccountsList.innerHTML = data.accounts.map((account) => `
       <article class="admin-account-row">
@@ -297,7 +262,16 @@ async function loadAdminAccounts() {
         <div class="admin-actions">${canManageAccount(account) ? `<button class="secondary-button account-action-button" type="button" data-account-action="nickname" data-admin-account-id="${escapeHtml(account.id)}" data-admin-nickname="${escapeHtml(account.nickname || "")}">Nickname</button>` : ""}${canRemoveAdmin(account) ? `<button class="secondary-button ${account.suspended_at ? "" : "danger"} account-action-button" type="button" data-account-action="${account.suspended_at ? "restore" : "suspend"}" data-admin-account-id="${escapeHtml(account.id)}" data-admin-email="${escapeHtml(account.email)}">${account.suspended_at ? "Unban" : "Suspend"}</button><button class="secondary-button danger remove-admin-button" type="button" data-admin-account-id="${escapeHtml(account.id)}" data-admin-email="${escapeHtml(account.email)}">Remove</button>` : ""}</div>
       </article>`).join("") || `<p class="tiny-note">No additional admin accounts yet.</p>`;
   } catch (error) {
-    adminAccountsList.innerHTML = `<p class="tiny-note">Security setup is not ready yet. Run the included SQL and deploy the included function.</p>`;
+    currentAdminRole = "admin";
+    if (inviteRoleField) inviteRoleField.hidden = true;
+    if (securityAccountsTab) securityAccountsTab.hidden = true;
+    if (paymentMethodsNav) paymentMethodsNav.hidden = true;
+    const paymentMenuOption = document.querySelector("#adminMenuPaymentsOption");
+    if (paymentMenuOption) paymentMenuOption.hidden = true;
+    if (paymentMethodsSection) paymentMethodsSection.hidden = true;
+    setActiveSecurityTab("sessions");
+    setSecurityStatus(`Could not load admin accounts: ${error.message || "Security request failed."}`, true);
+    adminAccountsList.innerHTML = `<p class="tiny-note security-status-error">Could not load admin accounts: ${escapeHtml(error.message || "Security request failed.")}</p>`;
   }
 }
 
@@ -329,7 +303,11 @@ changePasswordForm?.addEventListener("submit", async (event) => {
   const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
   if (error) return setSecurityStatus(error.message, true);
   changePasswordForm.reset();
-  setSecurityStatus("Password changed. For safety, log out all devices next.");
+  setSecurityStatus("Password changed successfully.");
+});
+
+document.querySelectorAll("[data-security-tab]").forEach((button) => {
+  button.addEventListener("click", () => setActiveSecurityTab(button.dataset.securityTab));
 });
 
 signOutAllButton?.addEventListener("click", async () => {
@@ -339,7 +317,9 @@ signOutAllButton?.addEventListener("click", async () => {
     await callAdminSecurity("signout-all");
     await supabaseClient.auth.signOut();
     await showLogin("All devices have been logged out. Please sign in again.");
-  } catch (error) { setSecurityStatus(error.message, true); }
+  } catch (error) {
+    setSecurityStatus(error.message, true);
+  }
 });
 
 inviteAdminForm?.addEventListener("submit", async (event) => {
@@ -349,37 +329,59 @@ inviteAdminForm?.addEventListener("submit", async (event) => {
     const email = String(formData.get("email") || "").trim();
     const role = currentAdminRole === "owner" ? String(formData.get("role") || "admin") : "admin";
     setSecurityStatus("Sending invitation…");
-    const result = await callAdminSecurity("invite", { email, role, redirectTo: `${window.location.origin}/admin.html` });
+    const result = await callAdminSecurity("invite", {
+      email,
+      role,
+      redirectTo: `${window.location.origin}/admin.html`
+    });
     inviteAdminForm.reset();
-    setSecurityStatus(result.restored_existing_account ? "Existing account restored successfully." : "Invitation sent successfully.");
+    setSecurityStatus(result.restored_existing_account
+      ? "Existing account restored successfully."
+      : "Invitation sent successfully.");
     await loadAdminAccounts();
-  } catch (error) { setSecurityStatus(error.message, true); }
+  } catch (error) {
+    setSecurityStatus(error.message, true);
+  }
 });
 
 adminAccountsList?.addEventListener("click", async (event) => {
-  const actionButton = event.target.closest(".account-action-button");
+  const target = event.target instanceof Element ? event.target : null;
+  const actionButton = target?.closest(".account-action-button");
   if (actionButton?.dataset.accountAction === "nickname") {
     const nickname = window.prompt("Nickname for this account (optional):", actionButton.dataset.adminNickname || "");
     if (nickname === null) return;
-    try { await callAdminSecurity("update-account", { id: actionButton.dataset.adminAccountId, nickname }); await loadAdminAccounts(); }
-    catch (error) { setSecurityStatus(error.message, true); }
+    try {
+      await callAdminSecurity("update-account", { id: actionButton.dataset.adminAccountId, nickname });
+      await loadAdminAccounts();
+    } catch (error) {
+      setSecurityStatus(error.message, true);
+    }
     return;
   }
   if (actionButton && ["suspend", "restore"].includes(actionButton.dataset.accountAction)) {
     const isSuspending = actionButton.dataset.accountAction === "suspend";
     if (!window.confirm(`${isSuspending ? "Suspend" : "restore"} ${actionButton.dataset.adminEmail || "this account"}?`)) return;
-    try { await callAdminSecurity("set-suspension", { id: actionButton.dataset.adminAccountId, suspended: isSuspending }); await loadAdminAccounts(); }
-    catch (error) { setSecurityStatus(error.message, true); }
+    try {
+      await callAdminSecurity("set-suspension", {
+        id: actionButton.dataset.adminAccountId,
+        suspended: isSuspending
+      });
+      await loadAdminAccounts();
+    } catch (error) {
+      setSecurityStatus(error.message, true);
+    }
     return;
   }
-  const button = event.target.closest(".remove-admin-button");
-  if (!button || !window.confirm(`Remove ${button.dataset.adminEmail} as an admin? They will no longer have access.`)) return;
+  const removeButton = target?.closest(".remove-admin-button");
+  if (!removeButton || !window.confirm(`Remove ${removeButton.dataset.adminEmail} as an admin? They will no longer have access.`)) return;
   try {
     setSecurityStatus("Removing admin access…");
-    await callAdminSecurity("remove", { id: button.dataset.adminAccountId });
+    await callAdminSecurity("remove", { id: removeButton.dataset.adminAccountId });
     setSecurityStatus("Admin access removed.");
     await loadAdminAccounts();
-  } catch (error) { setSecurityStatus(error.message, true); }
+  } catch (error) {
+    setSecurityStatus(error.message, true);
+  }
 });
 
 async function verifyAdmin() {
@@ -446,12 +448,6 @@ function setupAdminUI() {
     });
   });
 
-  document.querySelectorAll("[data-security-tab]").forEach((button) => {
-    if (button.dataset.bound) return;
-    button.dataset.bound = "true";
-    button.addEventListener("click", () => setActiveSecurityTab(button.dataset.securityTab));
-  });
-
   ordersSearch?.addEventListener("input", () => {
     renderOrders(getFilteredOrders());
   });
@@ -479,6 +475,12 @@ function setupAdminUI() {
       orderDetailsModal.close();
     }
   });
+
+  const addProductButton = document.querySelector("#addProductBtn");
+  if (addProductButton && !addProductButton.dataset.bound) {
+    addProductButton.dataset.bound = "true";
+    addProductButton.addEventListener("click", () => resetProductForm());
+  }
 
   document.querySelector("#addProductBtn")?.addEventListener("click", () => {
     resetProductForm();
@@ -625,7 +627,6 @@ if (selectedShopLogoFile) {
 if (selectedHeroImageFile) {
   try {
     updates.hero_image_url = await uploadProductImage(selectedHeroImageFile);
-    settingsForm.elements.heroImageUrl.value = updates.hero_image_url;
   } catch (uploadError) {
     alert(`Could not upload hero image: ${uploadError.message}`);
     return;
@@ -640,16 +641,31 @@ if (selectedCatalogImageFile) {
     return;
   }
 }
-const { error } = await supabaseClient
-  .from("shop_settings")
-  .update(updates)
-  .eq("id", 1);
+let saveResult;
+try {
+  saveResult = await supabaseClient
+    .from("shop_settings")
+    .update(updates)
+    .eq("id", 1)
+    .select("id")
+    .maybeSingle();
+} catch (saveError) {
+  alert(`Could not save shop profile: ${saveError?.message || "Unexpected error."}`);
+  return;
+}
+
+const { data: savedSettings, error } = saveResult;
 
 if (error) {
   alert(`Could not save shop profile: ${error.message}`);
   return;
 }
+if (!savedSettings) {
+  alert("Could not confirm that the shop profile was saved.");
+  return;
+}
 
+settingsForm.elements.heroImageUrl.value = updates.hero_image_url || "";
 selectedShopLogoFile = null;
 selectedHeroImageFile = null;
 selectedCatalogImageFile = null;
@@ -683,6 +699,11 @@ function resetShippingMethodForm() {
   shippingMethodForm.elements.methodType.value = "courier";
   shippingMethodForm.elements.isActive.checked = true;
   cancelShippingMethodEdit.hidden = true;
+  const editor = document.querySelector("#shippingMethodEditor");
+  if (editor) {
+    editor.open = false;
+    editor.querySelector("summary").textContent = "Add shipping option";
+  }
   syncShippingMethodFields();
 }
 
@@ -737,21 +758,28 @@ function renderShippingMethods() {
 
   shippingMethodsList.innerHTML = shippingMethods.map((method, index) => `
     <article class="shipping-fee-admin-card${method.is_active ? "" : " is-hidden"}" data-shipping-method-id="${method.id}">
-      <div class="shipping-fee-admin-order">${index + 1}</div>
-      <div class="shipping-fee-admin-copy">
+    <div class="shipping-fee-admin-copy">
+      <div class="shipping-card-title">
         <strong>${escapeHtml(method.name || "Shipping option")}</strong>
-        <span>${method.method_type === "external" ? "External checkout" : "Courier"}</span>
-        <small>${escapeHtml(method.description || (method.is_active ? "Visible at checkout" : "Hidden from checkout"))}</small>
-        ${method.method_type === "external" && method.external_url ? `<small class="shipping-method-url">${escapeHtml(method.external_url)}</small>` : ""}
+        <span class="admin-status-badge ${method.is_active ? "is-enabled" : "is-disabled"}">${method.is_active ? "Enabled" : "Disabled"}</span>
       </div>
-      <div class="admin-actions shipping-fee-actions">
-        <button class="secondary-button" type="button" data-method-move="up" data-method-id="${method.id}" ${index === 0 ? "disabled" : ""}>↑</button>
-        <button class="secondary-button" type="button" data-method-move="down" data-method-id="${method.id}" ${index === shippingMethods.length - 1 ? "disabled" : ""}>↓</button>
-        <button class="secondary-button" type="button" data-method-edit="${method.id}">Edit</button>
-        <button class="secondary-button" type="button" data-method-toggle="${method.id}">${method.is_active ? "Hide" : "Show"}</button>
-        <button class="secondary-button danger" type="button" data-method-delete="${method.id}">Delete</button>
-      </div>
-    </article>`).join("");
+      <span>${method.method_type === "external" ? "External checkout" : "Courier"} · Option ${index + 1}</span>
+      <small>${escapeHtml(method.description || (method.is_active ? "Visible at checkout" : "Hidden from checkout"))}</small>
+      ${method.method_type === "external" && method.external_url ? `<small class="shipping-method-url">${escapeHtml(method.external_url)}</small>` : ""}
+    </div>
+    <div class="shipping-card-actions">
+      <button class="primary-button" type="button" data-method-edit="${method.id}">Edit option</button>
+      <details class="card-more-actions">
+        <summary>More</summary>
+        <div class="card-more-actions-panel">
+          <button class="secondary-button" type="button" data-method-move="up" data-method-id="${method.id}" ${index === 0 ? "disabled" : ""}>Move up</button>
+          <button class="secondary-button" type="button" data-method-move="down" data-method-id="${method.id}" ${index === shippingMethods.length - 1 ? "disabled" : ""}>Move down</button>
+          <button class="secondary-button" type="button" data-method-toggle="${method.id}">${method.is_active ? "Disable" : "Enable"}</button>
+          <button class="secondary-button danger" type="button" data-method-delete="${method.id}">Delete option</button>
+        </div>
+      </details>
+    </div>
+  </article>`).join("");
 }
 
 function editShippingMethod(methodId) {
@@ -765,6 +793,11 @@ function editShippingMethod(methodId) {
   shippingMethodForm.elements.buttonLabel.value = method.button_label || "";
   shippingMethodForm.elements.isActive.checked = Boolean(method.is_active);
   cancelShippingMethodEdit.hidden = false;
+  const editor = document.querySelector("#shippingMethodEditor");
+  if (editor) {
+    editor.open = true;
+    editor.querySelector("summary").textContent = "Edit shipping option";
+  }
   syncShippingMethodFields();
   shippingMethodForm.scrollIntoView({ behavior: "smooth", block: "center" });
 }
@@ -871,6 +904,11 @@ function resetShippingFeeForm() {
   shippingFeeForm.elements.isActive.checked = true;
   renderShippingFeeMethodChoices();
   cancelShippingFeeEdit.hidden = true;
+  const editor = document.querySelector("#shippingFeeEditor");
+  if (editor) {
+    editor.open = false;
+    editor.querySelector("summary").textContent = "Add delivery fee";
+  }
 }
 
 async function loadShippingFees() {
@@ -914,18 +952,24 @@ function renderShippingFees() {
   shippingFeesList.innerHTML = shippingFees
     .map((fee, index) => `
       <article class="shipping-fee-admin-card${fee.is_active ? "" : " is-hidden"}" data-shipping-fee-id="${fee.id}">
-        <div class="shipping-fee-admin-order" aria-label="Shipping fee position">${index + 1}</div>
         <div class="shipping-fee-admin-copy">
-          <strong>${escapeHtml(fee.label || "Delivery area")}</strong>
-          <span>${formatCurrency(fee.amount || 0)}</span>
+          <div class="shipping-card-title">
+            <strong>${escapeHtml(fee.label || "Delivery area")}</strong>
+            <strong>${formatCurrency(fee.amount || 0)}</strong>
+          </div>
           <small>${escapeHtml(shippingMethods.find((method) => String(method.id) === String(fee.shipping_method_id))?.name || "Unassigned courier")} · ${fee.is_active ? "Visible" : "Hidden"}</small>
         </div>
-        <div class="admin-actions shipping-fee-actions">
-          <button class="secondary-button" type="button" data-shipping-move="up" data-shipping-id="${fee.id}" ${index === 0 ? "disabled" : ""} aria-label="Move ${escapeHtml(fee.label)} up">↑</button>
-          <button class="secondary-button" type="button" data-shipping-move="down" data-shipping-id="${fee.id}" ${index === shippingFees.length - 1 ? "disabled" : ""} aria-label="Move ${escapeHtml(fee.label)} down">↓</button>
-          <button class="secondary-button" type="button" data-shipping-edit="${fee.id}">Edit</button>
-          <button class="secondary-button" type="button" data-shipping-toggle="${fee.id}">${fee.is_active ? "Hide" : "Show"}</button>
-          <button class="secondary-button danger" type="button" data-shipping-delete="${fee.id}">Delete</button>
+        <div class="shipping-card-actions">
+          <button class="primary-button" type="button" data-shipping-edit="${fee.id}">Edit fee</button>
+          <details class="card-more-actions">
+            <summary>More</summary>
+            <div class="card-more-actions-panel">
+              <button class="secondary-button" type="button" data-shipping-move="up" data-shipping-id="${fee.id}" ${index === 0 ? "disabled" : ""} aria-label="Move ${escapeHtml(fee.label)} up">Move up</button>
+              <button class="secondary-button" type="button" data-shipping-move="down" data-shipping-id="${fee.id}" ${index === shippingFees.length - 1 ? "disabled" : ""} aria-label="Move ${escapeHtml(fee.label)} down">Move down</button>
+              <button class="secondary-button" type="button" data-shipping-toggle="${fee.id}">${fee.is_active ? "Disable" : "Enable"}</button>
+              <button class="secondary-button danger" type="button" data-shipping-delete="${fee.id}">Delete fee</button>
+            </div>
+          </details>
         </div>
       </article>
     `)
@@ -942,6 +986,11 @@ function editShippingFee(feeId) {
   shippingFeeForm.elements.shippingMethodId.value = fee.shipping_method_id || "";
   shippingFeeForm.elements.isActive.checked = Boolean(fee.is_active);
   cancelShippingFeeEdit.hidden = false;
+  const editor = document.querySelector("#shippingFeeEditor");
+  if (editor) {
+    editor.open = true;
+    editor.querySelector("summary").textContent = "Edit delivery fee";
+  }
   shippingFeeForm.scrollIntoView({ behavior: "smooth", block: "center" });
   shippingFeeForm.elements.label.focus({ preventScroll: true });
 }
@@ -1217,8 +1266,13 @@ function renderMenuItems() {
                 </small>
               </div>
               <div class="admin-actions">
-                <button class="secondary-button" type="button" data-menu-edit="${item.id}">Edit</button>
-                <button class="secondary-button danger" type="button" data-menu-delete="${item.id}">Delete</button>
+                <button class="primary-button" type="button" data-menu-edit="${item.id}">Edit link</button>
+                <details class="card-more-actions">
+                  <summary>More</summary>
+                  <div class="card-more-actions-panel">
+                    <button class="secondary-button danger" type="button" data-menu-delete="${item.id}">Delete link</button>
+                  </div>
+                </details>
               </div>
             </article>
           `).join("")}
@@ -1559,6 +1613,11 @@ open_new_tab: formData.get("openNewTab") === "on"
   menuForm.elements.id.value = "";
   menuFormTitle.textContent = "Add menu item";
   cancelMenuEdit.hidden = true;
+  const editor = document.querySelector("#menuItemEditor");
+  if (editor) {
+    editor.open = false;
+    editor.querySelector("summary").textContent = "Add storefront menu item";
+  }
 
   await loadMenuItems();
   updateMenuSectionChoices();
@@ -1566,6 +1625,11 @@ open_new_tab: formData.get("openNewTab") === "on"
 function editMenuItem(id) {
   const item = menuItems.find((m) => String(m.id) === String(id));
   if (!item) return;
+  const editor = document.querySelector("#menuItemEditor");
+  if (editor) {
+    editor.open = true;
+    editor.querySelector("summary").textContent = "Edit storefront menu item";
+  }
 
   menuForm.elements.id.value = item.id;
   menuForm.elements.label.value = item.label || "";
@@ -1589,6 +1653,11 @@ cancelMenuEdit.addEventListener("click", () => {
   updateMenuSectionChoices();
   menuFormTitle.textContent = "Add menu item";
   cancelMenuEdit.hidden = true;
+  const editor = document.querySelector("#menuItemEditor");
+  if (editor) {
+    editor.open = false;
+    editor.querySelector("summary").textContent = "Add storefront menu item";
+  }
 });
 
 async function deleteMenuItem(id) {
@@ -1735,7 +1804,11 @@ async function uploadPaymentMethodQr(file, methodId) {
     .from("payment-qr")
     .getPublicUrl(storagePath);
 
-  return publicData?.publicUrl || null;
+  if (!publicData?.publicUrl) {
+    throw new Error("The QR image uploaded, but no public URL was returned.");
+  }
+
+  return publicData.publicUrl;
 }
 
 async function deletePaymentMethodQr(publicUrl) {
@@ -1753,18 +1826,27 @@ async function deletePaymentMethodQr(publicUrl) {
 
 async function loadPaymentMethods() {
   const [{ data, error }, linksResult] = await Promise.all([
-    supabaseClient.from("payment_methods").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("payment_methods").select("*").order("sort_order", { ascending: true }).order("id", { ascending: true }),
     supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
   ]);
 
   if (error) {
+    paymentMethods = [];
+    paymentMethodShippingLinks = [];
     paymentMethodsContainer.innerHTML =
       `<p class="empty">Could not load payment methods: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
   paymentMethods = data || [];
-  paymentMethodShippingLinks = linksResult.error ? [] : (linksResult.data || []);
+  if (linksResult.error) {
+    paymentMethodShippingLinks = [];
+    paymentMethodShippingLinksError = linksResult.error;
+    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
+  } else {
+    paymentMethodShippingLinks = linksResult.data || [];
+    paymentMethodShippingLinksError = null;
+  }
   renderPaymentMethods();
 }
 
@@ -1782,8 +1864,12 @@ function renderPaymentCourierOptions(methodId = null) {
 }
 
 function renderPaymentMethods() {
+  const assignmentsNotice = paymentMethodShippingLinksError
+    ? `<p class="tiny-note">Shipping assignments could not be loaded: ${escapeHtml(paymentMethodShippingLinksError.message)}</p>`
+    : "";
+
   if (!paymentMethods.length) {
-    paymentMethodsContainer.innerHTML = `
+    paymentMethodsContainer.innerHTML = `${assignmentsNotice}
       <div class="payment-method-empty">
         <p>No payment methods loaded yet.</p>
         <p class="tiny-note">
@@ -1794,7 +1880,7 @@ function renderPaymentMethods() {
     return;
   }
 
-  paymentMethodsContainer.innerHTML = paymentMethods
+  paymentMethodsContainer.innerHTML = `${assignmentsNotice}${paymentMethods
     .map((method) => {
       const depositText = method.deposit_required
         ? `${method.deposit_percentage ?? 0}% deposit`
@@ -1802,10 +1888,14 @@ function renderPaymentMethods() {
 
       return `
         <article class="payment-method-card">
-          <div>
-            <strong>${escapeHtml(method.payment_name)}</strong>
-            <p>${escapeHtml(method.short_description || "")}</p>
+          <div class="payment-method-heading">
+            <div class="payment-method-mark" aria-hidden="true">₱</div>
+            <div class="payment-method-title">
+              <strong>${escapeHtml(method.payment_name)}</strong>
+              <span class="admin-status-badge ${method.is_visible ? "is-enabled" : "is-disabled"}">${method.is_visible ? "Enabled at checkout" : "Hidden at checkout"}</span>
+            </div>
           </div>
+          <p class="payment-method-description">${escapeHtml(method.short_description || "")}</p>
 
           ${method.qr_url
             ? `<img class="payment-qr-preview" src="${escapeHtml(method.qr_url)}" alt="${escapeHtml(method.payment_name)} QR" />`
@@ -1825,102 +1915,65 @@ function renderPaymentMethods() {
             <span class="payment-tag">${escapeHtml(courierNamesForPayment(method.id).join(", ") || "No shipping options assigned")}</span>
           </div>
 
-          <div class="admin-actions">
-            <button
-              class="secondary-button"
-              type="button"
-              data-payment-up="${method.id}"
-            >
-              ↑
-            </button>
-            <button
-              class="secondary-button"
-              type="button"
-              data-payment-down="${method.id}"
-            >
-              ↓
-            </button>
-            <button
-              class="secondary-button"
-              type="button"
-              data-payment-toggle-visible="${method.id}"
-            >
-              ${method.is_visible ? "Hide" : "Show"}
-            </button>
-            <button
-              class="secondary-button"
-              type="button"
-              data-payment-edit="${method.id}"
-            >
-              Edit
-            </button>
-            <button
-              class="secondary-button danger"
-              type="button"
-              data-payment-delete="${method.id}"
-            >
-              Delete
-            </button>
+          <div class="payment-card-actions">
+            <button class="primary-button" type="button" data-payment-edit="${escapeHtml(String(method.id))}">Edit method</button>
+            <details class="card-more-actions">
+              <summary>More</summary>
+              <div class="card-more-actions-panel">
+                <button class="secondary-button" type="button" data-payment-toggle-visible="${escapeHtml(String(method.id))}">${method.is_visible ? "Hide from checkout" : "Show at checkout"}</button>
+                <button class="secondary-button" type="button" data-payment-up="${escapeHtml(String(method.id))}">Move up</button>
+                <button class="secondary-button" type="button" data-payment-down="${escapeHtml(String(method.id))}">Move down</button>
+                <button class="secondary-button danger" type="button" data-payment-delete="${escapeHtml(String(method.id))}">Delete method</button>
+              </div>
+            </details>
           </div>
         </article>
       `;
     })
-    .join("");
+    .join("")}`;
 
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-toggle-visible]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        togglePaymentMethodVisibility(button.dataset.paymentToggleVisible);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-edit]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        editPaymentMethod(button.dataset.paymentEdit);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-down]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        changePaymentMethodOrder(button.dataset.paymentDown, 1);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-up]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        changePaymentMethodOrder(button.dataset.paymentUp, -1);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-delete]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        deletePaymentMethod(button.dataset.paymentDelete);
-      });
-    });
 }
 
+document.addEventListener("click", (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+  const button = target?.closest("#paymentMethodsContainer [data-payment-edit], #paymentMethodsContainer [data-payment-toggle-visible], #paymentMethodsContainer [data-payment-up], #paymentMethodsContainer [data-payment-down], #paymentMethodsContainer [data-payment-delete]");
+  if (!button) return;
+
+  if (button.dataset.paymentEdit) {
+    event.preventDefault();
+    event.stopPropagation();
+    editPaymentMethod(button.dataset.paymentEdit);
+  } else if (button.dataset.paymentToggleVisible) {
+    event.preventDefault();
+    togglePaymentMethodVisibility(button.dataset.paymentToggleVisible);
+  } else if (button.dataset.paymentUp) {
+    event.preventDefault();
+    changePaymentMethodOrder(button.dataset.paymentUp, -1);
+  } else if (button.dataset.paymentDown) {
+    event.preventDefault();
+    changePaymentMethodOrder(button.dataset.paymentDown, 1);
+  } else if (button.dataset.paymentDelete) {
+    event.preventDefault();
+    deletePaymentMethod(button.dataset.paymentDelete);
+  }
+}, true);
+
 function openPaymentMethodModal(isEdit = false) {
-  paymentMethodModalTitle.textContent = isEdit
-    ? "Edit payment method"
-    : "Add payment method";
+  paymentMethodModalTitle.textContent = isEdit ? "Edit Payment Method" : "Add Payment Method";
+  paymentMethodForm.querySelector('button[type="submit"]').textContent = isEdit ? "Save Changes" : "Save payment method";
 
   renderPaymentCourierOptions(isEdit ? paymentMethodForm.elements.id.value : null);
+  if (!paymentMethodModal.isConnected) {
+    document.body.append(paymentMethodModal);
+  }
   paymentMethodModal.showModal();
 }
 
 function closePaymentMethodDialog() {
-  paymentMethodModal.close();
+  if (paymentMethodModal.open) paymentMethodModal.close();
   paymentMethodForm.reset();
   paymentMethodForm.elements.id.value = "";
+  paymentMethodForm.querySelector('button[type="submit"]').textContent = "Save payment method";
   resetPaymentMethodQrState();
 }
 
@@ -2002,126 +2055,186 @@ paymentMethodQrInput?.addEventListener("change", (event) => {
   });
 });
 
+let isSavingPaymentMethod = false;
+
 paymentMethodForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (paymentMethodShippingLinksError) {
+    alert(`Cannot safely save payment methods until shipping assignments load: ${paymentMethodShippingLinksError.message}`);
+    return;
+  }
+  if (isSavingPaymentMethod || !paymentMethodForm.reportValidity()) return;
 
-  const formData = new FormData(paymentMethodForm);
-  const id = String(formData.get("id") || "").trim();
-  const selectedShippingMethodIds = formData.getAll("shipping_method_ids").map((value) => Number(value));
+  isSavingPaymentMethod = true;
+  const saveButton = paymentMethodForm.querySelector('button[type="submit"]');
+  if (saveButton) saveButton.disabled = true;
 
-  const requestedSortOrder = formData.get("sort_order");
-  const payload = {
-    payment_name: String(formData.get("payment_name") || "").trim(),
-    short_description: String(formData.get("short_description") || "").trim() || null,
-    instructions: String(formData.get("instructions") || "").trim() || null,
-    instructions_visible: formData.get("instructions_visible") === "on",
-    cod_fee: Math.max(0, Number(formData.get("cod_fee") || 0)),
-    receipt_required: formData.get("receipt_required") === "on",
-    reference_required: formData.get("reference_required") === "on",
-    deposit_required: formData.get("deposit_required") === "on",
-    deposit_percentage:
-  formData.get("deposit_percentage") !== ""
-    ? Number(formData.get("deposit_percentage"))
-    : 0,
-    is_visible: formData.get("is_visible") === "on",
-    sort_order:
-      requestedSortOrder !== ""
+  try {
+    const formData = new FormData(paymentMethodForm);
+    const id = String(formData.get("id") || "").trim();
+    const selectedShippingMethodIds = formData.getAll("shipping_method_ids").map((value) => Number(value));
+
+    const requestedSortOrder = formData.get("sort_order");
+    const payload = {
+      payment_name: String(formData.get("payment_name") || "").trim(),
+      short_description: String(formData.get("short_description") || "").trim() || null,
+      instructions: String(formData.get("instructions") || "").trim() || null,
+      instructions_visible: formData.get("instructions_visible") === "on",
+      cod_fee: Math.max(0, Number(formData.get("cod_fee") || 0)),
+      receipt_required: formData.get("receipt_required") === "on",
+      reference_required: formData.get("reference_required") === "on",
+      deposit_required: formData.get("deposit_required") === "on",
+      deposit_percentage: formData.get("deposit_percentage") !== ""
+        ? Number(formData.get("deposit_percentage"))
+        : 0,
+      is_visible: formData.get("is_visible") === "on",
+      sort_order: requestedSortOrder !== ""
         ? Number(requestedSortOrder)
         : paymentMethods.length
-        ? Math.max(...paymentMethods.map((item) => Number(item.sort_order ?? 0))) + 10
-        : 10,
-    updated_at: new Date().toISOString()
-  };
+          ? Math.max(...paymentMethods.map((item) => Number(item.sort_order ?? 0))) + 10
+          : 10,
+      updated_at: new Date().toISOString()
+    };
 
-  let qrUrl = null;
-  const existingMethod = id
-    ? paymentMethods.find((item) => item.id === id)
-    : null;
+    let qrUrl = null;
+    let previousQrUrlToDelete = null;
+    const existingMethod = id
+      ? paymentMethods.find((item) => String(item.id) === id)
+      : null;
 
-  if (paymentMethodQrFile) {
-    const validationMessage = validatePaymentMethodQrFile(paymentMethodQrFile);
-    if (validationMessage) {
-      alert(validationMessage);
-      return;
-    }
-
-    try {
-      qrUrl = await uploadPaymentMethodQr(paymentMethodQrFile, id || null);
-      if (id && existingMethod?.qr_url) {
-        await deletePaymentMethodQr(existingMethod.qr_url);
+    if (paymentMethodQrFile) {
+      const validationMessage = validatePaymentMethodQrFile(paymentMethodQrFile);
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
       }
-    } catch (uploadError) {
-      alert(`Could not upload QR image: ${uploadError.message}`);
+
+      try {
+        qrUrl = await uploadPaymentMethodQr(paymentMethodQrFile, id || null);
+      } catch (uploadError) {
+        alert(`Could not upload QR image: ${uploadError.message}`);
+        return;
+      }
+      if (id && existingMethod?.qr_url) {
+        previousQrUrlToDelete = existingMethod.qr_url;
+      }
+    }
+    else if (paymentMethodRemoveQr) {
+      qrUrl = null;
+      if (id && existingMethod?.qr_url) {
+        previousQrUrlToDelete = existingMethod.qr_url;
+      }
+    } else if (id && existingMethod) {
+      qrUrl = existingMethod.qr_url || null;
+    }
+
+    payload.qr_url = qrUrl;
+
+    let error;
+    let savedMethodId = id;
+    let uploadedQrUrl = paymentMethodQrFile ? qrUrl : null;
+
+    if (id) {
+      const result = await supabaseClient
+        .from("payment_methods")
+        .update(payload)
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+      error = result.error;
+      savedMethodId = String(result.data?.id || "");
+    } else {
+      const result = await supabaseClient
+        .from("payment_methods")
+        .insert(payload)
+        .select("id")
+        .single();
+      error = result.error;
+      savedMethodId = String(result.data?.id || "");
+    }
+
+    if (error || !savedMethodId) {
+      if (uploadedQrUrl) await deletePaymentMethodQr(uploadedQrUrl);
+      alert(error
+        ? `Could not save payment method: ${error.message}`
+        : "Could not confirm that the payment method was saved.");
       return;
     }
-  } else if (paymentMethodRemoveQr) {
-    qrUrl = null;
-    if (id && existingMethod?.qr_url) {
-      await deletePaymentMethodQr(existingMethod.qr_url);
+
+    if (previousQrUrlToDelete) {
+      try {
+        await deletePaymentMethodQr(previousQrUrlToDelete);
+      } catch (cleanupError) {
+        console.warn("Payment method saved, but its previous QR image could not be removed:", cleanupError);
+      }
     }
-  } else if (id && existingMethod) {
-    qrUrl = existingMethod.qr_url || null;
-  }
 
-  payload.qr_url = qrUrl;
-
-  let error;
-  let savedMethodId = id;
-
-  if (id) {
-    ({ error } = await supabaseClient
-      .from("payment_methods")
-      .update(payload)
-      .eq("id", id));
-  } else {
-    const result = await supabaseClient
-      .from("payment_methods")
-      .insert(payload)
-      .select("id")
-      .single();
-    error = result.error;
-    savedMethodId = result.data?.id || "";
-  }
-
-  if (error) {
-    alert(`Could not save payment method: ${error.message}`);
-    return;
-  }
-
-  const deleteLinks = await supabaseClient
-    .from("payment_method_shipping_methods")
-    .delete()
-    .eq("payment_method_id", savedMethodId);
-
-  if (deleteLinks.error) {
-    alert(`Payment method saved, but courier assignments could not be updated: ${deleteLinks.error.message}`);
-    return;
-  }
-
-  if (selectedShippingMethodIds.length) {
-    const { error: linkError } = await supabaseClient
+    const deleteLinks = await supabaseClient
       .from("payment_method_shipping_methods")
-      .insert(selectedShippingMethodIds.map((shippingMethodId) => ({ payment_method_id: savedMethodId, shipping_method_id: shippingMethodId })));
-    if (linkError) {
-      alert(`Payment method saved, but courier assignments could not be updated: ${linkError.message}`);
+      .delete()
+      .eq("payment_method_id", savedMethodId);
+
+    if (deleteLinks.error) {
+      closePaymentMethodDialog();
+      await loadPaymentMethods();
+      alert(`Payment method saved, but courier assignments could not be updated: ${deleteLinks.error.message}`);
       return;
     }
-  }
 
-  closePaymentMethodDialog();
-  await loadPaymentMethods();
+    if (selectedShippingMethodIds.length) {
+      const { error: linkError } = await supabaseClient
+        .from("payment_method_shipping_methods")
+        .insert(selectedShippingMethodIds.map((shippingMethodId) => ({ payment_method_id: savedMethodId, shipping_method_id: shippingMethodId })));
+      if (linkError) {
+        closePaymentMethodDialog();
+        await loadPaymentMethods();
+        alert(`Payment method saved, but courier assignments could not be updated: ${linkError.message}`);
+        return;
+      }
+    }
+
+    closePaymentMethodDialog();
+    await loadPaymentMethods();
+    if (id) alert("Payment method updated.");
+    if (payload.is_visible && !selectedShippingMethodIds.length) {
+      alert("Payment method saved, but it will not appear at checkout until it is assigned to a shipping option.");
+    }
+  } catch (saveError) {
+    console.error("Could not complete payment method save:", saveError);
+    alert(`Could not complete payment method save. Refresh the list before trying again: ${saveError?.message || "Unexpected error."}`);
+    try {
+      await loadPaymentMethods();
+    } catch (refreshError) {
+      console.error("Could not refresh payment methods after save error:", refreshError);
+    }
+  } finally {
+    isSavingPaymentMethod = false;
+    if (saveButton) saveButton.disabled = false;
+  }
 });
 
 function editPaymentMethod(id) {
-  const method = paymentMethods.find((item) => item.id === id);
-  if (!method) return;
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
+  if (!method) {
+    console.error("Could not find payment method to edit:", id);
+    alert("This payment method is no longer in the loaded list. Refresh the list and try again.");
+    return;
+  }
 
-  populatePaymentMethodForm(method);
-  openPaymentMethodModal(true);
+  try {
+    paymentMethodForm.reset();
+    paymentMethodForm.elements.id.value = "";
+    resetPaymentMethodQrState();
+    populatePaymentMethodForm(method);
+    openPaymentMethodModal(true);
+  } catch (error) {
+    console.error("Could not open payment method editor:", error);
+    alert(`Could not open payment method editor: ${error.message || "Unexpected error."}`);
+  }
 }
 
 async function deletePaymentMethod(id) {
-  const method = paymentMethods.find((item) => item.id === id);
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
   if (!method) return;
 
   if (!confirm(`Delete "${method.payment_name}" payment method?`)) return;
@@ -2140,7 +2253,7 @@ async function deletePaymentMethod(id) {
 }
 
 async function togglePaymentMethodVisibility(id) {
-  const method = paymentMethods.find((item) => item.id === id);
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
   if (!method) return;
 
   const { error } = await supabaseClient
@@ -2160,7 +2273,7 @@ async function togglePaymentMethodVisibility(id) {
 }
 
 async function changePaymentMethodOrder(id, direction) {
-  const index = paymentMethods.findIndex((item) => item.id === id);
+  const index = paymentMethods.findIndex((item) => String(item.id) === String(id));
   if (index === -1) return;
 
   const targetIndex = index + direction;
@@ -2284,48 +2397,44 @@ function renderProducts() {
   `;
 
   productsTableContainer.innerHTML = `
-    <div class="table-shell">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Badge</th>
-            <th>Price</th>
-            <th>Main product cost</th>
-            <th>Stock</th>
-            <th>Visibility</th>
-            <th>Sales</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${pageProducts.map((product) => `
-            <tr>
-              <td>${product.image_url ? `<img class="table-image" src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" />` : "—"}</td>
-              <td>${escapeHtml(product.name)}</td>
-              <td>${escapeHtml(product.description || "—")}</td>
-              <td>${escapeHtml(product.category || "Uncategorized")}</td>
-              <td>${escapeHtml(product.badge || "—")}</td>
-              <td>${formatCurrency(product.price)}</td>
-              <td>${formatCurrency(product.cost_price || 0)}</td>
-              <td>${Number(product.stock || 0)}</td>
-              <td>${product.is_visible ? "Visible" : "Hidden"}</td>
-              <td>${getProductSalesCount(product.id)}</td>
-              <td>
-                <div class="admin-actions compact-actions">
-                  <button class="secondary-button" type="button" data-edit="${product.id}">Edit</button>
-                  <button class="secondary-button" type="button" data-duplicate="${product.id}">Duplicate</button>
-                  <button class="secondary-button" type="button" data-toggle-visible="${product.id}">${product.is_visible ? "Hide" : "Show"}</button>
-                  <button class="secondary-button danger" type="button" data-delete="${product.id}">Delete</button>
+    <div class="product-card-list">
+      ${pageProducts.map((product) => {
+        const productId = escapeHtml(String(product.id));
+        const stock = Number(product.stock || 0);
+        return `
+          <article class="product-admin-card">
+            <div class="product-card-main">
+              <div class="product-card-image">
+                ${product.image_url
+                  ? `<img src="${escapeHtml(product.image_url)}" alt="" loading="lazy" />`
+                  : `<span aria-hidden="true">V</span>`}
+              </div>
+              <div class="product-card-copy">
+                <div class="product-card-title-row">
+                  <h3>${escapeHtml(product.name || "Untitled product")}</h3>
+                  <span class="product-visibility ${product.is_visible ? "is-visible" : "is-hidden"}">${product.is_visible ? "Visible" : "Hidden"}</span>
                 </div>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
+                <p>${escapeHtml(product.category || "Uncategorized")}${product.badge ? ` · ${escapeHtml(product.badge)}` : ""}</p>
+                <div class="product-card-metrics">
+                  <strong>${formatCurrency(product.price || 0)}</strong>
+                  <span>${stock} in stock</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-card-actions">
+              <button class="primary-button" type="button" data-edit="${productId}">Edit product</button>
+              <details class="product-card-more">
+                <summary aria-label="More actions for ${escapeHtml(product.name || "product")}">More</summary>
+                <div class="product-card-more-actions">
+                  <button class="secondary-button" type="button" data-duplicate="${productId}">Duplicate</button>
+                  <button class="secondary-button" type="button" data-toggle-visible="${productId}">${product.is_visible ? "Hide from shop" : "Show in shop"}</button>
+                  <button class="secondary-button danger" type="button" data-delete="${productId}">Delete product</button>
+                </div>
+              </details>
+            </div>
+          </article>
+        `;
+      }).join("")}
     </div>
   `;
 
@@ -3339,29 +3448,67 @@ async function verifyAdminAccess() {
 }
 
 async function viewOrderReceipt(order) {
-  const isAdmin = await verifyAdminAccess();
-
-  if (!isAdmin) {
-    alert("Admin access is required to view receipts.");
-    return;
-  }
-
   if (!order?.receipt_image) {
-    alert("No receipt uploaded for this order.");
     return;
   }
 
-  const { data, error } = await supabaseClient.storage
-    .from("payment-receipts")
-    .createSignedUrl(order.receipt_image, 60);
-
-  if (error) {
-    alert(`Could not open receipt: ${error.message}`);
+  if (!receiptViewerDialog || !receiptViewerStatus || !receiptViewerImage || !receiptViewerFullSize) {
+    alert("The receipt viewer is unavailable.");
     return;
   }
 
-  window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  receiptViewerImage.hidden = true;
+  receiptViewerImage.removeAttribute("src");
+  receiptViewerFullSize.hidden = true;
+  receiptViewerFullSize.removeAttribute("href");
+  receiptViewerStatus.textContent = "Loading receipt…";
+  receiptViewerDialog.showModal();
+
+  try {
+    const isAdmin = await verifyAdminAccess();
+    if (!isAdmin) {
+      receiptViewerStatus.textContent = "Admin access is required to view this receipt.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient.storage
+      .from("payment-receipts")
+      .createSignedUrl(order.receipt_image, 60);
+
+    if (error) {
+      throw new Error(`Could not open receipt: ${error.message}`);
+    }
+    if (!data?.signedUrl) {
+      throw new Error("Could not create a temporary receipt link.");
+    }
+
+    receiptViewerImage.src = data.signedUrl;
+    receiptViewerFullSize.href = data.signedUrl;
+    receiptViewerFullSize.hidden = false;
+    receiptViewerImage.hidden = false;
+    receiptViewerStatus.textContent = "";
+  } catch (error) {
+    receiptViewerStatus.textContent = error.message || "Could not load the receipt.";
+  }
 }
+
+closeReceiptViewer?.addEventListener("click", () => {
+  receiptViewerDialog?.close();
+});
+
+receiptViewerImage?.addEventListener("error", () => {
+  receiptViewerImage.hidden = true;
+  receiptViewerFullSize.hidden = true;
+  receiptViewerStatus.textContent = "The uploaded receipt could not be displayed.";
+});
+
+receiptViewerDialog?.addEventListener("close", () => {
+  receiptViewerImage.removeAttribute("src");
+  receiptViewerFullSize.removeAttribute("href");
+  receiptViewerImage.hidden = true;
+  receiptViewerFullSize.hidden = true;
+  receiptViewerStatus.textContent = "Loading receipt…";
+});
 
 async function updateOrderPaymentStatus(id, paymentStatus) {
   try {
@@ -3705,264 +3852,63 @@ function renderOrders(ordersToRender) {
   const pageOrders = ordersToRender.slice(pageStart, pageStart + orderPageSize);
 
   ordersList.innerHTML = pageOrders
-    .map(
-      (order) => {
-        const orderedAt = order.created_at
-  ? new Date(order.created_at).toLocaleString("en-PH", {
-      timeZone: "Asia/Manila",
-      month: "numeric",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    })
-  : "—";
-        const orderItems = orderItemsByOrder[String(order.id)] || [];
-        const orderTotals = orderItems.reduce(
-  (sum, item) => sum + Number(item.line_total || 0),
-  0
-);
-        const productsLabel = `Products (${orderItems.length})`;
-        const productRows = orderItems.length
-          ? orderItems
-              .map((item) => `
-                <div class="order-product-row">
-                  <div>
-  <strong>${escapeHtml(item.product_name || "Product")}</strong>
+    .map((order) => {
+      const id = escapeHtml(String(order.id));
+      const orderedAt = order.created_at
+        ? new Date(order.created_at).toLocaleString("en-PH", {
+            timeZone: "Asia/Manila",
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true
+          })
+        : "—";
+      const paymentStatus = String(order.payment_status || "Pending");
+      const paymentStatusClass = paymentStatus.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-  ${
-    item.variant_name
-      ? `
-        <div class="tiny-note">
-          Variant: ${escapeHtml(item.variant_name)}
-        </div>
-      `
-      : ""
-  }
-
-  ${
-    item.variant_sku
-      ? `
-        <div class="tiny-note">
-          SKU: ${escapeHtml(item.variant_sku)}
-        </div>
-      `
-      : ""
-  }
-
-  <div class="tiny-note">
-    Qty: ${Number(item.quantity || 0)}
-  </div>
-</div>
-<div class="order-product-prices">
-  <span>${formatCurrency(item.line_total || 0)}</span>
-</div>
-                </div>
-              `)
-              .join("")
-          : `<div class="tiny-note">No products found</div>`;
-
-    const shippingLines = [
-        order.province || "",
-        order.city || "",
-        order.barangay || "",
-        [order.house_unit, order.street].filter(Boolean).join(", ")
-    ].filter(Boolean);
-
-    const shippingAddress = shippingLines.length
-        ? shippingLines.map((line) => escapeHtml(line)).join("<br>")
-        : escapeHtml(order.address || "—");
-    const paymentStatus = String(order.payment_status || "Pending");
-    const paymentStatusClass = paymentStatus
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-");
-    const customerNote = String(order.notes || "").trim();
-
-    return `
+      return `
         <article class="order-card">
-            <header class="order-card-header">
-              <div>
-                <span class="order-card-label">Order</span>
-                <strong class="order-reference">${escapeHtml(getOrderReferenceLabel(order))}</strong>
-              </div>
+          <div class="order-card-summary">
+            <div class="order-card-primary">
+              <span class="order-card-label">${escapeHtml(getOrderReferenceLabel(order))}</span>
+              <h3>${escapeHtml(order.customer_name || "Guest customer")}</h3>
               <time class="order-date">${escapeHtml(orderedAt)}</time>
-            </header>
-
-            <div class="order-card-body">
-
-            <section class="order-customer-panel" aria-label="Customer information">
-              <div class="order-customer-row">
-                <span>Customer name</span>
-                <strong>${escapeHtml(order.customer_name || "Guest customer")}</strong>
-              </div>
-
-              <div class="order-customer-row">
-                <span>Username</span>
-                <strong>${escapeHtml(order.customer_username || "Not provided")}</strong>
-              </div>
-
-              <div class="order-customer-row">
-                <span>Contact number</span>
-                <strong>${escapeHtml(order.phone || "Not provided")}</strong>
-              </div>
-
-              <div class="order-customer-row">
-                <span>Email address</span>
-                <strong>${escapeHtml(order.email || "Not provided")}</strong>
-              </div>
-
-              <div class="order-customer-row order-address-row">
-                <span>Address</span>
-                <address class="order-address-details">
-                  <span><b>Province</b><em>${escapeHtml(order.province || "—")}</em></span>
-                  <span><b>City</b><em>${escapeHtml(order.city || "—")}</em></span>
-                  <span><b>District</b><em>${escapeHtml(order.barangay || "—")}</em></span>
-                  <span><b>Full address</b><em>${escapeHtml([order.house_unit, order.street].filter(Boolean).join(", ") || order.address || "—")}</em></span>
-                </address>
-              </div>
-
-              <div class="order-customer-row">
-                <span>Payment method</span>
-                <strong>${escapeHtml(order.payment_method || "—")}</strong>
-              </div>
-
-              <div class="order-customer-row">
-                <span>Shipping option</span>
-                <strong>${escapeHtml(order.shipping_method || "—")}</strong>
-              </div>
-            </section>
-
-            ${customerNote ? `
-              <section class="order-customer-note" aria-label="Customer note">
-                <span class="order-note-icon" aria-hidden="true">🌸</span>
-                <div>
-                  <strong>Customer note</strong>
-                  <p>${escapeHtml(customerNote)}</p>
-                </div>
-              </section>
-            ` : ""}
-
-<details class="order-products-details">
-  <summary>
-    ${escapeHtml(productsLabel)}
-  </summary>
-
-<div class="order-products-body">
-  ${productRows}
-
-  <div class="order-total-summary">
-    <div class="order-total-line">
-      <span>Subtotal</span>
-      <span>${formatCurrency(orderTotals)}</span>
-    </div>
-
-    <div class="order-total-line">
-      <span>Shipping</span>
-      <span>${formatCurrency(order.shipping_fee || 0)}</span>
-    </div>
-
-    ${Number(order.payment_fee || 0) > 0 ? `<div class="order-total-line"><span>COD fee</span><span>${formatCurrency(order.payment_fee)}</span></div>` : ""}
-
-    <div class="order-grand-total">
-      <span>TOTAL</span>
-      <strong>${formatCurrency(order.total || 0)}</strong>
-    </div>
-  </div>
-</div>
-</details>
-
             </div>
-
-<footer class="order-card-footer">
-  <div class="order-status-summary">
-    <span>Payment status</span>
-    <strong class="order-status-badge status-${escapeHtml(paymentStatusClass)}">
-      ${escapeHtml(paymentStatus)}
-    </strong>
-  </div>
-
-<div class="order-card-actions">
-  <button type="button" class="secondary-button" data-order-invoice="${escapeHtml(String(order.id))}">Invoice</button>
-  ${
-    order.receipt_image
-      ? `
-        <button
-          type="button"
-          class="secondary-button"
-          data-order-view-receipt="${escapeHtml(String(order.id))}"
-        >
-          View Receipt
-        </button>
-      `
-      : `
-        <span class="tiny-note">No receipt uploaded</span>
-      `
-  }
- ${
-  order.payment_status !== "Approved" &&
-  !Boolean(order.archived)
-    ? `
-      <button
-        type="button"
-        class="${order.receipt_image ? "primary-button" : "secondary-button"}"
-        data-order-approve="${escapeHtml(String(order.id))}"
-      >
-        ${order.receipt_image ? "Approve Payment" : "Approve Order"}
-      </button>
-    `
-    : ""
-}
-
-${
-  order.payment_status !== "Rejected" &&
-  !Boolean(order.archived)
-    ? `
-      <button
-        type="button"
-        class="secondary-button"
-        data-order-reject="${escapeHtml(String(order.id))}"
-      >
-        ${order.receipt_image ? "Reject Payment" : "Reject Order"}
-      </button>
-    `
-    : ""
-}
-${Boolean(order.archived) ? `
-    <button
-      type="button"
-      class="secondary-button"
-      data-order-restore="${escapeHtml(String(order.id))}"
-    >
-      Restore Order
-    </button>
-
-    <button
-      type="button"
-      class="secondary-button order-delete-btn"
-      data-order-delete-permanent="${escapeHtml(String(order.id))}"
-    >
-      Delete Permanently
-    </button>
-  `
-  : `
-    <button
-      type="button"
-      class="secondary-button"
-      data-order-archive="${escapeHtml(String(order.id))}"
-    >
-      Archive Order
-    </button>
-  `
-}
-</div>
-
-</footer>
-
-</article>
-    `;
-  })
+            <div class="order-card-total">
+              <strong>${formatCurrency(order.total || 0)}</strong>
+              <span class="order-status-badge status-${escapeHtml(paymentStatusClass)}">${escapeHtml(paymentStatus)}</span>
+            </div>
+          </div>
+          <div class="order-card-meta">
+            <span>${escapeHtml(order.payment_method || "Payment not specified")}</span>
+            <span>${escapeHtml(order.shipping_method || order.status || "Order received")}</span>
+          </div>
+          <div class="order-card-actions">
+            <button class="primary-button" type="button" data-order-view-details="${id}">View order details</button>
+            <button class="secondary-button" type="button" data-order-invoice="${id}">Invoice</button>
+          </div>
+          <details class="order-actions-disclosure">
+            <summary>More order actions</summary>
+            <div class="order-actions-disclosure-content">
+              ${order.receipt_image
+                ? `<button type="button" class="secondary-button" data-order-view-receipt="${id}">View receipt</button>`
+                : ""}
+              ${order.payment_status !== "Approved" && !Boolean(order.archived)
+                ? `<button type="button" class="secondary-button" data-order-approve="${id}">${order.receipt_image ? "Approve payment" : "Approve order"}</button>`
+                : ""}
+              ${order.payment_status !== "Rejected" && !Boolean(order.archived)
+                ? `<button type="button" class="secondary-button danger" data-order-reject="${id}">${order.receipt_image ? "Reject payment" : "Reject order"}</button>`
+                : ""}
+              ${Boolean(order.archived)
+                ? `<button type="button" class="secondary-button" data-order-restore="${id}">Restore order</button><button type="button" class="secondary-button danger order-delete-btn" data-order-delete-permanent="${id}">Delete permanently</button>`
+                : `<button type="button" class="secondary-button" data-order-archive="${id}">Archive order</button>`}
+            </div>
+          </details>
+        </article>
+      `;
+    })
   .join("") + `
     <div class="pagination order-pagination" aria-label="Orders pages">
       <button class="secondary-button" type="button" data-orders-page="prev" ${orderPage <= 1 ? "disabled" : ""}>Previous</button>
@@ -4087,84 +4033,117 @@ async function updateOrderStatus(id, status) {
 function openOrderDetails(order) {
   const items = orderItemsByOrder[String(order.id)] || [];
   const totalItems = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-  const orderTotals = items.reduce((sum, item) => sum + Number(item.line_total || 0), 0);
-  const currency = formatCurrency;
-const shippingLines = [
-    order.province || "",
-    order.city || "",
-    order.barangay || "",
-    [order.house_unit, order.street].filter(Boolean).join(", ")
-].filter(Boolean);
+  const itemSubtotal = items.reduce((sum, item) => sum + Number(item.line_total || 0), 0);
+  const subtotal = order.subtotal == null ? itemSubtotal : Number(order.subtotal);
+  const orderedAt = order.created_at
+    ? new Date(order.created_at).toLocaleString("en-PH", {
+        timeZone: "Asia/Manila",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      })
+    : "Date unavailable";
+  const fullAddress = [order.house_unit, order.street].filter(Boolean).join(", ") || order.address;
+  const shippingAddressFields = [
+    ["Province", order.province],
+    ["City", order.city],
+    ["District", order.barangay],
+    ["Full address", fullAddress]
+  ].filter(([, value]) => value);
+  const paymentStatus = String(order.payment_status || "Pending");
+  const paymentStatusClass = paymentStatus.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const orderStatus = String(order.status || "Pending");
+  const orderStatusClass = orderStatus.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const productRows = items.length
+    ? items.map((item) => {
+        const product = products.find((entry) => String(entry.id) === String(item.product_id));
+        const imageUrl = product?.image_url || "";
+        return `
+          <article class="order-product-row">
+            ${imageUrl
+              ? `<img class="order-detail-product-image" src="${escapeHtml(imageUrl)}" alt="" />`
+              : `<span class="order-detail-product-image order-detail-product-placeholder" aria-hidden="true">V</span>`}
+            <div class="order-detail-product-copy">
+              <strong>${escapeHtml(item.product_name || "Product")}</strong>
+              ${item.variant_name ? `<span>${escapeHtml(item.variant_name)}</span>` : ""}
+              <small>Qty ${Number(item.quantity || 0)} · ${formatCurrency(item.unit_price || 0)} each</small>
+            </div>
+            <strong class="order-detail-line-total">${formatCurrency(item.line_total || 0)}</strong>
+          </article>
+        `;
+      }).join("")
+    : `<p class="tiny-note">No products found for this order.</p>`;
 
-const shippingAddress = shippingLines.length
-   ? shippingLines.map(line => escapeHtml(line)).join("<br>")
-    : escapeHtml(order.address || "—");
   orderDetailsContent.innerHTML = `
     <div class="order-detail-shell">
-      <div class="order-detail-card">
-        <div class="admin-section-header">
-          <div>
-            <h3>${escapeHtml(getOrderReferenceLabel(order))}</h3>
-            <p class="tiny-note">Order details</p>
+      <article class="order-detail-card">
+        <header class="order-detail-header">
+          <div class="order-detail-heading-copy">
+            <span class="order-card-label">Order</span>
+            <h2>${escapeHtml(getOrderReferenceLabel(order))}</h2>
+            <time>${escapeHtml(orderedAt)}</time>
           </div>
           <button class="secondary-button" type="button" data-dismiss-order-details>Close</button>
-        </div>
-        <div class="detail-grid">
-          <div>
-            <h4>Customer</h4>
-            <p>${escapeHtml(order.customer_name || "—")}</p>
-            <p>${escapeHtml(order.phone || "—")}</p>
-            <p><strong>Province:</strong> ${escapeHtml(order.province || "—")}</p>
-            <p><strong>City:</strong> ${escapeHtml(order.city || "—")}</p>
-            <p><strong>District:</strong> ${escapeHtml(order.barangay || "—")}</p>
-            <p><strong>Full address:</strong> ${escapeHtml([order.house_unit, order.street].filter(Boolean).join(", ") || order.address || "—")}</p>
+          <div class="order-detail-statuses">
+            <span class="order-status-badge status-${escapeHtml(paymentStatusClass)}">${escapeHtml(paymentStatus)}</span>
+            <span class="admin-status-badge status-${escapeHtml(orderStatusClass)}">${escapeHtml(orderStatus)}</span>
           </div>
-          <div>
-            <h4>Payment</h4>
-            <p>Method: ${escapeHtml(order.payment_method || "—")}</p>
-            <p>Shipping option: ${escapeHtml(order.shipping_method || "—")}</p>
-            <p>Status: ${escapeHtml(order.payment_status || "Pending")}</p>
-            <p>Amount paid: ${currency(order.amount_paid || 0)}</p>
-            <p>Reference: ${escapeHtml(order.reference_number || "—")}</p>
-          </div>
-        </div>
-        <div class="detail-grid">
-          <div>
-            <h4>Products</h4>
-            ${items.length ? items.map((item) => `
-              <div class="order-product-row">
-                <div>
-                  <strong>${escapeHtml(item.product_name || "Product")}</strong>
-                  <div class="tiny-note">Qty ${Number(item.quantity || 0)}</div>
-                </div>
-                <div class="order-product-prices">
-                <span>${currency(item.line_total || 0)}</span>
-                </div>
-              </div>
-            `).join("") : `<div class="tiny-note">No products found</div>`}
-          </div>
-          <div>
-            <h4>Summary</h4>
-            <p>Items: ${totalItems}</p>
-            <p>Product total: ${currency(orderTotals)}</p>
-            <p>Shipping fee: ${currency(order.shipping_fee || 0)}</p>
+        </header>
 
-            <div class="order-total-summary">
-              <span>Total</span>
-              <strong>${currency(order.total || 0)}</strong>
-            </div>
+        <section class="order-detail-section">
+          <h3>Customer information</h3>
+          <dl class="order-detail-fields">
+            <div><dt>Customer</dt><dd>${escapeHtml(order.customer_name || "—")}</dd></div>
+            <div><dt>Contact number</dt><dd>${escapeHtml(order.phone || "—")}</dd></div>
+            ${order.email ? `<div><dt>Email</dt><dd>${escapeHtml(order.email)}</dd></div>` : ""}
+          </dl>
+        </section>
 
-            <p>Shipping status: ${escapeHtml(order.status || "Pending")}</p>
-            <p>Note: ${escapeHtml(order.notes || "No note provided")}</p>
-          </div>
-        </div>
-        <div class="order-actions detail-actions">
-          ${order.receipt_image ? `<button class="secondary-button" type="button" data-order-view-receipt-modal="${order.id}">View Receipt</button>` : ""}
-          ${!Boolean(order.archived) && order.payment_status !== "Approved" ? `<button class="secondary-button" type="button" data-order-approve-modal="${order.id}">${order.receipt_image ? "Approve Payment" : "Approve Order"}</button>` : ""}
-          ${!Boolean(order.archived) && order.payment_status !== "Rejected" ? `<button class="secondary-button danger" type="button" data-order-reject-modal="${order.id}">${order.receipt_image ? "Reject Payment" : "Reject Order"}</button>` : ""}
-          ${Boolean(order.archived) ? `<button class="secondary-button" type="button" data-order-restore-modal="${order.id}">Restore Order</button>` : `<button class="secondary-button" type="button" data-order-archive-modal="${order.id}">Archive Order</button>`}
-        </div>
-      </div>
+        <section class="order-detail-section">
+          <h3>Shipping address</h3>
+          ${shippingAddressFields.length
+            ? `<dl class="order-detail-fields">${shippingAddressFields.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}</dl>`
+            : `<address>—</address>`}
+        </section>
+
+        <section class="order-detail-section">
+          <h3>Payment information</h3>
+          <dl class="order-detail-fields">
+            <div><dt>Payment method</dt><dd>${escapeHtml(order.payment_method || "—")}</dd></div>
+            <div><dt>Payment status</dt><dd>${escapeHtml(paymentStatus)}</dd></div>
+            ${order.reference_number ? `<div><dt>Payment reference</dt><dd>${escapeHtml(order.reference_number)}</dd></div>` : ""}
+          </dl>
+          ${order.receipt_image
+            ? `<button class="secondary-button" type="button" data-order-view-receipt-modal="${escapeHtml(String(order.id))}">View receipt</button>`
+            : `<p class="order-no-receipt">No receipt uploaded</p>`}
+        </section>
+
+        <section class="order-detail-section">
+          <h3>Ordered products <span>${totalItems} item${totalItems === 1 ? "" : "s"}</span></h3>
+          <div class="order-detail-products">${productRows}</div>
+        </section>
+
+        <section class="order-detail-section">
+          <h3>Order summary</h3>
+          <div class="order-total-line"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
+          ${order.shipping_fee != null ? `<div class="order-total-line"><span>Shipping fee</span><strong>${formatCurrency(order.shipping_fee)}</strong></div>` : ""}
+          ${Number(order.payment_fee || 0) > 0 ? `<div class="order-total-line"><span>Payment fee</span><strong>${formatCurrency(order.payment_fee)}</strong></div>` : ""}
+          <div class="order-total-summary"><span>Total</span><strong>${order.total == null ? "—" : formatCurrency(order.total)}</strong></div>
+          ${order.notes ? `<p class="order-detail-note"><strong>Customer note</strong><br>${escapeHtml(order.notes)}</p>` : ""}
+        </section>
+
+        <footer class="order-actions detail-actions">
+          <button class="secondary-button" type="button" data-order-invoice-modal="${escapeHtml(String(order.id))}">Invoice</button>
+          ${!Boolean(order.archived) && paymentStatus !== "Approved" ? `<button class="primary-button" type="button" data-order-approve-modal="${escapeHtml(String(order.id))}">${order.receipt_image ? "Approve payment" : "Approve order"}</button>` : ""}
+          ${!Boolean(order.archived) && paymentStatus !== "Rejected" ? `<button class="secondary-button danger" type="button" data-order-reject-modal="${escapeHtml(String(order.id))}">${order.receipt_image ? "Reject payment" : "Reject order"}</button>` : ""}
+          ${Boolean(order.archived)
+            ? `<button class="secondary-button" type="button" data-order-restore-modal="${escapeHtml(String(order.id))}">Restore order</button>`
+            : `<button class="secondary-button" type="button" data-order-archive-modal="${escapeHtml(String(order.id))}">Archive order</button>`}
+        </footer>
+      </article>
     </div>
   `;
 
@@ -4176,6 +4155,10 @@ const shippingAddress = shippingLines.length
 
   orderDetailsContent.querySelector("[data-order-view-receipt-modal]")?.addEventListener("click", async () => {
     await viewOrderReceipt(order);
+  });
+
+  orderDetailsContent.querySelector("[data-order-invoice-modal]")?.addEventListener("click", () => {
+    openInvoice(order);
   });
 
   orderDetailsContent.querySelector("[data-order-approve-modal]")?.addEventListener("click", async () => {
@@ -4231,15 +4214,33 @@ function openInvoice(order) {
 function renderDashboard() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const manilaDateFormatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  const today = manilaDateFormatter.format(new Date());
 
   const dashboardOrders = orders.filter((order) => {
     const createdAt = new Date(order.created_at);
     return !Number.isNaN(createdAt.getTime()) && createdAt >= thirtyDaysAgo;
   });
 
-  const revenue = dashboardOrders.reduce((sum, order) => sum + Number(order.total || order.amount_paid || 0), 0);
-  const pendingPayments = dashboardOrders.filter((order) => String(order.payment_status || "Pending").toLowerCase() === "pending").length;
-  const shippedOrders = dashboardOrders.filter((order) => ["paid", "confirmed", "shipped", "delivered"].includes(String(order.status || "").toLowerCase())).length;
+  const todayOrders = orders.filter((order) => {
+    const createdAt = new Date(order.created_at);
+    return !Number.isNaN(createdAt.getTime()) && manilaDateFormatter.format(createdAt) === today;
+  });
+  const todaySales = todayOrders.reduce((sum, order) => {
+    if (String(order.payment_status || "").toLowerCase() !== "approved") {
+      return sum;
+    }
+
+    return sum + Number(order.total || order.amount_paid || 0);
+  }, 0);
+  const pendingOrders = orders.filter(
+    (order) => String(order.payment_status || "Pending").toLowerCase() === "pending"
+  ).length;
   const allRecentOrders = [...dashboardOrders]
     .sort((first, second) => new Date(second.created_at || 0) - new Date(first.created_at || 0));
   const recentOrderPages = Math.max(1, Math.ceil(allRecentOrders.length / dashboardOrderPageSize));
@@ -4284,19 +4285,23 @@ function renderDashboard() {
   if (dashboardStats) {
     dashboardStats.innerHTML = `
       <div class="stat-card">
-        <small>Total revenue</small>
-        <strong>${formatCurrency(revenue)}</strong>
+        <span class="stat-icon stat-icon-orders" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h10l4 4v14H3V3z"/><path d="M7 3v6h10V3M7 13h10M7 17h7"/></svg></span>
+        <small>Today's Orders</small>
+        <strong>${todayOrders.length}</strong>
       </div>
       <div class="stat-card">
-        <small>Pending payments</small>
-        <strong>${pendingPayments}</strong>
+        <span class="stat-icon stat-icon-sales" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg></span>
+        <small>Today's Sales</small>
+        <strong>${formatCurrency(todaySales)}</strong>
       </div>
       <div class="stat-card">
-        <small>Orders in progress</small>
-        <strong>${shippedOrders}</strong>
+        <span class="stat-icon stat-icon-pending" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <small>Pending Orders</small>
+        <strong>${pendingOrders}</strong>
       </div>
       <div class="stat-card">
-        <small>Products live</small>
+        <span class="stat-icon stat-icon-products" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1 14H5L4 7Z"/><path d="M9 7a3 3 0 0 1 6 0M3 4h18"/></svg></span>
+        <small>Total Products</small>
         <strong>${products.length}</strong>
       </div>
     `;
@@ -4304,18 +4309,27 @@ function renderDashboard() {
 
   if (dashboardRecentOrders) {
     dashboardRecentOrders.innerHTML = recentOrders.length
-      ? recentOrders.map((order) => `
-          <div class="dashboard-list-item">
-            <div>
+      ? recentOrders.map((order) => {
+          const createdAt = new Date(order.created_at);
+          const orderedAt = Number.isNaN(createdAt.getTime())
+            ? "Date unavailable"
+            : dashboardOrderDateFormatter.format(createdAt);
+
+          return `
+          <article class="dashboard-list-item">
+            <span class="dashboard-order-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+            <div class="dashboard-order-copy">
               <strong>${escapeHtml(getOrderReferenceLabel(order))}</strong>
-              <div class="tiny-note">${escapeHtml(order.customer_name || "Guest")}</div>
+              <span class="dashboard-order-customer">${escapeHtml(order.customer_name || "Guest")}</span>
+              <time class="dashboard-order-time" datetime="${escapeHtml(order.created_at || "")}">${escapeHtml(orderedAt)}</time>
             </div>
             <div class="dashboard-list-meta">
-              <span>${formatCurrency(order.total || 0)}</span>
-              <span>${escapeHtml(order.payment_status || "Pending")}</span>
+              <strong>${formatCurrency(order.total || 0)}</strong>
+              <span class="order-status-badge status-${escapeHtml(String(order.payment_status || "Pending").toLowerCase())}">${escapeHtml(order.payment_status || "Pending")}</span>
             </div>
-          </div>
-        `).join("") + `
+          </article>
+        `;
+        }).join("") + `
           <div class="pagination dashboard-order-pagination" aria-label="Recent order pages">
             <button class="secondary-button" type="button" data-dashboard-orders-page="prev" ${dashboardOrderPage <= 1 ? "disabled" : ""}>Previous</button>
             <span class="tiny-note">Page ${dashboardOrderPage} of ${recentOrderPages}</span>
@@ -4438,10 +4452,10 @@ function renderCategories() {
 
               <div class="admin-actions">
                 <button
-                  class="secondary-button"
+                  class="primary-button"
                   type="button"
                   data-edit-category="${escapeHtml(category)}"
-                >Edit</button>
+                >Edit category</button>
 
                 <button
                   class="secondary-button danger"
@@ -4581,6 +4595,11 @@ function initCategoryDragDrop() {
 }
 
 async function editCategory(categoryName) {
+  const editor = document.querySelector("#categoryEditor");
+  if (editor) {
+    editor.open = true;
+    editor.querySelector("summary").textContent = "Edit category";
+  }
   categoryForm.elements.id.value = categoryName;
   categoryForm.elements.categoryName.value = categoryName;
   const categoryProducts = products.filter(
@@ -4632,6 +4651,11 @@ async function editCategory(categoryName) {
 function resetCategoryForm() {
   categoryForm.reset();
   categoryForm.elements.id.value = "";
+  const editor = document.querySelector("#categoryEditor");
+  if (editor) {
+    editor.open = false;
+    editor.querySelector("summary").textContent = "Add or edit category";
+  }
   if (categoryProductsEditor) categoryProductsEditor.hidden = true;
   if (categoryProductsList) categoryProductsList.innerHTML = "";
   cancelCategoryEdit.hidden = true;

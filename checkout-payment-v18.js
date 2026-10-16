@@ -110,10 +110,12 @@ const successExternalMessage = document.querySelector("#successExternalMessage")
 const successExternalLink = document.querySelector("#successExternalLink");
 const closeSuccess = document.querySelector("#closeSuccess");
 const CART_STORAGE_KEY = "vialXBeautyCart";
+const LEGACY_CART_STORAGE_KEY = "wonderPepsCart";
 
 function loadSavedCart() {
   try {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY)
+      ?? localStorage.getItem(LEGACY_CART_STORAGE_KEY);
 
     if (!savedCart) {
       return [];
@@ -139,6 +141,7 @@ function saveCart() {
 function clearSavedCart() {
   cart = [];
   localStorage.removeItem(CART_STORAGE_KEY);
+  localStorage.removeItem(LEGACY_CART_STORAGE_KEY);
 }
 let selectedCategory = "All";
 let products = [];
@@ -151,6 +154,7 @@ let variantSourceButton = null;
 let cart = loadSavedCart();
 let paymentMethods = [];
 let paymentMethodShippingLinks = [];
+let paymentMethodShippingLinksError = null;
 let selectedPaymentMethod = null;
 let shippingFees = [];
 let selectedShippingFee = null;
@@ -387,15 +391,9 @@ function applyShopSettings(settings) {
       menuBrandFallback.hidden = false;
     }
   }
-if (heroImage && heroFallback) {
-  if (settings.hero_image_url) {
-    heroImage.src = settings.hero_image_url;
-    heroImage.hidden = false;
-    heroFallback.hidden = true;
-  } else {
-    heroImage.hidden = true;
-    heroFallback.hidden = false;
-  }
+if (heroImage) {
+  heroImage.src = settings.hero_image_url || "vialx-hero-logo.jpg";
+  heroImage.hidden = false;
 }
   if (facebookLink) {
     if (settings.facebook_url) {
@@ -430,6 +428,7 @@ if (heroImage && heroFallback) {
 
 async function loadProducts() {
   const grid = productGrid || document.getElementById("favoritesGrid");
+  productSoldCounts = new Map();
   const demoProducts = [
     { id: "vialx-demo-01", name: "Radiance Peptide Serum", description: "A refined daily peptide serum for the VialXBeauty preview collection.", price: 1290, stock: 12, badge: "Featured", image_url: "", variants: [] },
     { id: "vialx-demo-02", name: "Renewal Peptide Complex", description: "A premium peptide complex presented as a second storefront sample.", price: 1490, stock: 9, badge: "New", image_url: "", variants: [] }
@@ -445,12 +444,11 @@ async function loadProducts() {
   }
   grid.innerHTML = `<p class="empty">Loading products...</p>`;
 
-  let productData, productError, variantData, variantError, soldData, soldError;
+  let productData, productError, variantData, variantError;
   try {
     [
       { data: productData, error: productError },
-      { data: variantData, error: variantError },
-      { data: soldData, error: soldError }
+      { data: variantData, error: variantError }
     ] = await Promise.all([
     supabaseClient
       .from("products")
@@ -463,10 +461,6 @@ async function loadProducts() {
       .select("*")
       .eq("is_active", true)
       .order("sort_order", { ascending: true }),
-
-    // This RPC returns aggregate totals only, so no customer/order details are
-    // exposed to storefront visitors. See supabase-sold-counts.sql.
-    supabaseClient.rpc("get_product_sold_counts")
     ]);
   } catch (error) {
     console.warn("Catalog connection unavailable; showing demo product.", error);
@@ -494,16 +488,6 @@ async function loadProducts() {
   }
 
   productVariants = variantData || [];
-  productSoldCounts = new Map(
-    (soldError ? [] : soldData || []).map((row) => [
-      String(row.product_id),
-      Number(row.sold_count || 0)
-    ])
-  );
-
-  if (soldError) {
-    console.warn("Could not load sold counts:", soldError.message);
-  }
 
   products = (productData || []).map((product) => ({
     ...product,
@@ -1647,7 +1631,14 @@ async function loadPaymentMethods() {
   }
 
   paymentMethods = data || [];
-  paymentMethodShippingLinks = linksResult.error ? [] : (linksResult.data || []);
+  if (linksResult.error) {
+    paymentMethodShippingLinks = [];
+    paymentMethodShippingLinksError = linksResult.error;
+    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
+  } else {
+    paymentMethodShippingLinks = linksResult.data || [];
+    paymentMethodShippingLinksError = null;
+  }
   selectedPaymentMethod = null;
   if (selectedPaymentInput) {
     selectedPaymentInput.value = "";
@@ -1663,6 +1654,17 @@ function availablePaymentMethods() {
 
 function renderPaymentMethods() {
   if (!paymentMethodsList) {
+    return;
+  }
+
+  if (paymentMethodShippingLinksError) {
+    paymentMethodsList.innerHTML = `
+      <div class="payment-step-summary">
+        <strong>Payment methods unavailable</strong>
+        <p class="tiny-note">We could not load payment availability for shipping options. Please try again shortly.</p>
+      </div>
+    `;
+    updateProceedPaymentAvailability();
     return;
   }
 
@@ -1782,8 +1784,9 @@ function validateReceiptFile(file) {
 function renderPaymentStepReceiptPreview(file) {
   const previewBox = paymentStepContent?.querySelector("#receiptPreviewBox");
   const previewImage = paymentStepContent?.querySelector("#paymentReceiptPreview");
+  const previewLink = paymentStepContent?.querySelector("#paymentReceiptPreviewLink");
 
-  if (!previewBox || !previewImage) {
+  if (!previewBox || !previewImage || !previewLink) {
     return;
   }
 
@@ -1792,10 +1795,12 @@ function renderPaymentStepReceiptPreview(file) {
   if (!file) {
     previewBox.hidden = true;
     previewImage.removeAttribute("src");
+    previewLink.removeAttribute("href");
     return;
   }
 
   paymentStepReceiptPreviewUrl = URL.createObjectURL(file);
+  previewLink.href = paymentStepReceiptPreviewUrl;
   previewImage.src = paymentStepReceiptPreviewUrl;
   previewImage.alt = "Receipt preview";
   previewBox.hidden = false;
@@ -1920,7 +1925,7 @@ function openPaymentStep() {
   paymentStepContent.innerHTML = `
     <div class="payment-step-qr ${qrUrl ? "has-qr" : "no-qr"}">
       ${qrUrl
-        ? `<img src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
+        ? `<img class="payment-step-qr-image" src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
         : payOnDeliveryOnly
         ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
         : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><span><strong>No QR code available</strong><small>Follow the payment instructions below.</small></span></div>`}
@@ -1939,18 +1944,24 @@ function openPaymentStep() {
       ${buyerPaymentNote ? `<p class="payment-step-custom-note">♡ ${escapeHtml(buyerPaymentNote)}</p>` : ""}
     </div>
     ${requiresReceipt ? `
-      <label class="payment-step-field">
-        Upload receipt image
-        <input id="paymentReceiptFile" name="receipt_file" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" />
+      <label class="payment-step-field payment-step-receipt-field">
+        <span class="payment-step-field-label">Upload receipt image</span>
+        <input id="paymentReceiptFile" class="payment-receipt-input" name="receipt_file" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" />
+        <span class="payment-receipt-controls">
+          <span class="payment-receipt-button">Choose receipt image</span>
+          <span id="paymentReceiptFileName" class="payment-receipt-filename">No image selected</span>
+        </span>
       </label>
       <div id="receiptPreviewBox" class="payment-step-preview-box" hidden>
-        <div class="tiny-note">Local receipt preview</div>
-        <img id="paymentReceiptPreview" class="payment-step-preview-image" alt="Receipt preview" />
+        <div class="tiny-note">Receipt preview · tap to view full image</div>
+        <a id="paymentReceiptPreviewLink" class="payment-step-preview-link" target="_blank" rel="noopener noreferrer" aria-label="Open full receipt image">
+          <img id="paymentReceiptPreview" class="payment-step-preview-image" alt="Receipt preview" />
+        </a>
       </div>
     ` : ""}
     ${requiresReference ? `
-      <label class="payment-step-field">
-        Reference number
+      <label class="payment-step-field payment-step-reference-field">
+        <span class="payment-step-field-label">Reference number</span>
         <input id="paymentReferenceInput" name="reference_number" type="text" maxlength="80" required />
       </label>
     ` : ""}
@@ -1958,6 +1969,7 @@ function openPaymentStep() {
   `;
 
   const receiptInput = paymentStepContent.querySelector("#paymentReceiptFile");
+  const receiptFileName = paymentStepContent.querySelector("#paymentReceiptFileName");
 
   receiptInput?.addEventListener("change", (event) => {
     const file = event.target.files?.[0] || null;
@@ -1968,11 +1980,13 @@ function openPaymentStep() {
       clearPaymentStepReceiptState();
       renderPaymentStepReceiptPreview(null);
       event.target.value = "";
+      if (receiptFileName) receiptFileName.textContent = "No image selected";
       return;
     }
 
     showPaymentStepFeedback("");
     paymentStepReceiptFile = file;
+    if (receiptFileName) receiptFileName.textContent = file.name;
     renderPaymentStepReceiptPreview(file);
   });
 
@@ -2402,24 +2416,63 @@ async function initializeStorefront() {
     renderCart();
 
 }
-function showAddedToBag(productName) {
-    let toast = document.getElementById("cartToast");
 
-    if (!toast) {
-        toast = document.createElement("div");
-        toast.id = "cartToast";
-        document.body.appendChild(toast);
+window.VialXStorefront = {
+  formatCurrency,
+  escapeHtml,
+  getProductById,
+  renderProducts: () => renderProducts(products),
+  addProductToCart(productId) {
+    const product = getProductById(productId);
+    if (!product) return false;
+    if (getProductVariants(product.id).length) {
+      openVariantSelector(product);
+    } else {
+      addToCart(product.id);
     }
+    return true;
+  },
+  notify: showStorefrontToast
+};
 
-    toast.textContent = `🩷 ${productName} added to your cart!`;
+const storefrontToastQueue = [];
+let storefrontToastTimer = null;
 
-    toast.classList.add("show");
+function showStorefrontToast(message) {
+  const toast = document.getElementById("storefrontToast") || (() => {
+    const element = document.createElement("div");
+    element.id = "storefrontToast";
+    element.className = "storefront-toast";
+    element.setAttribute("role", "status");
+    element.setAttribute("aria-live", "polite");
+    document.body.appendChild(element);
+    return element;
+  })();
 
-    clearTimeout(toast.timeout);
+  storefrontToastQueue.push(String(message));
+  if (storefrontToastTimer === null) {
+    displayNextStorefrontToast(toast);
+  }
+}
 
-    toast.timeout = setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2200);
+function displayNextStorefrontToast(toast) {
+  const message = storefrontToastQueue.shift();
+  if (!message) {
+    toast.classList.remove("show");
+    storefrontToastTimer = null;
+    return;
+  }
+
+  toast.textContent = message;
+  toast.classList.add("show");
+  storefrontToastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+    storefrontToastTimer = setTimeout(() => displayNextStorefrontToast(toast), 220);
+  }, 1900);
+}
+
+function showAddedToBag(productName) {
+  showStorefrontToast(`${productName} added to cart`);
 }
 
 function animateBag() {
