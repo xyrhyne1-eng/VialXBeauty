@@ -679,12 +679,20 @@ body.admin-page {
 
 .admin-page .order-tabs {
   display: flex;
+  flex-wrap: nowrap;
   min-width: 0;
   max-width: 100%;
   gap: 7px;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-page .order-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-page .order-tabs > * {

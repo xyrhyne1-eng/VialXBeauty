@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
   <title>VialXBeauty Admin</title>
   <meta name="theme-color" content="#8b0028" />
-  <link rel="stylesheet" href="admin-v2.css?v=20261011-final-redesign-1" />
+  <link rel="stylesheet" href="admin-v2.css?v=20261016-orders-scrollbar-hidden-1" />
 </head>
 <body class="admin-page">
   <a class="skip-link" href="#dashboardSection">Skip to dashboard</a>
@@ -608,12 +608,12 @@ Hero eyebrow
       </details>
     </section>
 
-    <dialog id="paymentMethodModal">
+    <dialog id="paymentMethodModal" aria-labelledby="paymentMethodModalTitle">
       <form id="paymentMethodForm" class="admin-form">
         <input type="hidden" name="id" />
         <div class="modal-header">
           <div>
-            <h2 id="paymentMethodModalTitle">Add payment method</h2>
+            <h2 id="paymentMethodModalTitle">Add Payment Method</h2>
             <p class="tiny-note">Create or update a payment option available at checkout.</p>
           </div>
           <button type="button" class="icon-button" id="closePaymentMethodModal">✕</button>
@@ -747,7 +747,7 @@ Hero eyebrow
 <script src="supabase.js"></script>
 <script src="variants.js?v=clean-console-v1"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="admin.js?v=20261011-payment-auth-fix-1"></script>
-<script src="admin-ui.js?v=20261011-mobile-visual-final-1"></script>
+<script src="admin.js?v=20261016-payment-method-edit-fix-2"></script>
+<script src="admin-ui.js?v=20261016-payment-dialog-layer-fix-1"></script>
 </body>
 </html>

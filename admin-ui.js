@@ -103,7 +103,9 @@
   });
   const logoutButton = document.getElementById("sidebarLogoutButton");
   if (logoutButton) menuScreen.querySelector(".admin-menu-options").append(logoutButton);
-  modalElements.forEach((dialog) => app.append(dialog));
+  modalElements.forEach((dialog) => {
+    (dialog.id === "paymentMethodModal" ? document.body : app).append(dialog);
+  });
 
   oldNavigation?.remove();
   oldLayout?.remove();

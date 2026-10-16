@@ -8,6 +8,7 @@
   <meta name="description" content="VialXBeauty — curated beauty essentials in a modern Cherry Noir storefront." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b090a'/%3E%3Cpath d='M14 18h9l9 28 9-28h9L37 52H27z' fill='%23b41435'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="vialx-store.css?v=final-mobile-1" />
+  <link rel="stylesheet" href="vialx-store-final.css?v=20261016-scrollbar-visibility-1" />
 </head>
 <body class="storefront-page settings-loading">
   <header class="vx-header">
@@ -39,7 +40,7 @@
   <main>
     <section id="home" class="vx-hero" aria-labelledby="heroTitle">
       <div class="hero-logo-wrap">
-        <img class="hero-logo-image" src="vialx-hero-logo.jpg" alt="VIALX" />
+        <img id="heroImage" class="hero-logo-image" src="vialx-hero-logo.jpg" alt="VialXBeauty storefront" />
       </div>
       <div class="hero-copy">
         <p id="heroEyebrow" class="eyebrow">VIALXBEAUTY</p>
@@ -385,7 +386,7 @@
   <dialog id="paymentStepDialog">
     <div class="payment-step-card">
       <div class="drawer-header">
-        <h2>Payment</h2>
+        <h2>Payment details</h2>
         <button id="paymentStepCloseButton" class="icon-button" type="button" aria-label="Close payment step">×</button>
       </div>
       <div id="paymentStepContent" class="payment-step-content"></div>
@@ -398,10 +399,15 @@
 
   <dialog id="successDialog">
     <div class="success-card">
-      <div class="success-icon">VX</div>
+      <div class="success-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.4 4.2L19 7.5" /></svg>
+      </div>
       <h2>Order received!</h2>
-      <p>Your order reference is:</p>
-      <strong id="orderReference"></strong>
+      <p>Thank you. We've received your order and will contact you with any updates.</p>
+      <div class="order-reference-card">
+        <span>Order reference</span>
+        <strong id="orderReference"></strong>
+      </div>
       <div id="successExternalCheckout" class="success-external-checkout" hidden>
         <p id="successExternalMessage">Your item payment is complete. Continue to the selected marketplace to arrange shipping.</p>
         <a id="successExternalLink" class="primary-button full" href="#" target="_blank" rel="noopener noreferrer">Continue to shipping checkout</a>
@@ -422,8 +428,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="variants.js"></script>
-<script src="favorites.js?v=vialx-1"></script>
+<script src="favorites.js?v=storefront-v2-fixes-1"></script>
 <script src="philippine-address.js?v=vialx-1"></script>
-<script src="checkout-payment-v18.js?v=final-mobile-1"></script>
+<script src="checkout-payment-v18.js?v=storefront-v2-fixes-1"></script>
 </body>
 </html>

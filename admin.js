@@ -139,6 +139,7 @@ let products = [];
 let expenseProfiles = [];
 let paymentMethods = [];
 let paymentMethodShippingLinks = [];
+let paymentMethodShippingLinksError = null;
 let orders = [];
 let orderItemsByOrder = {};
 let activeOrderFilter = "all";
@@ -468,7 +469,6 @@ if (selectedShopLogoFile) {
 if (selectedHeroImageFile) {
   try {
     updates.hero_image_url = await uploadProductImage(selectedHeroImageFile);
-    settingsForm.elements.heroImageUrl.value = updates.hero_image_url;
   } catch (uploadError) {
     alert(`Could not upload hero image: ${uploadError.message}`);
     return;
@@ -483,16 +483,31 @@ if (selectedCatalogImageFile) {
     return;
   }
 }
-const { error } = await supabaseClient
-  .from("shop_settings")
-  .update(updates)
-  .eq("id", 1);
+let saveResult;
+try {
+  saveResult = await supabaseClient
+    .from("shop_settings")
+    .update(updates)
+    .eq("id", 1)
+    .select("id")
+    .maybeSingle();
+} catch (saveError) {
+  alert(`Could not save shop profile: ${saveError?.message || "Unexpected error."}`);
+  return;
+}
+
+const { data: savedSettings, error } = saveResult;
 
 if (error) {
   alert(`Could not save shop profile: ${error.message}`);
   return;
 }
+if (!savedSettings) {
+  alert("Could not confirm that the shop profile was saved.");
+  return;
+}
 
+settingsForm.elements.heroImageUrl.value = updates.hero_image_url || "";
 selectedShopLogoFile = null;
 selectedHeroImageFile = null;
 selectedCatalogImageFile = null;
@@ -1631,7 +1646,11 @@ async function uploadPaymentMethodQr(file, methodId) {
     .from("payment-qr")
     .getPublicUrl(storagePath);
 
-  return publicData?.publicUrl || null;
+  if (!publicData?.publicUrl) {
+    throw new Error("The QR image uploaded, but no public URL was returned.");
+  }
+
+  return publicData.publicUrl;
 }
 
 async function deletePaymentMethodQr(publicUrl) {
@@ -1649,18 +1668,27 @@ async function deletePaymentMethodQr(publicUrl) {
 
 async function loadPaymentMethods() {
   const [{ data, error }, linksResult] = await Promise.all([
-    supabaseClient.from("payment_methods").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("payment_methods").select("*").order("sort_order", { ascending: true }).order("id", { ascending: true }),
     supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
   ]);
 
   if (error) {
+    paymentMethods = [];
+    paymentMethodShippingLinks = [];
     paymentMethodsContainer.innerHTML =
       `<p class="empty">Could not load payment methods: ${escapeHtml(error.message)}</p>`;
     return;
   }
 
   paymentMethods = data || [];
-  paymentMethodShippingLinks = linksResult.error ? [] : (linksResult.data || []);
+  if (linksResult.error) {
+    paymentMethodShippingLinks = [];
+    paymentMethodShippingLinksError = linksResult.error;
+    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
+  } else {
+    paymentMethodShippingLinks = linksResult.data || [];
+    paymentMethodShippingLinksError = null;
+  }
   renderPaymentMethods();
 }
 
@@ -1678,8 +1706,12 @@ function renderPaymentCourierOptions(methodId = null) {
 }
 
 function renderPaymentMethods() {
+  const assignmentsNotice = paymentMethodShippingLinksError
+    ? `<p class="tiny-note">Shipping assignments could not be loaded: ${escapeHtml(paymentMethodShippingLinksError.message)}</p>`
+    : "";
+
   if (!paymentMethods.length) {
-    paymentMethodsContainer.innerHTML = `
+    paymentMethodsContainer.innerHTML = `${assignmentsNotice}
       <div class="payment-method-empty">
         <p>No payment methods loaded yet.</p>
         <p class="tiny-note">
@@ -1690,7 +1722,7 @@ function renderPaymentMethods() {
     return;
   }
 
-  paymentMethodsContainer.innerHTML = paymentMethods
+  paymentMethodsContainer.innerHTML = `${assignmentsNotice}${paymentMethods
     .map((method) => {
       const depositText = method.deposit_required
         ? `${method.deposit_percentage ?? 0}% deposit`
@@ -1726,76 +1758,64 @@ function renderPaymentMethods() {
           </div>
 
           <div class="payment-card-actions">
-            <button class="primary-button" type="button" data-payment-edit="${method.id}">Edit method</button>
+            <button class="primary-button" type="button" data-payment-edit="${escapeHtml(String(method.id))}">Edit method</button>
             <details class="card-more-actions">
               <summary>More</summary>
               <div class="card-more-actions-panel">
-                <button class="secondary-button" type="button" data-payment-toggle-visible="${method.id}">${method.is_visible ? "Hide from checkout" : "Show at checkout"}</button>
-                <button class="secondary-button" type="button" data-payment-up="${method.id}">Move up</button>
-                <button class="secondary-button" type="button" data-payment-down="${method.id}">Move down</button>
-                <button class="secondary-button danger" type="button" data-payment-delete="${method.id}">Delete method</button>
+                <button class="secondary-button" type="button" data-payment-toggle-visible="${escapeHtml(String(method.id))}">${method.is_visible ? "Hide from checkout" : "Show at checkout"}</button>
+                <button class="secondary-button" type="button" data-payment-up="${escapeHtml(String(method.id))}">Move up</button>
+                <button class="secondary-button" type="button" data-payment-down="${escapeHtml(String(method.id))}">Move down</button>
+                <button class="secondary-button danger" type="button" data-payment-delete="${escapeHtml(String(method.id))}">Delete method</button>
               </div>
             </details>
           </div>
         </article>
       `;
     })
-    .join("");
+    .join("")}`;
 
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-toggle-visible]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        togglePaymentMethodVisibility(button.dataset.paymentToggleVisible);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-edit]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        editPaymentMethod(button.dataset.paymentEdit);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-down]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        changePaymentMethodOrder(button.dataset.paymentDown, 1);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-up]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        changePaymentMethodOrder(button.dataset.paymentUp, -1);
-      });
-    });
-
-  paymentMethodsContainer
-    .querySelectorAll("[data-payment-delete]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        deletePaymentMethod(button.dataset.paymentDelete);
-      });
-    });
 }
 
+document.addEventListener("click", (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+  const button = target?.closest("#paymentMethodsContainer [data-payment-edit], #paymentMethodsContainer [data-payment-toggle-visible], #paymentMethodsContainer [data-payment-up], #paymentMethodsContainer [data-payment-down], #paymentMethodsContainer [data-payment-delete]");
+  if (!button) return;
+
+  if (button.dataset.paymentEdit) {
+    event.preventDefault();
+    event.stopPropagation();
+    editPaymentMethod(button.dataset.paymentEdit);
+  } else if (button.dataset.paymentToggleVisible) {
+    event.preventDefault();
+    togglePaymentMethodVisibility(button.dataset.paymentToggleVisible);
+  } else if (button.dataset.paymentUp) {
+    event.preventDefault();
+    changePaymentMethodOrder(button.dataset.paymentUp, -1);
+  } else if (button.dataset.paymentDown) {
+    event.preventDefault();
+    changePaymentMethodOrder(button.dataset.paymentDown, 1);
+  } else if (button.dataset.paymentDelete) {
+    event.preventDefault();
+    deletePaymentMethod(button.dataset.paymentDelete);
+  }
+}, true);
+
 function openPaymentMethodModal(isEdit = false) {
-  paymentMethodModalTitle.textContent = isEdit
-    ? "Edit payment method"
-    : "Add payment method";
+  paymentMethodModalTitle.textContent = isEdit ? "Edit Payment Method" : "Add Payment Method";
+  paymentMethodForm.querySelector('button[type="submit"]').textContent = isEdit ? "Save Changes" : "Save payment method";
 
   renderPaymentCourierOptions(isEdit ? paymentMethodForm.elements.id.value : null);
+  if (!paymentMethodModal.isConnected) {
+    document.body.append(paymentMethodModal);
+  }
   paymentMethodModal.showModal();
 }
 
 function closePaymentMethodDialog() {
-  paymentMethodModal.close();
+  if (paymentMethodModal.open) paymentMethodModal.close();
   paymentMethodForm.reset();
   paymentMethodForm.elements.id.value = "";
+  paymentMethodForm.querySelector('button[type="submit"]').textContent = "Save payment method";
   resetPaymentMethodQrState();
 }
 
@@ -1877,126 +1897,186 @@ paymentMethodQrInput?.addEventListener("change", (event) => {
   });
 });
 
+let isSavingPaymentMethod = false;
+
 paymentMethodForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (paymentMethodShippingLinksError) {
+    alert(`Cannot safely save payment methods until shipping assignments load: ${paymentMethodShippingLinksError.message}`);
+    return;
+  }
+  if (isSavingPaymentMethod || !paymentMethodForm.reportValidity()) return;
 
-  const formData = new FormData(paymentMethodForm);
-  const id = String(formData.get("id") || "").trim();
-  const selectedShippingMethodIds = formData.getAll("shipping_method_ids").map((value) => Number(value));
+  isSavingPaymentMethod = true;
+  const saveButton = paymentMethodForm.querySelector('button[type="submit"]');
+  if (saveButton) saveButton.disabled = true;
 
-  const requestedSortOrder = formData.get("sort_order");
-  const payload = {
-    payment_name: String(formData.get("payment_name") || "").trim(),
-    short_description: String(formData.get("short_description") || "").trim() || null,
-    instructions: String(formData.get("instructions") || "").trim() || null,
-    instructions_visible: formData.get("instructions_visible") === "on",
-    cod_fee: Math.max(0, Number(formData.get("cod_fee") || 0)),
-    receipt_required: formData.get("receipt_required") === "on",
-    reference_required: formData.get("reference_required") === "on",
-    deposit_required: formData.get("deposit_required") === "on",
-    deposit_percentage:
-  formData.get("deposit_percentage") !== ""
-    ? Number(formData.get("deposit_percentage"))
-    : 0,
-    is_visible: formData.get("is_visible") === "on",
-    sort_order:
-      requestedSortOrder !== ""
+  try {
+    const formData = new FormData(paymentMethodForm);
+    const id = String(formData.get("id") || "").trim();
+    const selectedShippingMethodIds = formData.getAll("shipping_method_ids").map((value) => Number(value));
+
+    const requestedSortOrder = formData.get("sort_order");
+    const payload = {
+      payment_name: String(formData.get("payment_name") || "").trim(),
+      short_description: String(formData.get("short_description") || "").trim() || null,
+      instructions: String(formData.get("instructions") || "").trim() || null,
+      instructions_visible: formData.get("instructions_visible") === "on",
+      cod_fee: Math.max(0, Number(formData.get("cod_fee") || 0)),
+      receipt_required: formData.get("receipt_required") === "on",
+      reference_required: formData.get("reference_required") === "on",
+      deposit_required: formData.get("deposit_required") === "on",
+      deposit_percentage: formData.get("deposit_percentage") !== ""
+        ? Number(formData.get("deposit_percentage"))
+        : 0,
+      is_visible: formData.get("is_visible") === "on",
+      sort_order: requestedSortOrder !== ""
         ? Number(requestedSortOrder)
         : paymentMethods.length
-        ? Math.max(...paymentMethods.map((item) => Number(item.sort_order ?? 0))) + 10
-        : 10,
-    updated_at: new Date().toISOString()
-  };
+          ? Math.max(...paymentMethods.map((item) => Number(item.sort_order ?? 0))) + 10
+          : 10,
+      updated_at: new Date().toISOString()
+    };
 
-  let qrUrl = null;
-  const existingMethod = id
-    ? paymentMethods.find((item) => item.id === id)
-    : null;
+    let qrUrl = null;
+    let previousQrUrlToDelete = null;
+    const existingMethod = id
+      ? paymentMethods.find((item) => String(item.id) === id)
+      : null;
 
-  if (paymentMethodQrFile) {
-    const validationMessage = validatePaymentMethodQrFile(paymentMethodQrFile);
-    if (validationMessage) {
-      alert(validationMessage);
-      return;
-    }
-
-    try {
-      qrUrl = await uploadPaymentMethodQr(paymentMethodQrFile, id || null);
-      if (id && existingMethod?.qr_url) {
-        await deletePaymentMethodQr(existingMethod.qr_url);
+    if (paymentMethodQrFile) {
+      const validationMessage = validatePaymentMethodQrFile(paymentMethodQrFile);
+      if (validationMessage) {
+        alert(validationMessage);
+        return;
       }
-    } catch (uploadError) {
-      alert(`Could not upload QR image: ${uploadError.message}`);
+
+      try {
+        qrUrl = await uploadPaymentMethodQr(paymentMethodQrFile, id || null);
+      } catch (uploadError) {
+        alert(`Could not upload QR image: ${uploadError.message}`);
+        return;
+      }
+      if (id && existingMethod?.qr_url) {
+        previousQrUrlToDelete = existingMethod.qr_url;
+      }
+    }
+    else if (paymentMethodRemoveQr) {
+      qrUrl = null;
+      if (id && existingMethod?.qr_url) {
+        previousQrUrlToDelete = existingMethod.qr_url;
+      }
+    } else if (id && existingMethod) {
+      qrUrl = existingMethod.qr_url || null;
+    }
+
+    payload.qr_url = qrUrl;
+
+    let error;
+    let savedMethodId = id;
+    let uploadedQrUrl = paymentMethodQrFile ? qrUrl : null;
+
+    if (id) {
+      const result = await supabaseClient
+        .from("payment_methods")
+        .update(payload)
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+      error = result.error;
+      savedMethodId = String(result.data?.id || "");
+    } else {
+      const result = await supabaseClient
+        .from("payment_methods")
+        .insert(payload)
+        .select("id")
+        .single();
+      error = result.error;
+      savedMethodId = String(result.data?.id || "");
+    }
+
+    if (error || !savedMethodId) {
+      if (uploadedQrUrl) await deletePaymentMethodQr(uploadedQrUrl);
+      alert(error
+        ? `Could not save payment method: ${error.message}`
+        : "Could not confirm that the payment method was saved.");
       return;
     }
-  } else if (paymentMethodRemoveQr) {
-    qrUrl = null;
-    if (id && existingMethod?.qr_url) {
-      await deletePaymentMethodQr(existingMethod.qr_url);
+
+    if (previousQrUrlToDelete) {
+      try {
+        await deletePaymentMethodQr(previousQrUrlToDelete);
+      } catch (cleanupError) {
+        console.warn("Payment method saved, but its previous QR image could not be removed:", cleanupError);
+      }
     }
-  } else if (id && existingMethod) {
-    qrUrl = existingMethod.qr_url || null;
-  }
 
-  payload.qr_url = qrUrl;
-
-  let error;
-  let savedMethodId = id;
-
-  if (id) {
-    ({ error } = await supabaseClient
-      .from("payment_methods")
-      .update(payload)
-      .eq("id", id));
-  } else {
-    const result = await supabaseClient
-      .from("payment_methods")
-      .insert(payload)
-      .select("id")
-      .single();
-    error = result.error;
-    savedMethodId = result.data?.id || "";
-  }
-
-  if (error) {
-    alert(`Could not save payment method: ${error.message}`);
-    return;
-  }
-
-  const deleteLinks = await supabaseClient
-    .from("payment_method_shipping_methods")
-    .delete()
-    .eq("payment_method_id", savedMethodId);
-
-  if (deleteLinks.error) {
-    alert(`Payment method saved, but courier assignments could not be updated: ${deleteLinks.error.message}`);
-    return;
-  }
-
-  if (selectedShippingMethodIds.length) {
-    const { error: linkError } = await supabaseClient
+    const deleteLinks = await supabaseClient
       .from("payment_method_shipping_methods")
-      .insert(selectedShippingMethodIds.map((shippingMethodId) => ({ payment_method_id: savedMethodId, shipping_method_id: shippingMethodId })));
-    if (linkError) {
-      alert(`Payment method saved, but courier assignments could not be updated: ${linkError.message}`);
+      .delete()
+      .eq("payment_method_id", savedMethodId);
+
+    if (deleteLinks.error) {
+      closePaymentMethodDialog();
+      await loadPaymentMethods();
+      alert(`Payment method saved, but courier assignments could not be updated: ${deleteLinks.error.message}`);
       return;
     }
-  }
 
-  closePaymentMethodDialog();
-  await loadPaymentMethods();
+    if (selectedShippingMethodIds.length) {
+      const { error: linkError } = await supabaseClient
+        .from("payment_method_shipping_methods")
+        .insert(selectedShippingMethodIds.map((shippingMethodId) => ({ payment_method_id: savedMethodId, shipping_method_id: shippingMethodId })));
+      if (linkError) {
+        closePaymentMethodDialog();
+        await loadPaymentMethods();
+        alert(`Payment method saved, but courier assignments could not be updated: ${linkError.message}`);
+        return;
+      }
+    }
+
+    closePaymentMethodDialog();
+    await loadPaymentMethods();
+    if (id) alert("Payment method updated.");
+    if (payload.is_visible && !selectedShippingMethodIds.length) {
+      alert("Payment method saved, but it will not appear at checkout until it is assigned to a shipping option.");
+    }
+  } catch (saveError) {
+    console.error("Could not complete payment method save:", saveError);
+    alert(`Could not complete payment method save. Refresh the list before trying again: ${saveError?.message || "Unexpected error."}`);
+    try {
+      await loadPaymentMethods();
+    } catch (refreshError) {
+      console.error("Could not refresh payment methods after save error:", refreshError);
+    }
+  } finally {
+    isSavingPaymentMethod = false;
+    if (saveButton) saveButton.disabled = false;
+  }
 });
 
 function editPaymentMethod(id) {
-  const method = paymentMethods.find((item) => item.id === id);
-  if (!method) return;
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
+  if (!method) {
+    console.error("Could not find payment method to edit:", id);
+    alert("This payment method is no longer in the loaded list. Refresh the list and try again.");
+    return;
+  }
 
-  populatePaymentMethodForm(method);
-  openPaymentMethodModal(true);
+  try {
+    paymentMethodForm.reset();
+    paymentMethodForm.elements.id.value = "";
+    resetPaymentMethodQrState();
+    populatePaymentMethodForm(method);
+    openPaymentMethodModal(true);
+  } catch (error) {
+    console.error("Could not open payment method editor:", error);
+    alert(`Could not open payment method editor: ${error.message || "Unexpected error."}`);
+  }
 }
 
 async function deletePaymentMethod(id) {
-  const method = paymentMethods.find((item) => item.id === id);
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
   if (!method) return;
 
   if (!confirm(`Delete "${method.payment_name}" payment method?`)) return;
@@ -2015,7 +2095,7 @@ async function deletePaymentMethod(id) {
 }
 
 async function togglePaymentMethodVisibility(id) {
-  const method = paymentMethods.find((item) => item.id === id);
+  const method = paymentMethods.find((item) => String(item.id) === String(id));
   if (!method) return;
 
   const { error } = await supabaseClient
@@ -2035,7 +2115,7 @@ async function togglePaymentMethodVisibility(id) {
 }
 
 async function changePaymentMethodOrder(id, direction) {
-  const index = paymentMethods.findIndex((item) => item.id === id);
+  const index = paymentMethods.findIndex((item) => String(item.id) === String(id));
   if (index === -1) return;
 
   const targetIndex = index + direction;
