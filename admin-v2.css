@@ -404,7 +404,7 @@ body.admin-page {
   gap: 10px;
 }
 
-.admin-page .admin-menu-options > button {
+.admin-page .admin-menu-options > :is(button, .admin-menu-option-link) {
   display: grid;
   width: 100%;
   min-width: 0;
@@ -418,16 +418,30 @@ body.admin-page {
   color: var(--vx-ink);
   background: var(--vx-white);
   box-shadow: 0 4px 14px rgba(139, 0, 40, .04);
-  cursor: pointer;
   text-align: left;
 }
 
-.admin-page .admin-menu-options > button > strong {
+.admin-page .admin-menu-options > button {
+  cursor: pointer;
+}
+
+.admin-page .admin-menu-options > .admin-menu-option-link {
+  text-decoration: none;
+}
+
+.admin-page .admin-menu-options > :is(button, .admin-menu-option-link):hover,
+.admin-page .admin-menu-options > :is(button, .admin-menu-option-link):focus-visible {
+  border-color: var(--vx-cherry);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 0, 40, .12);
+}
+
+.admin-page .admin-menu-options > :is(button, .admin-menu-option-link) > strong {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.admin-page .admin-menu-options > button > span:last-child {
+.admin-page .admin-menu-options > :is(button, .admin-menu-option-link) > span:last-child {
   color: var(--vx-cherry);
   font-size: 1.3rem;
 }
