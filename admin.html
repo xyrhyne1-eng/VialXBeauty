@@ -308,13 +308,49 @@ Hero eyebrow
     </section>
 
     <section id="securitySection" class="admin-card admin-panel-section security-section">
-      <form id="changePasswordForm" class="admin-form security-password-form">
-        <label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
-        <label>New password<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
-        <label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
-        <button class="primary-button" type="submit">Change password</button>
-        <p id="securityStatus" class="tiny-note" role="status" aria-live="polite"></p>
-      </form>
+      <div class="admin-section-header">
+        <div>
+          <h2>Security &amp; accounts</h2>
+          <p class="tiny-note">Manage your password, sessions, and authorized admin access.</p>
+        </div>
+      </div>
+      <div class="admin-toolbar security-tabs" aria-label="Security settings">
+        <button id="securityAccountsTab" class="secondary-button active" type="button" data-security-tab="accounts">Accounts &amp; access</button>
+        <button class="secondary-button" type="button" data-security-tab="sessions">Password &amp; sessions</button>
+      </div>
+      <p id="securityStatus" class="tiny-note" role="status" aria-live="polite"></p>
+      <div class="security-grid" data-security-group="sessions" hidden>
+        <form id="changePasswordForm" class="admin-form security-card security-password-form">
+          <h3>Change password</h3>
+          <label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+          <label>New password<input name="newPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+          <label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required /></label>
+          <button class="primary-button" type="submit">Change password</button>
+        </form>
+        <div class="security-card">
+          <h3>Log out all devices</h3>
+          <p>End every admin session, including this one. You will need to sign in again.</p>
+          <button id="signOutAllButton" class="secondary-button danger" type="button">Log out all devices</button>
+        </div>
+      </div>
+      <div class="security-grid security-accounts-grid" data-security-group="accounts">
+        <form id="inviteAdminForm" class="admin-form security-card">
+          <h3>Invite another admin</h3>
+          <p>Send an invitation to grant authorized access to the admin workspace.</p>
+          <label>Email address<input name="email" type="email" autocomplete="email" placeholder="admin@example.com" required /></label>
+          <label id="inviteRoleField">Role<select name="role"><option value="admin">Admin</option><option value="co_owner">Co-owner</option></select></label>
+          <button class="primary-button" type="submit">Send invitation</button>
+        </form>
+      </div>
+      <div class="security-admin-list-wrap" data-security-group="accounts">
+        <div class="admin-section-header">
+          <div>
+            <h3>Admin accounts</h3>
+            <p class="tiny-note">Account actions are limited by your assigned role.</p>
+          </div>
+        </div>
+        <div id="adminAccountsList" class="admin-accounts-list" aria-live="polite"></div>
+      </div>
     </section>
 
     <section id="shippingFeesSection" class="admin-card admin-panel-section">

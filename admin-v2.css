@@ -1512,6 +1512,65 @@ body.admin-page {
   max-width: 620px;
 }
 
+.admin-page .security-tabs {
+  margin: 14px 0;
+}
+
+.admin-page .security-tabs [data-security-tab].active {
+  border-color: var(--vx-cherry);
+  color: var(--vx-white);
+  background: var(--vx-cherry);
+}
+
+.admin-page .security-accounts-grid {
+  margin-top: 14px;
+}
+
+.admin-page .security-admin-list-wrap {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--vx-rose);
+}
+
+.admin-page .admin-accounts-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.admin-page .admin-account-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--vx-rose);
+  border-radius: 14px;
+  background: var(--vx-white);
+}
+
+.admin-page .admin-account-row > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.admin-page .admin-account-row strong,
+.admin-page .admin-account-row small {
+  overflow-wrap: anywhere;
+}
+
+.admin-page .admin-account-row small {
+  color: var(--vx-muted);
+  line-height: 1.45;
+}
+
+.admin-page .security-admin-list-wrap .admin-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .admin-page .security-password-form > .primary-button {
   width: 100%;
   margin-top: 4px;
@@ -2149,6 +2208,14 @@ body.admin-page {
 
   .admin-page .admin-section-header > .primary-button {
     width: 100%;
+  }
+
+  .admin-page .admin-account-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-page .security-admin-list-wrap .admin-actions {
+    justify-content: flex-start;
   }
 
   .admin-page .settings-grid,
