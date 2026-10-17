@@ -1560,6 +1560,8 @@ body.storefront-page #successDialog #closeSuccess {
 
 body.storefront-page #paymentStepDialog .payment-step-content {
 	display: grid;
+	grid-auto-rows: max-content;
+	align-content: start;
 	gap: 14px;
 	min-width: 0;
 	overflow-x: hidden;
@@ -1651,13 +1653,16 @@ body.storefront-page #paymentStepDialog .payment-receipt-filename {
 body.storefront-page #paymentStepDialog .payment-step-preview-box {
 	box-sizing: border-box;
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: max-content minmax(140px, 220px);
+	align-content: start;
 	gap: 10px;
 	min-width: 0;
 	max-width: 100%;
-	max-height: 320px;
+	min-height: 0;
 	margin: 0;
 	padding: 12px;
-	overflow: hidden;
+	overflow: visible;
 }
 
 body.storefront-page #paymentStepDialog .payment-step-preview-box[hidden] {
@@ -1665,22 +1670,25 @@ body.storefront-page #paymentStepDialog .payment-step-preview-box[hidden] {
 }
 
 body.storefront-page #paymentStepDialog .payment-step-preview-link {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	box-sizing: border-box;
+	display: grid;
+	place-items: center;
 	width: 100%;
 	min-width: 0;
-	max-height: 270px;
-	overflow: hidden;
+	height: clamp(140px, 32vh, 220px);
+	min-height: 140px;
+	max-height: 220px;
+	overflow: visible;
 }
 
 body.storefront-page #paymentStepDialog .payment-step-preview-image {
 	display: block;
-	width: auto;
-	height: auto;
+	width: 100%;
+	height: 100%;
 	max-width: 100%;
-	max-height: 260px;
+	max-height: 100%;
 	object-fit: contain;
+	object-position: center;
 }
 
 body.storefront-page #paymentStepDialog .payment-total-row {
@@ -1738,32 +1746,6 @@ body.storefront-page .footer-links a {
 
 	body.storefront-page #paymentStepDialog .payment-receipt-button {
 		width: 100%;
-	}
-
-	body.storefront-page #paymentStepDialog .payment-step-preview-box {
-		max-height: 270px;
-	}
-
-	body.storefront-page #paymentStepDialog .payment-step-preview-link {
-		max-height: 220px;
-	}
-
-	body.storefront-page #paymentStepDialog .payment-step-preview-image {
-		max-height: 210px;
-	}
-}
-
-@media (max-width: 600px) {
-	body.storefront-page #paymentStepDialog .payment-step-preview-box {
-		max-height: 280px;
-	}
-
-	body.storefront-page #paymentStepDialog .payment-step-preview-link {
-		max-height: 235px;
-	}
-
-	body.storefront-page #paymentStepDialog .payment-step-preview-image {
-		max-height: 220px;
 	}
 }
 

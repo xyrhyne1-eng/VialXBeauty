@@ -154,7 +154,11 @@ let variantSourceButton = null;
 let cart = loadSavedCart();
 let paymentMethods = [];
 let paymentMethodShippingLinks = [];
-let paymentMethodShippingLinksError = null;
+let paymentMethodsLoaded = false;
+let paymentMethodsLoading = false;
+let paymentMethodsLoadError = null;
+let paymentMethodsLoadPromise = null;
+let paymentStepOpeningPromise = null;
 let selectedPaymentMethod = null;
 let shippingFees = [];
 let selectedShippingFee = null;
@@ -1331,7 +1335,7 @@ function selectShippingMethod(methodId) {
   if (!method) return;
   selectedShippingMethod = method;
   selectedShippingFee = null;
-  if (selectedPaymentMethod && !availablePaymentMethods().some((payment) => String(payment.id) === String(selectedPaymentMethod.id))) {
+  if (!paymentMethodsLoading && selectedPaymentMethod && !availablePaymentMethods().some((payment) => String(payment.id) === String(selectedPaymentMethod.id))) {
     selectedPaymentMethod = null;
     if (selectedPaymentInput) selectedPaymentInput.value = "";
   }
@@ -1575,7 +1579,7 @@ checkoutButton.addEventListener("click", () => {
   lockPageScroll("checkout-flow");
   closeCartDrawer();
   updateCheckoutTotal();
-  checkoutDialog.showModal();
+  openCheckoutDialog();
 });
 
 if (closeCheckout) {
@@ -1584,6 +1588,12 @@ if (closeCheckout) {
     unlockPageScroll("checkout-flow");
   });
 }
+
+function openCheckoutDialog() {
+  checkoutDialog.showModal();
+  void loadPaymentMethods();
+}
+
 /* -------------------------
    CHECKOUT AND ORDERS
 ------------------------- */
@@ -1604,46 +1614,62 @@ function createOrderReference() {
 
 async function loadPaymentMethods() {
   if (!paymentMethodsList) {
-    return;
+    return false;
   }
 
-  paymentMethodsList.innerHTML = `<p class="empty">Loading payment methods…</p>`;
-
-  const [{ data, error }, linksResult] = await Promise.all([
-    supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
-    supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
-  ]);
-
-  if (error) {
-    paymentMethods = [];
-    selectedPaymentMethod = null;
-    if (selectedPaymentInput) {
-      selectedPaymentInput.value = "";
-    }
-    paymentMethodsList.innerHTML = `
-      <div class="payment-step-summary">
-        <strong>Payment methods unavailable</strong>
-        <p class="tiny-note">We could not load payment options right now. Please try again shortly.</p>
-      </div>
-    `;
-    updateProceedPaymentAvailability();
-    return;
+  if (paymentMethodsLoadPromise) {
+    return paymentMethodsLoadPromise;
   }
 
-  paymentMethods = data || [];
-  if (linksResult.error) {
-    paymentMethodShippingLinks = [];
-    paymentMethodShippingLinksError = linksResult.error;
-    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
-  } else {
-    paymentMethodShippingLinks = linksResult.data || [];
-    paymentMethodShippingLinksError = null;
-  }
-  selectedPaymentMethod = null;
-  if (selectedPaymentInput) {
-    selectedPaymentInput.value = "";
-  }
+  paymentMethodsLoading = true;
+  paymentMethodsLoadError = null;
+  paymentMethodsList.setAttribute("aria-busy", "true");
   renderPaymentMethods();
+
+  const loadPromise = (async () => {
+    try {
+      const [methodsResult, linksResult] = await Promise.all([
+        supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
+        supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
+      ]);
+
+      if (methodsResult.error) throw methodsResult.error;
+      if (linksResult.error) throw linksResult.error;
+
+      const nextPaymentMethods = methodsResult.data || [];
+      const nextShippingLinks = linksResult.data || [];
+      const selectedMethodId = selectedPaymentMethod?.id;
+      const allowedMethodIds = new Set(
+        nextShippingLinks
+          .filter((link) => String(link.shipping_method_id) === String(selectedShippingMethod?.id))
+          .map((link) => String(link.payment_method_id))
+      );
+
+      paymentMethods = nextPaymentMethods;
+      paymentMethodShippingLinks = nextShippingLinks;
+      paymentMethodsLoaded = true;
+      selectedPaymentMethod = paymentMethods.find((method) =>
+        String(method.id) === String(selectedMethodId)
+        && allowedMethodIds.has(String(method.id))
+      ) || null;
+      if (selectedPaymentInput) {
+        selectedPaymentInput.value = selectedPaymentMethod?.payment_name || "";
+      }
+      return true;
+    } catch (error) {
+      console.error("Could not load payment methods and shipping assignments:", error);
+      paymentMethodsLoadError = "Payment options could not be refreshed. Check your connection and try again.";
+      return false;
+    } finally {
+      paymentMethodsLoading = false;
+      paymentMethodsLoadPromise = null;
+      paymentMethodsList.setAttribute("aria-busy", "false");
+      renderPaymentMethods();
+    }
+  })();
+
+  paymentMethodsLoadPromise = loadPromise;
+  return loadPromise;
 }
 
 function availablePaymentMethods() {
@@ -1657,25 +1683,42 @@ function renderPaymentMethods() {
     return;
   }
 
-  if (paymentMethodShippingLinksError) {
+  if (paymentMethodsLoading && !paymentMethodsLoaded) {
+    paymentMethodsList.innerHTML = `<p class="empty" role="status">Loading payment methods…</p>`;
+    updateProceedPaymentAvailability();
+    return;
+  }
+
+  if (paymentMethodsLoadError && !paymentMethodsLoaded) {
     paymentMethodsList.innerHTML = `
-      <div class="payment-step-summary">
+      <div class="payment-step-summary" role="status">
         <strong>Payment methods unavailable</strong>
-        <p class="tiny-note">We could not load payment availability for shipping options. Please try again shortly.</p>
+        <p class="tiny-note">${escapeHtml(paymentMethodsLoadError)}</p>
       </div>
     `;
     updateProceedPaymentAvailability();
     return;
   }
 
+  const refreshNotice = paymentMethodsLoading
+    ? `<p class="tiny-note" role="status">Refreshing payment methods…</p>`
+    : paymentMethodsLoadError
+    ? `<p class="tiny-note" role="status">${escapeHtml(paymentMethodsLoadError)} Showing the last successfully loaded options.</p>`
+    : "";
   const availableMethods = availablePaymentMethods();
   if (!selectedShippingMethod) {
-    paymentMethodsList.innerHTML = `<div class="payment-step-summary"><strong>Choose a shipping option first</strong><p class="tiny-note">Available payment methods depend on your selected courier.</p></div>`;
+    paymentMethodsList.innerHTML = `${refreshNotice}<div class="payment-step-summary"><strong>Choose a shipping option first</strong><p class="tiny-note">Available payment methods depend on your selected courier.</p></div>`;
+    updateProceedPaymentAvailability();
+    return;
+  }
+  if (!paymentMethods.length) {
+    paymentMethodsList.innerHTML = `${refreshNotice}<div class="payment-step-summary"><strong>No enabled payment methods are available</strong><p class="tiny-note">The shop has not enabled a payment method for checkout yet.</p></div>`;
     updateProceedPaymentAvailability();
     return;
   }
   if (!availableMethods.length) {
     paymentMethodsList.innerHTML = `
+      ${refreshNotice}
       <div class="payment-step-summary">
         <strong>No payment methods available</strong>
         <p class="tiny-note">No payment method is assigned to ${escapeHtml(selectedShippingMethod.name || "this shipping option")}.</p>
@@ -1685,7 +1728,7 @@ function renderPaymentMethods() {
     return;
   }
 
-  paymentMethodsList.innerHTML = availableMethods
+  paymentMethodsList.innerHTML = `${refreshNotice}${availableMethods
     .map((method) => {
       const isSelected = selectedPaymentMethod && String(selectedPaymentMethod.id) === String(method.id);
       const depositText = method.deposit_required
@@ -1706,7 +1749,7 @@ function renderPaymentMethods() {
         </button>
       `;
     })
-    .join("");
+    .join("")}`;
 
   updateProceedPaymentAvailability();
 
@@ -1844,6 +1887,17 @@ async function deleteUploadedReceipt(storagePath) {
 }
 
 function openPaymentStep() {
+  if (paymentStepOpeningPromise) {
+    return paymentStepOpeningPromise;
+  }
+
+  paymentStepOpeningPromise = performOpenPaymentStep().finally(() => {
+    paymentStepOpeningPromise = null;
+  });
+  return paymentStepOpeningPromise;
+}
+
+async function performOpenPaymentStep() {
   if (!selectedShippingMethod) {
     showCheckoutError("Please choose a shipping option to continue.");
     shippingMethodOptions?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1853,6 +1907,11 @@ function openPaymentStep() {
   if (selectedShippingMethod.method_type === "courier" && !selectedShippingFee) {
     showCheckoutError("Please choose a shipping fee to continue.");
     shippingFeeOptions?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  if (!(await loadPaymentMethods())) {
+    showCheckoutError("Payment methods could not be loaded. Please try again shortly.");
     return;
   }
 
@@ -2237,7 +2296,7 @@ checkoutForm.addEventListener("submit", (event) => {
 
 paymentStepBackButton?.addEventListener("click", () => {
   paymentStepDialog.close();
-  checkoutDialog.showModal();
+  openCheckoutDialog();
 });
 
 paymentStepContinueButton?.addEventListener("click", () => {
