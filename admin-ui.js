@@ -84,7 +84,6 @@
         <button id="adminMenuPaymentsOption" type="button" data-screen-target="payments"><span class="admin-menu-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 9h18M16 14h2"></path></svg></span><strong>Payment Methods</strong><span aria-hidden="true">›</span></button>
         <button type="button" data-screen-target="settings"><span class="admin-menu-option-icon">⚙</span><strong>Shop Settings</strong><span aria-hidden="true">›</span></button>
         <button type="button" data-screen-target="security"><span class="admin-menu-option-icon">⌑</span><strong>Password &amp; Security</strong><span aria-hidden="true">›</span></button>
-        <a class="admin-menu-option-link" href="sales.html"><span class="admin-menu-option-icon">₱</span><strong>Sales Tracker</strong><span aria-hidden="true">›</span></a>
       </div>
     </section>
   `;
