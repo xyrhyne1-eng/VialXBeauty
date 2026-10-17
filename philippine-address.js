@@ -81,21 +81,18 @@
     input.before(wrapper);
     wrapper.append(input);
 
-    const toggle = document.createElement("button");
-    toggle.className = "address-combobox-toggle";
-    toggle.type = "button";
-    toggle.tabIndex = -1;
-    toggle.setAttribute("aria-label", `Show ${input.name} choices`);
-    toggle.innerHTML = '<span aria-hidden="true">⌄</span>';
-
     const panel = document.createElement("div");
+    panel.id = `${input.id}OptionsPanel`;
     panel.className = "address-combobox-panel";
     panel.hidden = true;
+    panel.setAttribute("role", "listbox");
 
-    wrapper.append(toggle, panel);
+    wrapper.append(panel);
     input.setAttribute("role", "combobox");
     input.setAttribute("aria-autocomplete", "none");
     input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-haspopup", "listbox");
+    input.setAttribute("aria-controls", panel.id);
 
     function close() {
       panel.hidden = true;
@@ -119,6 +116,11 @@
         const option = document.createElement("button");
         option.type = "button";
         option.className = "address-combobox-option";
+        option.setAttribute("role", "option");
+        option.setAttribute(
+          "aria-selected",
+          normalize(item.name) === normalize(input.value) ? "true" : "false"
+        );
         option.innerHTML = `<span aria-hidden="true">♡</span><strong></strong>`;
         option.querySelector("strong").textContent = String(item.name || "");
         if (normalize(item.name) === normalize(input.value)) option.classList.add("is-selected");
@@ -129,6 +131,25 @@
           input.dispatchEvent(new Event("change", { bubbles: true }));
           suppressNextOpen = true;
           input.focus({ preventScroll: true });
+        });
+        option.addEventListener("keydown", (event) => {
+          const options = [...panel.querySelectorAll(".address-combobox-option")];
+          const index = options.indexOf(option);
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            const offset = event.key === "ArrowDown" ? 1 : -1;
+            options[(index + offset + options.length) % options.length]?.focus();
+          } else if (event.key === "Home") {
+            event.preventDefault();
+            options[0]?.focus();
+          } else if (event.key === "End") {
+            event.preventDefault();
+            options.at(-1)?.focus();
+          } else if (event.key === "Escape") {
+            event.preventDefault();
+            close();
+            input.focus({ preventScroll: true });
+          }
         });
         panel.append(option);
       });
@@ -159,14 +180,6 @@
         event.preventDefault();
         open(true);
         panel.querySelector(".address-combobox-option")?.focus();
-      }
-    });
-    toggle.addEventListener("click", () => {
-      if (panel.hidden) {
-        open(true);
-        input.focus({ preventScroll: true });
-      } else {
-        close();
       }
     });
     document.addEventListener("pointerdown", (event) => {

@@ -154,7 +154,9 @@ let variantSourceButton = null;
 let cart = loadSavedCart();
 let paymentMethods = [];
 let paymentMethodShippingLinks = [];
-let paymentMethodShippingLinksError = null;
+let paymentMethodsLoading = false;
+let paymentMethodsLoadError = null;
+let paymentMethodsLoadPromise = null;
 let selectedPaymentMethod = null;
 let shippingFees = [];
 let selectedShippingFee = null;
@@ -1254,7 +1256,7 @@ function renderShippingMethods() {
   shippingMethodOptions.innerHTML = shippingMethods.map((method) => {
     const selected = String(selectedShippingMethod?.id) === String(method.id);
     return `<button class="shipping-method-option${selected ? " selected" : ""}" type="button" data-shipping-method="${method.id}" aria-pressed="${selected}">
-      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : ""}</span>
       <span class="shipping-method-copy"><strong>${escapeHtml(method.name)}</strong><small>${escapeHtml(method.description || (method.method_type === "external" ? "Marketplace shipping checkout" : "Courier delivery"))}</small></span>
       <span class="shipping-method-arrow" aria-hidden="true">›</span>
     </button>`;
@@ -1293,7 +1295,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : ""}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1575,7 +1577,7 @@ checkoutButton.addEventListener("click", () => {
   lockPageScroll("checkout-flow");
   closeCartDrawer();
   updateCheckoutTotal();
-  checkoutDialog.showModal();
+  openCheckoutDialog();
 });
 
 if (closeCheckout) {
@@ -1602,48 +1604,70 @@ function createOrderReference() {
   return `WPPH-${datePart}-${randomPart}`;
 }
 
+function openCheckoutDialog() {
+  checkoutDialog.showModal();
+  void loadPaymentMethods();
+}
+
 async function loadPaymentMethods() {
   if (!paymentMethodsList) {
-    return;
+    return false;
   }
 
-  paymentMethodsList.innerHTML = `<p class="empty">Loading payment methods…</p>`;
-
-  const [{ data, error }, linksResult] = await Promise.all([
-    supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
-    supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
-  ]);
-
-  if (error) {
-    paymentMethods = [];
-    selectedPaymentMethod = null;
-    if (selectedPaymentInput) {
-      selectedPaymentInput.value = "";
-    }
-    paymentMethodsList.innerHTML = `
-      <div class="payment-step-summary">
-        <strong>Payment methods unavailable</strong>
-        <p class="tiny-note">We could not load payment options right now. Please try again shortly.</p>
-      </div>
-    `;
-    updateProceedPaymentAvailability();
-    return;
+  if (paymentMethodsLoadPromise) {
+    return paymentMethodsLoadPromise;
   }
 
-  paymentMethods = data || [];
-  if (linksResult.error) {
-    paymentMethodShippingLinks = [];
-    paymentMethodShippingLinksError = linksResult.error;
-    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
-  } else {
-    paymentMethodShippingLinks = linksResult.data || [];
-    paymentMethodShippingLinksError = null;
-  }
-  selectedPaymentMethod = null;
-  if (selectedPaymentInput) {
-    selectedPaymentInput.value = "";
-  }
+  const previouslySelectedMethodId = selectedPaymentMethod?.id;
+  paymentMethodsLoading = true;
+  paymentMethodsLoadError = null;
   renderPaymentMethods();
+
+  paymentMethodsLoadPromise = (async () => {
+    try {
+      const [methodsResult, linksResult] = await Promise.all([
+        supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
+        supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
+      ]);
+
+      if (methodsResult.error) throw methodsResult.error;
+      if (linksResult.error) throw linksResult.error;
+
+      paymentMethods = methodsResult.data || [];
+      paymentMethodShippingLinks = linksResult.data || [];
+      paymentMethodsLoadError = null;
+
+      const allowedMethodIds = new Set(
+        paymentMethodShippingLinks
+          .filter((link) => String(link.shipping_method_id) === String(selectedShippingMethod?.id))
+          .map((link) => String(link.payment_method_id))
+      );
+      selectedPaymentMethod = paymentMethods.find((method) =>
+        String(method.id) === String(previouslySelectedMethodId)
+        && allowedMethodIds.has(String(method.id))
+      ) || null;
+      if (selectedPaymentInput) {
+        selectedPaymentInput.value = selectedPaymentMethod?.payment_name || "";
+      }
+      return true;
+    } catch (error) {
+      console.error("Could not load payment methods:", error);
+      paymentMethods = [];
+      paymentMethodShippingLinks = [];
+      selectedPaymentMethod = null;
+      paymentMethodsLoadError = error?.message || "Please try again shortly.";
+      if (selectedPaymentInput) {
+        selectedPaymentInput.value = "";
+      }
+      return false;
+    } finally {
+      paymentMethodsLoading = false;
+      paymentMethodsLoadPromise = null;
+      renderPaymentMethods();
+    }
+  })();
+
+  return paymentMethodsLoadPromise;
 }
 
 function availablePaymentMethods() {
@@ -1657,11 +1681,17 @@ function renderPaymentMethods() {
     return;
   }
 
-  if (paymentMethodShippingLinksError) {
+  if (paymentMethodsLoading) {
+    paymentMethodsList.innerHTML = `<p class="empty" role="status">Loading payment methods…</p>`;
+    updateProceedPaymentAvailability();
+    return;
+  }
+
+  if (paymentMethodsLoadError) {
     paymentMethodsList.innerHTML = `
-      <div class="payment-step-summary">
+      <div class="payment-step-summary" role="status">
         <strong>Payment methods unavailable</strong>
-        <p class="tiny-note">We could not load payment availability for shipping options. Please try again shortly.</p>
+        <p class="tiny-note">We could not load payment options right now. ${escapeHtml(paymentMethodsLoadError)} Please try again shortly.</p>
       </div>
     `;
     updateProceedPaymentAvailability();
@@ -1671,6 +1701,16 @@ function renderPaymentMethods() {
   const availableMethods = availablePaymentMethods();
   if (!selectedShippingMethod) {
     paymentMethodsList.innerHTML = `<div class="payment-step-summary"><strong>Choose a shipping option first</strong><p class="tiny-note">Available payment methods depend on your selected courier.</p></div>`;
+    updateProceedPaymentAvailability();
+    return;
+  }
+  if (!paymentMethods.length) {
+    paymentMethodsList.innerHTML = `
+      <div class="payment-step-summary">
+        <strong>No enabled payment methods are available</strong>
+        <p class="tiny-note">The shop has not enabled a payment method for checkout yet.</p>
+      </div>
+    `;
     updateProceedPaymentAvailability();
     return;
   }
@@ -1697,12 +1737,14 @@ function renderPaymentMethods() {
           class="payment-option-card${isSelected ? " selected" : ""}"
           type="button"
           data-payment-select="${method.id}"
+          aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <div class="payment-option-header">
+          <span class="payment-option-icon" aria-hidden="true">₱</span>
+          <div class="payment-option-copy">
             <strong>${escapeHtml(method.payment_name || "Payment method")}</strong>
-            <span class="payment-option-pill">${escapeHtml(depositText)}</span>
+            <p>${escapeHtml(method.short_description || "Please follow the payment instructions provided.")}</p>
           </div>
-          <p>${escapeHtml(method.short_description || "Please follow the payment instructions provided.")}</p>
+          <span class="payment-option-pill">${escapeHtml(depositText)}</span>
         </button>
       `;
     })
@@ -1734,6 +1776,10 @@ function selectPaymentMethod(methodId) {
   }
   renderPaymentMethods();
 }
+
+/* -------------------------
+   PAYMENT STEP AND RECEIPTS
+------------------------- */
 
 function revokePaymentStepReceiptPreview() {
   if (paymentStepReceiptPreviewUrl) {
@@ -1843,7 +1889,7 @@ async function deleteUploadedReceipt(storagePath) {
     .remove([storagePath]);
 }
 
-function openPaymentStep() {
+async function openPaymentStep() {
   if (!selectedShippingMethod) {
     showCheckoutError("Please choose a shipping option to continue.");
     shippingMethodOptions?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1853,6 +1899,11 @@ function openPaymentStep() {
   if (selectedShippingMethod.method_type === "courier" && !selectedShippingFee) {
     showCheckoutError("Please choose a shipping fee to continue.");
     shippingFeeOptions?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  if (!(await loadPaymentMethods())) {
+    showCheckoutError("Payment methods could not be loaded. Please try again shortly.");
     return;
   }
 
@@ -2237,7 +2288,7 @@ checkoutForm.addEventListener("submit", (event) => {
 
 paymentStepBackButton?.addEventListener("click", () => {
   paymentStepDialog.close();
-  checkoutDialog.showModal();
+  openCheckoutDialog();
 });
 
 paymentStepContinueButton?.addEventListener("click", () => {
@@ -2406,7 +2457,6 @@ async function initializeStorefront() {
             loadShopSettings(),
             loadProducts(),
             loadStoreMenuItems(),
-            loadPaymentMethods(),
             loadShippingOptions()
         ]);
     } finally {
