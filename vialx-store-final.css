@@ -2413,3 +2413,58 @@ body.storefront-page #paymentStepDialog .payment-step-method > .tiny-note {
   margin-top: 0;
   margin-bottom: 0;
 }
+/* COD notice: keep checkmark and message inside the same card */
+body.storefront-page #paymentStepDialog
+.payment-step-qr.no-qr
+.payment-step-qr-placeholder.payment-cod-status {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 76px !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+body.storefront-page #paymentStepDialog
+.payment-step-qr.no-qr
+.payment-cod-status > .payment-status-icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+  align-self: center !important;
+}
+
+body.storefront-page #paymentStepDialog
+.payment-step-qr.no-qr
+.payment-cod-status > span:last-child {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  transform: none !important;
+}
+
+body.storefront-page #paymentStepDialog
+.payment-step-qr.no-qr
+.payment-cod-status strong,
+body.storefront-page #paymentStepDialog
+.payment-step-qr.no-qr
+.payment-cod-status small {
+  display: block !important;
+  position: static !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+  white-space: normal !important;
+}
