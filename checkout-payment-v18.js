@@ -309,7 +309,7 @@ function applyShopSettings(settings) {
     brandName.innerHTML = escapeHtml(shopName).replace(
       /\sPH$/i,
       " <small>PH</small>"
-    ) + '<span class="brand-heart" aria-hidden="true">♥</span>';
+    );
   }
 
   if (menuBrandName) {
@@ -393,8 +393,14 @@ function applyShopSettings(settings) {
     }
   }
 if (heroImage) {
-  heroImage.src = settings.hero_image_url || "vialx-hero-logo.jpg";
-  heroImage.hidden = false;
+  const configuredHero = String(settings.hero_image_url || "").trim();
+  if (configuredHero) {
+    heroImage.src = configuredHero;
+    heroImage.hidden = false;
+  } else {
+    heroImage.removeAttribute("src");
+    heroImage.hidden = true;
+  }
 }
   if (facebookLink) {
     if (settings.facebook_url) {
@@ -1935,8 +1941,8 @@ function openPaymentStep() {
       ${qrUrl
         ? `<img class="payment-step-qr-image" src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
         : payOnDeliveryOnly
-        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
-        : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><span><strong>No QR code available</strong><small>Follow the payment instructions below.</small></span></div>`}
+        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><div class="payment-step-qr-copy"><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></div></div>`
+        : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><div class="payment-step-qr-copy"><strong>No QR code available</strong><small>Follow the payment instructions below.</small></div></div>`}
     </div>
     <div class="payment-step-summary payment-step-order-summary">
       <div class="payment-step-method">

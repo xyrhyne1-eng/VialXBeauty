@@ -2313,3 +2313,63 @@ body.admin-page {
     transition-duration: .01ms !important;
   }
 }
+
+/* Final UI polish — dashboard recent orders only; Orders page untouched. */
+.admin-page #dashboardRecentOrders .dashboard-list-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 8px 12px;
+  align-items: start;
+  padding: 14px 0;
+}
+.admin-page #dashboardRecentOrders .dashboard-order-avatar { display: none; }
+.admin-page #dashboardRecentOrders .dashboard-order-copy {
+  display: flex; flex-direction: column; align-items: flex-start;
+  min-width: 0; gap: 3px; overflow-wrap: anywhere;
+}
+.admin-page #dashboardRecentOrders .dashboard-order-copy > strong {
+  display: block; color: var(--vx-ink); font-size: .83rem;
+  line-height: 1.35; overflow-wrap: anywhere;
+}
+.admin-page #dashboardRecentOrders .dashboard-order-customer {
+  display: block; color: var(--vx-muted); font-size: .78rem; line-height: 1.35;
+}
+.admin-page #dashboardRecentOrders .dashboard-order-time {
+  display: block; color: var(--vx-muted); font-size: .72rem; line-height: 1.35;
+}
+.admin-page #dashboardRecentOrders .dashboard-list-meta {
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: 7px; min-width: 84px; text-align: right;
+}
+.admin-page #dashboardRecentOrders .dashboard-list-meta > strong {
+  font-size: .9rem; font-variant-numeric: tabular-nums;
+  color: var(--vx-ink); white-space: nowrap;
+}
+.admin-page #dashboardRecentOrders .order-status-badge {
+  max-width: 100%; text-align: center; white-space: nowrap;
+  font-size: .71rem;
+}
+/* Settings tabs: horizontal swipe works without the gray scrollbar. */
+.admin-page #shopSettingsSection .admin-toolbar:has([data-settings-tab]) {
+  flex-direction: row; align-items: center; flex-wrap: nowrap;
+  gap: 8px; overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch; padding: 2px 0 8px;
+}
+.admin-page #shopSettingsSection .admin-toolbar:has([data-settings-tab])::-webkit-scrollbar { display: none; }
+.admin-page #shopSettingsSection [data-settings-tab] {
+  flex: 0 0 auto; min-width: max-content;
+  border-radius: 12px; white-space: nowrap;
+}
+.admin-page #shopSettingsSection [data-settings-tab].active {
+  color: #fff; background: var(--vx-cherry);
+  border-color: var(--vx-cherry);
+}
+/* Hide cosmetic scrollbars, preserve scrolling and touch navigation. */
+html:has(body.admin-page), body.admin-page,
+.admin-page .admin-main-content, .admin-page .admin-sidebar,
+.admin-page .admin-sidebar-nav { scrollbar-width: none; -ms-overflow-style: none; }
+html:has(body.admin-page)::-webkit-scrollbar, body.admin-page::-webkit-scrollbar,
+.admin-page .admin-main-content::-webkit-scrollbar,
+.admin-page .admin-sidebar::-webkit-scrollbar,
+.admin-page .admin-sidebar-nav::-webkit-scrollbar { display: none; }
