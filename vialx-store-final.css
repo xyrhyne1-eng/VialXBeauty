@@ -2258,18 +2258,61 @@ body.storefront-page #menuDrawer #closeMenu { color: #fff !important; }
   body.storefront-page .product-grid .add-button { margin-top: 0 !important; }
 }
 
-/* Payment reference: match Cherry Noir checkout, never a white browser-default field. */
-body.storefront-page #paymentStepDialog #paymentReferenceInput {
-  display: block; width: 100%; min-width: 0; min-height: 46px;
-  padding: 11px 13px; border: 1px solid rgba(197,20,61,.5);
-  border-radius: 10px; background: #160b10 !important;
-  color: #fff5f7 !important; caret-color: #ff6886;
-  font: inherit; font-size: 16px; outline: none;
-  -webkit-text-fill-color: #fff5f7;
+
+/* VialXBeauty: scoped, mobile-first product variant dialog design.
+   CSS-only: all original IDs, events, prices, stock, and cart logic remain unchanged. */
+body.storefront-page #variantDialog.variant-dialog {
+  box-sizing: border-box; width: min(520px, calc(100vw - 24px)); max-width: calc(100vw - 24px);
+  max-height: min(90dvh, 850px); margin: auto; padding: 0; border: 0;
+  border-radius: 22px; background: transparent; color: #25141a; overflow: visible;
 }
-body.storefront-page #paymentStepDialog #paymentReferenceInput:focus {
-  border-color: #e72d56; box-shadow: 0 0 0 3px rgba(197,20,61,.2);
+body.storefront-page #variantDialog::backdrop { background: rgba(12,2,7,.78); backdrop-filter: blur(4px); }
+body.storefront-page #variantDialog .variant-dialog-card {
+  box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;
+  width: 100%; max-height: min(90dvh, 850px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 22px; border: 1px solid #f0d5dd; border-radius: 22px;
+  background: linear-gradient(180deg,#fff9fb,#fff0f4); box-shadow: 0 22px 70px rgba(0,0,0,.32);
+  scrollbar-width: none;
 }
-body.storefront-page #paymentStepDialog #paymentReferenceInput::placeholder {
-  color: #bca5ac; opacity: 1;
+body.storefront-page #variantDialog .variant-dialog-card::-webkit-scrollbar { display: none; }
+body.storefront-page #variantDialog .variant-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+body.storefront-page #variantDialog .eyebrow { margin: 0 0 5px; color: #b50f38; font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+body.storefront-page #variantDialog h2 { margin: 0; color: #310a17; font-size: clamp(22px,5.5vw,29px); font-weight: 800; line-height: 1.18; }
+body.storefront-page #variantDialog #closeVariantDialog { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; min-width: 38px; border: 1px solid #f1ccd5; border-radius: 12px; background: #fff; color: #8b0028; font-size: 24px; line-height: 1; }
+body.storefront-page #variantDialog .variant-dialog-product { display: grid; grid-template-columns: 86px minmax(0,1fr); align-items: center; gap: 14px; padding: 12px; border: 1px solid #f1d9df; border-radius: 16px; background: #fff; }
+body.storefront-page #variantDialog .variant-dialog-image-wrap { position: relative; width: 86px; height: 90px; min-height: 90px; overflow: hidden; border-radius: 12px; background: #fae6eb; }
+body.storefront-page #variantDialog .variant-dialog-image { width: 100%; height: 100%; object-fit: cover; }
+body.storefront-page #variantDialog .variant-dialog-image[hidden] { display: none !important; }
+body.storefront-page #variantDialog .variant-dialog-image-fallback { display: grid; place-items: center; width: 100%; height: 100%; color: #ad7d8a; font-size: 25px; }
+body.storefront-page #variantDialog .variant-dialog-image-fallback[hidden] { display: none !important; }
+body.storefront-page #variantDialog .variant-dialog-product h3 { margin: 0 0 6px; overflow-wrap: anywhere; color: #250b14; font-size: 16px; line-height: 1.3; }
+body.storefront-page #variantDialog .variant-dialog-product .tiny-note { margin: 0; color: #886773; font-size: 12px; line-height: 1.5; }
+body.storefront-page #variantDialog .variant-options-list { display: grid; gap: 10px; margin: 0; }
+body.storefront-page #variantDialog .variant-option-card { box-sizing: border-box; display: grid; grid-template-columns: 20px minmax(0,1fr) auto; align-items: center; gap: 12px; min-height: 76px; margin: 0; padding: 13px; border: 1px solid #edd3db; border-radius: 15px; background: #fff; color: #2a111a; cursor: pointer; }
+body.storefront-page #variantDialog .variant-option-card.selected, body.storefront-page #variantDialog .variant-option-card:has(input:checked) { border-color: #c2183a; background: #fff0f3; box-shadow: inset 0 0 0 1px #c2183a; }
+body.storefront-page #variantDialog .variant-option-card:focus-within { outline: 2px solid #c2183a; outline-offset: 2px; }
+body.storefront-page #variantDialog .variant-option-card.disabled { opacity: .55; cursor: not-allowed; }
+body.storefront-page #variantDialog .variant-option-card input[type=radio] { width: 18px; height: 18px; margin: 0; accent-color: #c2183a; }
+body.storefront-page #variantDialog .variant-option-main { display: grid; min-width: 0; gap: 5px; }
+body.storefront-page #variantDialog .variant-option-main > strong { overflow-wrap: anywhere; color: #251018; font-size: 14px; line-height: 1.3; }
+body.storefront-page #variantDialog .variant-option-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 10px; text-align: left; }
+body.storefront-page #variantDialog .variant-option-meta span { color: #a20e30; font-size: 14px; font-weight: 800; }
+body.storefront-page #variantDialog .variant-option-meta small { color: #826a73; font-size: 11px; }
+body.storefront-page #variantDialog .variant-option-badge { max-width: 100px; padding: 5px 8px; border-radius: 999px; background: #fce1e9; color: #a20e30; font-size: 10px; font-weight: 700; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+body.storefront-page #variantDialog .variant-selection-summary { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+body.storefront-page #variantDialog .variant-selection-summary > div { display: grid; gap: 6px; min-width: 0; padding: 13px; border: 1px solid #efd5dd; border-radius: 13px; background: #fff; }
+body.storefront-page #variantDialog .variant-selection-summary span { color: #84616e; font-size: 11px; }
+body.storefront-page #variantDialog .variant-selection-summary strong { color: #a20e30; font-size: 17px; overflow-wrap: anywhere; }
+body.storefront-page #variantDialog .variant-quantity-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0; padding: 2px 0; }
+body.storefront-page #variantDialog .variant-quantity-row > span { font-size: 13px; font-weight: 800; }
+body.storefront-page #variantDialog .variant-quantity-control { display: flex; align-items: center; gap: 0; border: 1px solid #edc9d3; border-radius: 12px; background: #fff; overflow: hidden; }
+body.storefront-page #variantDialog .variant-quantity-control button { display: grid; place-items: center; width: 40px; height: 40px; border: 0; background: #fff; color: #a20e30; font-size: 20px; }
+body.storefront-page #variantDialog .variant-quantity-control strong { min-width: 42px; text-align: center; font-size: 14px; }
+body.storefront-page #variantDialog #variantDialogError:empty { display: none; }
+body.storefront-page #variantDialog #confirmVariantButton { display: flex; justify-content: center; align-items: center; width: 100%; min-height: 48px; border: 0; border-radius: 13px; background: #be1239; color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+body.storefront-page #variantDialog #confirmVariantButton:disabled { opacity: .55; cursor: not-allowed; }
+@media(max-width:420px) {
+  body.storefront-page #variantDialog .variant-dialog-card { gap: 13px; padding: 16px; }
+  body.storefront-page #variantDialog .variant-option-card { grid-template-columns: 18px minmax(0,1fr); gap: 10px; padding: 12px; }
+  body.storefront-page #variantDialog .variant-option-badge { grid-column: 2; justify-self: start; max-width: 100%; }
 }
