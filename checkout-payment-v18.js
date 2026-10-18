@@ -1941,8 +1941,8 @@ function openPaymentStep() {
       ${qrUrl
         ? `<img class="payment-step-qr-image" src="${escapeHtml(qrUrl)}" alt="${escapeHtml(selectedPaymentMethod.payment_name || "Payment QR")}" loading="lazy" />`
         : payOnDeliveryOnly
-        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><span><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></span></div>`
-        : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><span><strong>No QR code available</strong><small>Follow the payment instructions below.</small></span></div>`}
+        ? `<div class="payment-step-qr-placeholder payment-cod-status"><span class="payment-status-icon" aria-hidden="true">♡</span><div class="payment-step-qr-copy"><strong>No payment needed now</strong><small>Pay when your courier delivers your order.</small></div></div>`
+        : `<div class="payment-step-qr-placeholder"><span class="payment-status-icon" aria-hidden="true">✦</span><div class="payment-step-qr-copy"><strong>No QR code available</strong><small>Follow the payment instructions below.</small></div></div>`}
     </div>
     <div class="payment-step-summary payment-step-order-summary">
       <div class="payment-step-method">
