@@ -2388,3 +2388,19 @@ body.storefront-page #paymentStepDialog .payment-step-method > strong {
 body.storefront-page #paymentStepDialog .payment-step-method > .tiny-note {
   color:#cbb9bf !important; font-size:.83rem !important;
 }
+/* Align the no-payment-needed message */
+.payment-no-payment-notice,
+.payment-cod-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+
+.payment-no-payment-notice > *,
+.payment-cod-notice > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
