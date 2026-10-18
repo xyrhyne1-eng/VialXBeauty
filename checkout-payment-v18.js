@@ -309,7 +309,7 @@ function applyShopSettings(settings) {
     brandName.innerHTML = escapeHtml(shopName).replace(
       /\sPH$/i,
       " <small>PH</small>"
-    ) + '<span class="brand-heart" aria-hidden="true">♥</span>';
+    );
   }
 
   if (menuBrandName) {
@@ -393,8 +393,14 @@ function applyShopSettings(settings) {
     }
   }
 if (heroImage) {
-  heroImage.src = settings.hero_image_url || "vialx-hero-logo.jpg";
-  heroImage.hidden = false;
+  const configuredHero = String(settings.hero_image_url || "").trim();
+  if (configuredHero) {
+    heroImage.src = configuredHero;
+    heroImage.hidden = false;
+  } else {
+    heroImage.removeAttribute("src");
+    heroImage.hidden = true;
+  }
 }
   if (facebookLink) {
     if (settings.facebook_url) {

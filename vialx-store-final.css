@@ -2214,3 +2214,46 @@ body.storefront-page #checkoutDialog .payment-option-card p {
   margin: 0;
   overflow-wrap: break-word;
 }
+
+/* Final mobile cleanup: preserve the admin-managed hero, hide its old bundled fallback. */
+body.storefront-page #heroImage[hidden] { display: none !important; }
+body.storefront-page .hero-logo-wrap:has(#heroImage[hidden]) { display: none !important; }
+
+/* The mobile drawer must use readable contrast even when older global styles load. */
+body.storefront-page #menuDrawer .menu-panel {
+  background: #14090e !important;
+  color: #fff6f8 !important;
+}
+body.storefront-page #menuDrawer .menu-brand-identity h2,
+body.storefront-page #menuDrawer #menuBrandName,
+body.storefront-page #menuDrawer .store-menu-items .store-menu-label {
+  color: #fff6f8 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: #fff6f8 !important;
+}
+body.storefront-page #menuDrawer #menuBrandTagline { color: #e7b8c4 !important; }
+body.storefront-page #menuDrawer .store-menu-heading { color: #ef9bb0 !important; }
+body.storefront-page #menuDrawer .store-menu-items a.store-menu-link {
+  color: #fff6f8 !important;
+  border-bottom-color: rgba(255,255,255,.13) !important;
+}
+body.storefront-page #menuDrawer #closeMenu { color: #fff !important; }
+
+/* Match stock and action rows across two-column mobile product cards.
+   Only alignment is changed: displayed stock quantities still come from Supabase. */
+@media (max-width: 760px) {
+  body.storefront-page .product-grid .product-card { display: flex !important; flex-direction: column !important; }
+  body.storefront-page .product-grid .product-body { display: flex !important; flex: 1 1 auto !important; flex-direction: column !important; }
+  body.storefront-page .product-grid .product-body h3 {
+    min-height: 3.6em !important;
+    line-height: 1.2 !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+  body.storefront-page .product-grid .price-row { min-height: 1.7em; }
+  body.storefront-page .product-grid .product-stats { margin-top: auto !important; margin-bottom: 10px !important; }
+  body.storefront-page .product-grid .add-button { margin-top: 0 !important; }
+}
