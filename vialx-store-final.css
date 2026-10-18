@@ -2162,3 +2162,55 @@ body.storefront-page #paymentStepDialog .payment-step-preview-image {
   max-height: 55dvh;
   object-fit: contain;
 }
+
+/* Checkout polish: courier selection, address dropdowns, payment cards. */
+body.storefront-page #checkoutDialog .address-combobox-toggle { display: none !important; }
+body.storefront-page #checkoutDialog .address-combobox-option > span[aria-hidden="true"] { display: none !important; }
+body.storefront-page #checkoutDialog .address-combobox-option strong { display: block; }
+body.storefront-page #checkoutDialog .shipping-fee-check .cart-thumb-fallback,
+body.storefront-page #checkoutDialog .shipping-fee-check .mini-vial { display: none !important; }
+body.storefront-page #checkoutDialog .shipping-fee-check { overflow: hidden; }
+body.storefront-page #checkoutDialog .payment-option-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  min-width: 0;
+}
+body.storefront-page #checkoutDialog .payment-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+body.storefront-page #checkoutDialog .payment-option-header strong {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  font-size: .95rem;
+}
+body.storefront-page #checkoutDialog .payment-option-header .payment-option-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  max-width: 48%;
+  min-width: 0;
+  margin: 0;
+  padding: 5px 8px;
+  white-space: nowrap;
+  font-size: .68rem;
+}
+body.storefront-page #checkoutDialog .payment-option-card p {
+  display: block;
+  width: 100%;
+  margin: 0;
+  overflow-wrap: break-word;
+}

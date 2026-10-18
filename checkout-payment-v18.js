@@ -1255,7 +1255,7 @@ function renderShippingMethods() {
   shippingMethodOptions.innerHTML = shippingMethods.map((method) => {
     const selected = String(selectedShippingMethod?.id) === String(method.id);
     return `<button class="shipping-method-option${selected ? " selected" : ""}" type="button" data-shipping-method="${method.id}" aria-pressed="${selected}">
-      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+      <span class="shipping-fee-check" aria-hidden="true">${selected ? "✓" : ""}</span>
       <span class="shipping-method-copy"><strong>${escapeHtml(method.name)}</strong><small>${escapeHtml(method.description || (method.method_type === "external" ? "Marketplace shipping checkout" : "Courier delivery"))}</small></span>
       <span class="shipping-method-arrow" aria-hidden="true">›</span>
     </button>`;
@@ -1294,7 +1294,7 @@ function renderShippingFees() {
           data-shipping-select="${fee.id}"
           aria-pressed="${isSelected ? "true" : "false"}"
         >
-          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`}</span>
+          <span class="shipping-fee-check" aria-hidden="true">${isSelected ? "✓" : ""}</span>
           <span class="shipping-fee-label">${escapeHtml(fee.label || "Delivery area")}</span>
           <strong>${formatCurrency(fee.amount || 0)}</strong>
         </button>
@@ -1421,7 +1421,7 @@ const itemPrice =
       alt="${escapeHtml(product.name)}"
     />
   `
-  : `<span class="cart-thumb-fallback"><i class="mini-vial"></i></span>`
+  : ""
             }
           </div>
 
