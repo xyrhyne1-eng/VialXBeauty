@@ -153,6 +153,7 @@ let selectedVariantQuantity = 1;
 let variantSourceButton = null;
 let cart = loadSavedCart();
 let paymentMethods = [];
+let paymentMethodsLoadPromise = null;
 let paymentMethodShippingLinks = [];
 let paymentMethodShippingLinksError = null;
 let selectedPaymentMethod = null;
@@ -1576,6 +1577,8 @@ checkoutButton.addEventListener("click", () => {
   closeCartDrawer();
   updateCheckoutTotal();
   checkoutDialog.showModal();
+  // Refresh payment options whenever checkout opens, not only on page startup.
+  void loadPaymentMethods();
 });
 
 if (closeCheckout) {
@@ -1603,47 +1606,52 @@ function createOrderReference() {
 }
 
 async function loadPaymentMethods() {
-  if (!paymentMethodsList) {
-    return;
+  // Share an in-flight request so checkout and storefront startup cannot race.
+  if (paymentMethodsLoadPromise) return paymentMethodsLoadPromise;
+  paymentMethodsLoadPromise = fetchPaymentMethods();
+  try {
+    await paymentMethodsLoadPromise;
+  } finally {
+    paymentMethodsLoadPromise = null;
+  }
+}
+
+async function fetchPaymentMethods() {
+  if (!paymentMethodsList) return;
+  if (!paymentMethods.length) {
+    paymentMethodsList.innerHTML = `<p class="empty">Loading payment methods…</p>`;
   }
 
-  paymentMethodsList.innerHTML = `<p class="empty">Loading payment methods…</p>`;
+  try {
+    const [{ data, error }, linksResult] = await Promise.all([
+      supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
+      supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
+    ]);
 
-  const [{ data, error }, linksResult] = await Promise.all([
-    supabaseClient.from("payment_methods").select("*").eq("is_visible", true).order("sort_order", { ascending: true }),
-    supabaseClient.from("payment_method_shipping_methods").select("payment_method_id,shipping_method_id")
-  ]);
+    if (error) throw error;
+    if (linksResult.error) throw linksResult.error;
 
-  if (error) {
-    paymentMethods = [];
-    selectedPaymentMethod = null;
-    if (selectedPaymentInput) {
-      selectedPaymentInput.value = "";
-    }
-    paymentMethodsList.innerHTML = `
-      <div class="payment-step-summary">
-        <strong>Payment methods unavailable</strong>
-        <p class="tiny-note">We could not load payment options right now. Please try again shortly.</p>
-      </div>
-    `;
-    updateProceedPaymentAvailability();
-    return;
-  }
-
-  paymentMethods = data || [];
-  if (linksResult.error) {
-    paymentMethodShippingLinks = [];
-    paymentMethodShippingLinksError = linksResult.error;
-    console.error("Could not load payment method shipping assignments:", linksResult.error.message);
-  } else {
+    const previousSelectionId = selectedPaymentMethod?.id;
+    paymentMethods = data || [];
     paymentMethodShippingLinks = linksResult.data || [];
     paymentMethodShippingLinksError = null;
+    selectedPaymentMethod = availablePaymentMethods().find(
+      (method) => String(method.id) === String(previousSelectionId)
+    ) || null;
+    if (selectedPaymentInput) {
+      selectedPaymentInput.value = selectedPaymentMethod?.payment_name || "";
+    }
+    renderPaymentMethods();
+  } catch (error) {
+    console.error("Could not refresh payment methods:", error);
+    // Do not erase a previously loaded valid selection because a refresh failed.
+    if (!paymentMethods.length || !paymentMethodShippingLinks.length) {
+      paymentMethodsList.innerHTML = `<div class="payment-step-summary"><strong>Payment methods unavailable</strong><p class="tiny-note">Could not load payment options. Close and reopen checkout to retry.</p></div>`;
+      updateProceedPaymentAvailability();
+    } else {
+      renderPaymentMethods();
+    }
   }
-  selectedPaymentMethod = null;
-  if (selectedPaymentInput) {
-    selectedPaymentInput.value = "";
-  }
-  renderPaymentMethods();
 }
 
 function availablePaymentMethods() {

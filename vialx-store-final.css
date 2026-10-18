@@ -2145,3 +2145,20 @@ body.storefront-page #menuDrawer .store-menu-arrow {
 		max-width: calc(100vw - 20px);
 	}
 }
+
+/* Keep uploaded receipt previews fully visible on narrow screens. */
+body.storefront-page #paymentStepDialog .payment-step-preview-box {
+  max-height: none;
+  overflow: visible;
+}
+body.storefront-page #paymentStepDialog .payment-step-preview-link {
+  max-height: none;
+  overflow: visible;
+}
+body.storefront-page #paymentStepDialog .payment-step-preview-image {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 55dvh;
+  object-fit: contain;
+}
