@@ -2316,3 +2316,75 @@ body.storefront-page #variantDialog #confirmVariantButton:disabled { opacity: .5
   body.storefront-page #variantDialog .variant-option-card { grid-template-columns: 18px minmax(0,1fr); gap: 10px; padding: 12px; }
   body.storefront-page #variantDialog .variant-option-badge { grid-column: 2; justify-self: start; max-width: 100%; }
 }
+
+
+/* 2026-10-18: Checkout payment details layout and reference input repair.
+   Scope to this dialog only; no data or checkout behavior changes. */
+body.storefront-page #paymentStepDialog #paymentReferenceInput {
+  display:block !important; box-sizing:border-box !important; width:100% !important;
+  min-height:46px !important; padding:11px 13px !important;
+  border:1px solid #913149 !important; border-radius:10px !important;
+  background:#1a1014 !important; background-image:none !important;
+  color:#fff7f8 !important; -webkit-text-fill-color:#fff7f8 !important;
+  font:inherit !important; font-size:16px !important; line-height:1.35 !important;
+  box-shadow:none !important; appearance:none; -webkit-appearance:none;
+}
+body.storefront-page #paymentStepDialog #paymentReferenceInput:focus {
+  outline:2px solid #dc4164 !important; outline-offset:2px; border-color:#dc4164 !important;
+}
+body.storefront-page #paymentStepDialog #paymentReferenceInput::placeholder {color:#bda4ac !important;opacity:1;}
+body.storefront-page #paymentStepDialog #paymentReferenceInput:-webkit-autofill {
+  -webkit-box-shadow:0 0 0 1000px #1a1014 inset !important;
+  -webkit-text-fill-color:#fff7f8 !important;
+}
+/* The older stylesheet lays out the placeholder using flex, but another
+   inherited rule makes its text block grid contents overlap on narrow phones. */
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr {
+  display:block !important; height:auto !important; min-height:0 !important;
+  padding:12px !important; overflow:visible !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder {
+  box-sizing:border-box; display:grid !important; grid-template-columns:34px minmax(0,1fr) !important;
+  align-items:start !important; justify-content:start !important; gap:11px !important;
+  width:100% !important; min-width:0 !important; margin:0 !important; padding:2px !important;
+  text-align:left !important; white-space:normal !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-status-icon {
+  box-sizing:border-box; display:grid !important; place-items:center !important;
+  width:34px !important; height:34px !important; min-width:34px !important;
+  margin:0 !important; grid-column:1;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder > span:last-child {
+  display:flex !important; flex-direction:column !important; align-items:flex-start !important;
+  gap:5px !important; grid-column:2; min-width:0 !important; max-width:100%;
+  margin:0 !important; padding:0 !important; white-space:normal !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder strong,
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder small {
+  display:block !important; position:static !important; width:auto !important; max-width:100%;
+  margin:0 !important; padding:0 !important; overflow-wrap:anywhere; white-space:normal !important;
+  line-height:1.45 !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder strong {
+  font-size:.95rem !important; font-weight:800 !important; color:#fff7f8 !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-qr.no-qr .payment-step-qr-placeholder small {
+  font-size:.82rem !important; color:#cbb9bf !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-method {
+  display:flex !important; flex-direction:column !important; align-items:flex-start !important;
+  gap:6px !important; min-width:0 !important; padding:0 0 14px !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-method > span,
+body.storefront-page #paymentStepDialog .payment-step-method > strong,
+body.storefront-page #paymentStepDialog .payment-step-method > .tiny-note {
+  display:block !important; position:static !important; min-width:0; max-width:100%;
+  margin:0 !important; padding:0 !important; line-height:1.45 !important;
+  overflow-wrap:anywhere; white-space:normal !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-method > strong {
+  font-size:1.1rem !important; font-family:inherit !important; color:#fff7f8 !important;
+}
+body.storefront-page #paymentStepDialog .payment-step-method > .tiny-note {
+  color:#cbb9bf !important; font-size:.83rem !important;
+}
